@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans text-slate-800 bg-slate-50;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5 {
+    @apply font-display tracking-tight;
+  }
+
+  /* A11y: focus visible amélioré */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-white rounded;
+  }
+
+  /* Skip link */
+  .skip-link {
+    @apply absolute left-2 top-2 -translate-y-20 focus:translate-y-0 bg-brand-700 text-white px-4 py-2 rounded-md z-50 transition-transform;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed select-none;
+  }
+  .btn-primary {
+    @apply btn bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 shadow-soft hover:shadow-elevated;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-brand-700 border border-brand-200 hover:bg-brand-50;
+  }
+  .btn-ghost {
+    @apply btn text-slate-700 hover:bg-slate-100;
+  }
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700;
+  }
+  .btn-lg {
+    @apply px-7 py-3.5 text-base;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-soft border border-slate-100;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm shadow-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-100 transition;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-slate-700 mb-1.5;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+  .badge-success { @apply badge bg-emerald-100 text-emerald-800; }
+  .badge-warning { @apply badge bg-amber-100 text-amber-800; }
+  .badge-danger  { @apply badge bg-red-100 text-red-800; }
+  .badge-info    { @apply badge bg-brand-100 text-brand-800; }
+  .badge-muted   { @apply badge bg-slate-100 text-slate-700; }
+
+  .container-app {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+  }
+}
+
+/* Animation simple pulse pour bandeaux */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, #f1f5f9 0px, #e2e8f0 200px, #f1f5f9 400px);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s linear infinite;
+}

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /staff
+Disallow: /compte
+
+Sitemap: https://baignade.rivesdaparis.fr/sitemap.xml

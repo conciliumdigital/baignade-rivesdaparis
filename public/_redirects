@@ -1,0 +1,3 @@
+# SPA fallback pour Cloudflare Pages / Netlify
+# Toute route inconnue retombe sur index.html pour que React Router prenne la main
+/*  /index.html  200

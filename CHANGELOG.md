@@ -4,6 +4,24 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.0.2] — 2026-05-11
+
+### 🚀 Mise en ligne sur Cloudflare Pages
+
+- Déployé sur https://baignade-rivesdaparis.thomas-kolbe.workers.dev (Cloudflare Workers Assets)
+- Upgrade **Vite 5 → 6** (pré-requis Cloudflare Pages wrangler v4)
+- Suppression de `public/_redirects` (conflit avec `not_found_handling: single-page-application` de `wrangler.json`)
+- `.gitignore` étendu : `supabase/.temp/`, `.wrangler/`, `wrangler.jsonc`
+- **HANDOFF.md** ajouté : doc complète de reprise du projet pour changement de machine ou de collaborateur
+- Secrets Supabase configurés : `APP_URL`, `FROM_NAME`, `FROM_EMAIL`, `BREVO_API_KEY`
+- 4 Edge Functions déployées en production sur le projet `nunglkeqekxzpmushxty` (Frankfurt)
+
+### ⏳ Reste à faire avant ouverture publique
+- DNS : pointer `baignade.rivesdaparis.fr` vers Cloudflare (CNAME)
+- Vérification domaine Brevo (3 enregistrements TXT)
+- Création compte Stripe par la commune + injection des clés `STRIPE_*`
+- Génération du planning saisonnier des créneaux (juillet-août 2026)
+
 ## [1.0.1] — 2026-05-11
 
 ### Adaptation hébergement budget zéro

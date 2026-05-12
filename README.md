@@ -1,113 +1,140 @@
-# Baignade Rives d'Paris
+# 🏊‍♀️ Baignade Rives d'Paris
 
-Application web de réservation pour la zone de baignade estivale de Neuilly-sur-Marne.
+Application web de réservation pour la zone de baignade estivale de la **Commune de Neuilly-sur-Marne**.
 
-**Stack** : Vite · React 18 · TypeScript · Tailwind · React Router · Supabase (Postgres + Auth Magic Link + Edge Functions) · Stripe · QR code.
+**Stack** : Vite 6 · React 18 · TypeScript · Tailwind · Supabase (Postgres + Auth Magic Link + Edge Functions Deno) · Stripe Checkout · Brevo · Cloudflare Pages.
 
-## Démarrage rapide
+🌐 **Site en ligne** : https://baignade-rivesdaparis.thomas-kolbe.workers.dev
+🎯 **Site cible** : https://baignade.rivesdaparis.fr *(DNS à activer)*
+
+---
+
+## 📖 Documentation
+
+| Fichier | Quand le lire |
+|---|---|
+| **[HANDOFF.md](HANDOFF.md)** | **À LIRE EN PRIORITÉ.** État du projet, comptes, credentials, comment reprendre depuis une nouvelle machine, tâches restantes |
+| **[DEPLOY.md](DEPLOY.md)** | Runbook complet de déploiement (Supabase, Brevo, Stripe, Cloudflare) |
+| **[CHANGELOG.md](CHANGELOG.md)** | Historique des versions |
+
+---
+
+## 🚀 Démarrage rapide
 
 ```bash
+git clone https://github.com/conciliumdigital/baignade-rivesdaparis.git
+cd baignade-rivesdaparis
 npm install
-cp .env.example .env.local   # à renseigner avec vos clés Supabase + Stripe
+
+# Créer .env.local avec les clés (voir HANDOFF.md section 3.2)
+cp .env.example .env.local
+# Compléter avec :
+#   VITE_SUPABASE_URL=https://nunglkeqekxzpmushxty.supabase.co
+#   VITE_SUPABASE_ANON_KEY=sb_publishable_XHasVadnhVZMoispGMq3aA_GdZEs8xy
+#   VITE_APP_URL=http://localhost:5173
+
 npm run dev
+# → http://localhost:5173
 ```
 
-L'app démarre sur `http://localhost:5173`. **Mode démo** sans `.env.local` : créneaux fictifs, pas de paiement réel, pas de persistance.
+Sans `.env.local`, l'app tourne en **mode démo** (créneaux fictifs, pas de persistance) — utile pour démos UI offline.
 
-## Structure
+---
+
+## 📁 Structure
 
 ```
 src/
-├── components/        # UI réutilisable (Header, Footer, CookieBanner, RequireAuth)
+├── components/        # Header, Footer, CookieBanner, RequireAuth
 ├── layouts/           # PublicLayout, AdminLayout
-├── pages/             # Pages publiques + admin/* + staff/*
-├── lib/               # supabase.ts, auth.tsx, format.ts, slots.ts, demoData.ts
+├── pages/             # Pages publiques + admin/ + staff/
+├── lib/               # supabase.ts, auth.tsx, format.ts, slots.ts
 ├── types/             # Types alignés avec le schéma Postgres
-└── version.ts         # Version affichée dans le footer
+└── version.ts         # APP_VERSION (bumpée à chaque push prod)
 
 supabase/
-├── migrations/        # Schéma SQL (tables, RLS, triggers)
-└── functions/         # Edge functions Deno (Stripe checkout, webhook, scan QR, email)
+├── migrations/        # Schéma SQL versionné
+└── functions/         # 4 Edge Functions Deno (Stripe, scan QR, email)
 
-public/                # robots.txt, sitemap.xml, favicon.svg
+public/                # robots.txt, sitemap.xml, _headers, favicon.svg
 ```
 
-## Fonctionnalités V1 livrées
+---
+
+## ✅ Fonctionnalités livrées
 
 ### Public
-- Landing SEO (Open Graph, Twitter Cards, sitemap)
-- Calendrier dynamique des créneaux (affichage temps réel, places restantes, créneaux fermés)
-- Tunnel de réservation (1-6 personnes, adultes/enfants, RGPD)
-- Authentification Magic Link (sans mot de passe)
-- Stripe Checkout (CB / Apple Pay / Google Pay)
-- Confirmation + QR code généré + envoi email
-- Infos pratiques, CGU, Confidentialité, Mentions légales, Accessibilité
+- Landing SEO (Open Graph, sitemap, robots)
+- Calendrier des créneaux temps réel
+- Réservation 1-6 personnes (adultes/enfants)
+- Authentification **Magic Link** (Supabase Auth)
+- **Paiement Stripe Checkout** (CB / Apple Pay / Google Pay) ⏳ *à brancher quand client prêt*
+- Confirmation + **QR code** + email transactionnel (Brevo)
+- Pages légales : CGU, Confidentialité, Mentions légales, Accessibilité
+- Bandeau cookies RGPD
 
 ### Espace utilisateur
-- Mes réservations + statut
-- Détail + QR code téléchargeable
-- Annulation (J-1)
+- Mes réservations + QR téléchargeable
+- Annulation (jusqu'à J-1)
 - Profil + préférences notifications
-- Suppression compte (RGPD droit à l'oubli)
+- **Suppression compte RGPD** (droit à l'oubli)
 
-### Back-office admin
-- Tableau de bord (réservations, recettes, taux de remplissage, NPS)
-- Gestion des créneaux (CRUD + génération en masse + ouverture/fermeture rapide)
-- Liste des réservations (recherche, filtres, export CSV)
-- Communication (templates, segments, envoi test)
-- Satisfaction (avis, NPS)
-- Gestion des comptes staff
-- Paramètres
+### Back-office admin (7 écrans)
+Tableau de bord · Créneaux (CRUD + génération en masse) · Réservations (filtres + export CSV) · Communication (templates + segments) · Satisfaction (NPS) · Équipe · Paramètres
 
-### Staff
-- Scanner QR mobile-first (caméra)
-- Validation visuelle vert/rouge < 1s + bip sonore
-- Anti-réutilisation
-- Historique des scans
+### Staff mobile-first
+Scanner QR caméra · Validation visuelle vert/orange/rouge < 1s · Bip sonore · Anti-réutilisation · Historique scans
 
-## Edge Functions Supabase
+### Backend
+9 tables · 1 view · RLS active partout · 4 Edge Functions Deno · Triggers anti-overbooking, auto-profile, updated_at
 
-| Fonction | Rôle |
-|---|---|
-| `create-checkout-session` | Crée une session Stripe Checkout pour une réservation |
-| `stripe-webhook` | Réceptionne les événements Stripe, génère le QR token, déclenche l'email |
-| `send-confirmation-email` | Envoie le mail transactionnel (Resend) avec QR code en pièce jointe |
-| `scan-qr` | Vérifie un QR + marque la réservation comme utilisée + journalise |
+---
 
-## Déploiement
+## 🔒 Sécurité & RGPD
 
-```bash
-npm run build
-# déployer dist/ sur Vercel / Netlify / Scaleway / OVH
-# déployer les edge functions : supabase functions deploy <nom>
-# appliquer le schéma : supabase db push
-```
-
-## RGPD
-
-- Hébergement Supabase région UE
+- Hébergement données **UE (Frankfurt)** — Supabase
+- Hébergement emails **France (Paris)** — Brevo
+- Hébergement front **CDN mondial avec PoPs européens** — Cloudflare
 - Cookies strictement nécessaires (banner)
 - Pas de tracking tiers
-- Droit à l'oubli en un clic depuis le profil
-- Données de réservation : conservation 13 mois
+- Droit à l'oubli en 1 clic
+- Headers sécurité : HSTS, X-Frame-Options, Permissions-Policy
+- RLS (Row Level Security) Supabase
 
-## Accessibilité
+---
 
-- Skip-link, focus-visible, ARIA labels
-- Cible RGAA 4.1 niveau AA (audit complet à finaliser)
-- Mobile-first
+## 🛠 Workflow de mise à jour
 
-## Variables d'environnement
+Voir **[HANDOFF.md section 6](HANDOFF.md#6-workflow-de-développement)** pour le détail.
 
-Front (`.env.local`) :
-- `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
-- `VITE_STRIPE_PUBLISHABLE_KEY`
-- `VITE_APP_URL`
+```bash
+# 1. Travailler localement
+npm run dev
+npm run build  # vérifier que le build passe
 
-Edge Functions (Supabase secrets) :
-- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
-- `RESEND_API_KEY`
-- `APP_URL`
+# 2. Bumper version (à chaque push prod)
+# - src/version.ts → APP_VERSION
+# - package.json → "version"
+# - CHANGELOG.md → nouvelle entrée
+
+# 3. Commit + push
+git add . && git commit -m "feat: …" && git push origin main
+# → Cloudflare Pages auto-redéploie en ~2 min
+```
+
+---
+
+## 💰 Coût
+
+**0 €/mois** en plan free (Cloudflare Pages + Supabase Free + Brevo Free). Coût variable : commission Stripe ~1,4 % + 0,25 € par réservation.
+
+---
+
+## 📞 Support
+
+- **Prestataire** : CONCILIUM (Thomas Kolbe)
+- **Repo** : https://github.com/conciliumdigital/baignade-rivesdaparis
+- **Issues** : https://github.com/conciliumdigital/baignade-rivesdaparis/issues
 
 ---
 

@@ -1,12 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Calendar, Clock, MapPin, Users, CreditCard, ShieldCheck, Loader2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MapPin, Users, CreditCard, ShieldCheck, Loader2, Upload, FileCheck2, X } from 'lucide-react';
 import { fetchSlotById } from '../lib/slots';
 import { formatDate, formatPrice, formatTimeRange } from '../lib/format';
 import { useAuth } from '../lib/auth';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
-import type { SlotAvailability } from '../types/database';
+import type { SlotAvailability, UsagerType } from '../types/database';
+
+const PROOF_MIME = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+const PROOF_MAX_BYTES = 5 * 1024 * 1024;
 
 export function ReservationDetailPage() {
   const { slotId } = useParams<{ slotId: string }>();
@@ -27,6 +30,11 @@ export function ReservationDetailPage() {
   const [phone, setPhone] = useState(profile?.phone ?? '');
   const [acceptCgu, setAcceptCgu] = useState(false);
 
+  const [usagerType, setUsagerType] = useState<UsagerType>('exterieur');
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [honorCert, setHonorCert] = useState(false);
+  const proofInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (!slotId) return;
     setLoading(true);
@@ -43,15 +51,57 @@ export function ReservationDetailPage() {
     setPhone(profile?.phone ?? '');
   }, [profile, user]);
 
-  const totalCents = useMemo(() => {
+  const isResident = usagerType === 'habitant';
+  const hasResidentPrice = slot?.price_resident_cents != null && slot.price_resident_cents > 0;
+
+  const adultPriceCents = useMemo(() => {
     if (!slot) return 0;
-    const adultPrice = slot.price_cents;
-    const childPrice = Math.round(slot.price_cents * 0.5);
-    return adults * adultPrice + children * childPrice;
-  }, [slot, adults, children]);
+    return isResident && hasResidentPrice ? (slot.price_resident_cents as number) : slot.price_cents;
+  }, [slot, isResident, hasResidentPrice]);
+
+  const childPriceCents = useMemo(() => Math.round(adultPriceCents * 0.5), [adultPriceCents]);
+
+  const totalCents = useMemo(() => {
+    return adults * adultPriceCents + children * childPriceCents;
+  }, [adults, children, adultPriceCents, childPriceCents]);
 
   const totalPersons = adults + children;
   const insufficient = slot && totalPersons > slot.remaining;
+
+  function onProofChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0] ?? null;
+    if (!f) {
+      setProofFile(null);
+      return;
+    }
+    if (!PROOF_MIME.includes(f.type)) {
+      toast.error('Format accepté : JPG, PNG, WEBP ou PDF.');
+      e.target.value = '';
+      return;
+    }
+    if (f.size > PROOF_MAX_BYTES) {
+      toast.error('Le fichier doit faire moins de 5 Mo.');
+      e.target.value = '';
+      return;
+    }
+    setProofFile(f);
+  }
+
+  function removeProof() {
+    setProofFile(null);
+    if (proofInputRef.current) proofInputRef.current.value = '';
+  }
+
+  async function uploadProof(userId: string, reservationId: string): Promise<string | null> {
+    if (!proofFile) return null;
+    const ext = proofFile.name.split('.').pop()?.toLowerCase() ?? 'bin';
+    const path = `${userId}/${reservationId}.${ext}`;
+    const { error: upErr } = await supabase.storage
+      .from('resident-proofs')
+      .upload(path, proofFile, { upsert: true, contentType: proofFile.type });
+    if (upErr) throw upErr;
+    return path;
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -68,6 +118,16 @@ export function ReservationDetailPage() {
       toast.error('Vous pouvez réserver entre 1 et 6 personnes par réservation.');
       return;
     }
+    if (isResident) {
+      if (!proofFile && isSupabaseConfigured) {
+        toast.error('Veuillez joindre un justificatif de domicile pour bénéficier du tarif habitant.');
+        return;
+      }
+      if (!honorCert) {
+        toast.error('Veuillez certifier sur l\'honneur votre domiciliation à Neuilly-sur-Marne.');
+        return;
+      }
+    }
 
     setSubmitting(true);
     try {
@@ -78,7 +138,7 @@ export function ReservationDetailPage() {
           navigate('/reserver/confirmation/demo');
           return;
         }
-        const redirectUrl = `${window.location.origin}/reserver/${slot.id}/finaliser?adults=${adults}&children=${children}`;
+        const redirectUrl = `${window.location.origin}/reserver/${slot.id}?adults=${adults}&children=${children}`;
         const { error } = await supabase.auth.signInWithOtp({
           email,
           options: { emailRedirectTo: redirectUrl, data: { first_name: firstName, last_name: lastName } },
@@ -99,11 +159,28 @@ export function ReservationDetailPage() {
           nb_children: children,
           total_amount_cents: totalCents,
           status: 'pending_payment',
+          usager_type: usagerType,
+          honor_certification: isResident ? honorCert : false,
         })
         .select()
         .single();
 
       if (insertError) throw insertError;
+
+      // 2b. Upload du justificatif si habitant
+      if (isResident && proofFile) {
+        try {
+          const proofPath = await uploadProof(user.id, reservation.id);
+          if (proofPath) {
+            await supabase
+              .from('reservations')
+              .update({ resident_proof_url: proofPath })
+              .eq('id', reservation.id);
+          }
+        } catch (upErr: any) {
+          toast.error(`Justificatif : ${upErr.message ?? 'échec de l\'envoi'}`);
+        }
+      }
 
       // 3. Appel Edge Function pour créer la session Stripe
       const { data: checkoutData, error: fnError } = await supabase.functions.invoke('create-checkout-session', {
@@ -158,13 +235,13 @@ export function ReservationDetailPage() {
             </ul>
             <div className="space-y-1.5 text-sm">
               <div className="flex justify-between">
-                <span>Adultes × {adults}</span>
-                <span>{formatPrice(adults * slot.price_cents)}</span>
+                <span>Adultes × {adults} {isResident && <span className="text-xs text-emerald-700 font-medium">(habitant)</span>}</span>
+                <span>{formatPrice(adults * adultPriceCents)}</span>
               </div>
               {children > 0 && (
                 <div className="flex justify-between text-slate-600">
                   <span>Enfants × {children} (-50%)</span>
-                  <span>{formatPrice(children * Math.round(slot.price_cents * 0.5))}</span>
+                  <span>{formatPrice(children * childPriceCents)}</span>
                 </div>
               )}
             </div>
@@ -180,6 +257,86 @@ export function ReservationDetailPage() {
 
         {/* Formulaire */}
         <form onSubmit={handleSubmit} className="lg:col-span-2 lg:order-1 space-y-6">
+          <section className="card p-6">
+            <h2 className="font-display font-bold text-lg mb-1">Type de tarif</h2>
+            <p className="text-sm text-slate-500 mb-4">
+              Les habitant·e·s de Neuilly-sur-Marne bénéficient d'un tarif réduit sur présentation d'un justificatif de domicile.
+            </p>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <TarifCard
+                selected={usagerType === 'exterieur'}
+                onSelect={() => setUsagerType('exterieur')}
+                title="Tarif normal"
+                subtitle="Hors Neuilly-sur-Marne"
+                price={formatPrice(slot.price_cents)}
+              />
+              <TarifCard
+                selected={isResident}
+                onSelect={() => setUsagerType('habitant')}
+                title="Tarif habitant"
+                subtitle="Neuilly-sur-Marne"
+                price={hasResidentPrice ? formatPrice(slot.price_resident_cents as number) : formatPrice(slot.price_cents)}
+                disabled={!hasResidentPrice}
+                disabledReason="Tarif réduit non disponible pour ce créneau"
+              />
+            </div>
+
+            {isResident && (
+              <div className="mt-5 space-y-4 border-t border-slate-100 pt-5">
+                <div>
+                  <label htmlFor="proof" className="label">
+                    Justificatif de domicile <span className="text-red-600">*</span>
+                  </label>
+                  <p className="text-xs text-slate-500 mb-2">
+                    Facture (eau, électricité, internet) de moins de 3 mois, avis d'imposition ou quittance de loyer. JPG, PNG, WEBP ou PDF — max 5 Mo.
+                  </p>
+                  {proofFile ? (
+                    <div className="flex items-center justify-between gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-sm">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <FileCheck2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                        <span className="truncate">{proofFile.name}</span>
+                        <span className="text-xs text-slate-500 flex-shrink-0">({(proofFile.size / 1024).toFixed(0)} Ko)</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={removeProof}
+                        className="text-slate-500 hover:text-red-600 flex-shrink-0"
+                        aria-label="Retirer le fichier"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-200 hover:border-brand-300 hover:bg-brand-50/30 px-4 py-6 cursor-pointer text-sm text-slate-600">
+                      <Upload className="w-5 h-5 text-brand-600" />
+                      <span>Choisir un fichier</span>
+                      <input
+                        ref={proofInputRef}
+                        id="proof"
+                        type="file"
+                        accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf"
+                        className="hidden"
+                        onChange={onProofChange}
+                      />
+                    </label>
+                  )}
+                </div>
+
+                <label className="flex items-start gap-3 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={honorCert}
+                    onChange={(e) => setHonorCert(e.target.checked)}
+                    className="mt-1"
+                  />
+                  <span>
+                    Je certifie sur l'honneur être domicilié·e à Neuilly-sur-Marne et reconnais que toute déclaration mensongère peut entraîner l'annulation de la réservation sans remboursement, conformément à l'article 441-1 du Code pénal.
+                  </span>
+                </label>
+              </div>
+            )}
+          </section>
+
           <section className="card p-6">
             <h2 className="font-display font-bold text-lg mb-4">Composition du groupe</h2>
             <div className="grid grid-cols-2 gap-4">
@@ -208,6 +365,11 @@ export function ReservationDetailPage() {
             {insufficient && (
               <p className="text-sm text-red-600 mt-3">
                 Il ne reste que {slot.remaining} place(s) sur ce créneau.
+              </p>
+            )}
+            {isResident && totalPersons > 1 && (
+              <p className="text-xs text-slate-500 mt-3">
+                Le tarif habitant s'applique à toutes les personnes de la réservation (un seul justificatif au nom du réservant suffit).
               </p>
             )}
           </section>
@@ -261,5 +423,48 @@ export function ReservationDetailPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+function TarifCard({
+  selected,
+  onSelect,
+  title,
+  subtitle,
+  price,
+  disabled,
+  disabledReason,
+}: {
+  selected: boolean;
+  onSelect: () => void;
+  title: string;
+  subtitle: string;
+  price: string;
+  disabled?: boolean;
+  disabledReason?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={disabled ? undefined : onSelect}
+      disabled={disabled}
+      aria-pressed={selected}
+      className={`text-left rounded-2xl border-2 px-4 py-3 transition ${
+        disabled
+          ? 'border-slate-100 bg-slate-50 text-slate-400 cursor-not-allowed'
+          : selected
+            ? 'border-brand-500 bg-brand-50 ring-2 ring-brand-100'
+            : 'border-slate-200 bg-white hover:border-brand-300'
+      }`}
+    >
+      <div className="flex items-baseline justify-between gap-2">
+        <div className="font-semibold">{title}</div>
+        <div className={`font-display font-bold ${selected ? 'text-brand-700' : ''}`}>{price}</div>
+      </div>
+      <div className="text-xs text-slate-500 mt-0.5">{subtitle}</div>
+      {disabled && disabledReason && (
+        <div className="text-xs text-amber-600 mt-1.5">{disabledReason}</div>
+      )}
+    </button>
   );
 }

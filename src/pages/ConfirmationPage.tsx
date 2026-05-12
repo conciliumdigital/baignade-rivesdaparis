@@ -36,6 +36,8 @@ export function ConfirmationPage() {
           notes: null,
           cancelled_at: null,
           cancellation_reason: null,
+          resident_proof_url: null,
+          honor_certification: false,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
           slot: {

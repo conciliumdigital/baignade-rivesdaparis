@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Search, Download, Filter, Loader2 } from 'lucide-react';
+import { Search, Download, Filter, Loader2, FileText, Home } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { isSupabaseConfigured, supabase } from '../../lib/supabase';
 import { formatDate, formatPrice, formatTimeRange } from '../../lib/format';
-import type { ReservationStatus } from '../../types/database';
+import type { ReservationStatus, UsagerType } from '../../types/database';
 
 interface Row {
   id: string;
@@ -11,6 +12,9 @@ interface Row {
   nb_adults: number;
   nb_children: number;
   total_amount_cents: number;
+  usager_type: UsagerType;
+  resident_proof_url: string | null;
+  honor_certification: boolean;
   created_at: string;
   user: { email: string; first_name: string | null; last_name: string | null } | null;
   slot: { date: string; start_time: string; end_time: string } | null;
@@ -31,7 +35,7 @@ export function AdminReservations() {
       }
       const { data } = await supabase
         .from('reservations')
-        .select('id, reference, status, nb_adults, nb_children, total_amount_cents, created_at, user:profiles(email, first_name, last_name), slot:slots(date, start_time, end_time)')
+        .select('id, reference, status, nb_adults, nb_children, total_amount_cents, usager_type, resident_proof_url, honor_certification, created_at, user:profiles(email, first_name, last_name), slot:slots(date, start_time, end_time)')
         .order('created_at', { ascending: false })
         .limit(500);
       setRows((data ?? []) as any);
@@ -52,11 +56,27 @@ export function AdminReservations() {
     });
   }, [rows, search, statusFilter]);
 
+  async function openProof(path: string) {
+    if (!isSupabaseConfigured) {
+      toast.error('Mode démo : justificatif non disponible.');
+      return;
+    }
+    const { data, error } = await supabase.storage
+      .from('resident-proofs')
+      .createSignedUrl(path, 60 * 5);
+    if (error || !data?.signedUrl) {
+      toast.error('Impossible d\'ouvrir le justificatif.');
+      return;
+    }
+    window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+  }
+
   function exportCsv() {
-    const header = ['Référence', 'Statut', 'Nom', 'Email', 'Date', 'Horaire', 'Adultes', 'Enfants', 'Montant'];
+    const header = ['Référence', 'Statut', 'Type usager', 'Nom', 'Email', 'Date', 'Horaire', 'Adultes', 'Enfants', 'Montant', 'Justificatif'];
     const lines = filtered.map((r) => [
       r.reference,
       r.status,
+      r.usager_type,
       `${r.user?.first_name ?? ''} ${r.user?.last_name ?? ''}`.trim(),
       r.user?.email ?? '',
       r.slot?.date ?? '',
@@ -64,6 +84,7 @@ export function AdminReservations() {
       r.nb_adults,
       r.nb_children,
       (r.total_amount_cents / 100).toFixed(2),
+      r.resident_proof_url ? 'oui' : 'non',
     ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
     const csv = [header.join(','), ...lines].join('\n');
     const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
@@ -121,6 +142,8 @@ export function AdminReservations() {
                 <th className="px-4 py-3 text-left">Client</th>
                 <th className="px-4 py-3 text-left">Créneau</th>
                 <th className="px-4 py-3 text-left">Pers.</th>
+                <th className="px-4 py-3 text-left">Tarif</th>
+                <th className="px-4 py-3 text-left">Justif.</th>
                 <th className="px-4 py-3 text-left">Montant</th>
                 <th className="px-4 py-3 text-left">Statut</th>
               </tr>
@@ -142,18 +165,49 @@ export function AdminReservations() {
                     ) : '—'}
                   </td>
                   <td className="px-4 py-3">{r.nb_adults}A {r.nb_children > 0 && `· ${r.nb_children}E`}</td>
+                  <td className="px-4 py-3"><UsagerBadge type={r.usager_type} /></td>
+                  <td className="px-4 py-3">
+                    {r.resident_proof_url ? (
+                      <button
+                        onClick={() => openProof(r.resident_proof_url as string)}
+                        className="inline-flex items-center gap-1 text-brand-700 hover:underline text-xs font-medium"
+                      >
+                        <FileText className="w-3.5 h-3.5" /> Voir
+                      </button>
+                    ) : r.usager_type === 'habitant' ? (
+                      <span className="text-xs text-amber-600">manquant</span>
+                    ) : (
+                      <span className="text-xs text-slate-400">—</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">{formatPrice(r.total_amount_cents)}</td>
                   <td className="px-4 py-3"><StatusBadge status={r.status} /></td>
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-10 text-center text-slate-500 text-sm">Aucun résultat</td></tr>
+                <tr><td colSpan={8} className="px-4 py-10 text-center text-slate-500 text-sm">Aucun résultat</td></tr>
               )}
             </tbody>
           </table>
         </div>
       )}
     </div>
+  );
+}
+
+function UsagerBadge({ type }: { type: UsagerType }) {
+  const map: Record<UsagerType, { label: string; cls: string; icon: typeof Home | null }> = {
+    habitant: { label: 'Habitant', cls: 'badge bg-emerald-50 text-emerald-700 border border-emerald-200', icon: Home },
+    exterieur: { label: 'Extérieur', cls: 'badge-muted', icon: null },
+    groupe: { label: 'Groupe', cls: 'badge-info', icon: null },
+    ecole: { label: 'École', cls: 'badge-info', icon: null },
+  };
+  const m = map[type];
+  const Icon = m.icon;
+  return (
+    <span className={`${m.cls} inline-flex items-center gap-1`}>
+      {Icon && <Icon className="w-3 h-3" />} {m.label}
+    </span>
   );
 }
 

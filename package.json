@@ -7,12 +7,13 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview",
-    "lint": "eslint ."
+    "preview": "npm run build && wrangler dev",
+    "lint": "eslint .",
+    "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.4",
     "@stripe/stripe-js": "^4.7.0",
+    "@supabase/supabase-js": "^2.45.4",
     "@yudiel/react-qr-scanner": "^2.0.8",
     "date-fns": "^3.6.0",
     "lucide-react": "^0.453.0",
@@ -23,6 +24,7 @@
     "react-router-dom": "^6.27.0"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.36.3",
     "@types/qrcode": "^1.5.5",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
@@ -32,6 +34,7 @@
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
     "typescript": "^5.6.3",
-    "vite": "^6.0.0"
+    "vite": "^6.0.0",
+    "wrangler": "^4.90.0"
   }
 }

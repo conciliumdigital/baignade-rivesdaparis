@@ -11,6 +11,10 @@ alter table public.reservations
   add column if not exists honor_certification boolean not null default false;
 
 -- 2) Vue slot_availability : exposer le tarif habitant
+-- IMPORTANT : `create or replace view` n'autorise QUE l'ajout de colonnes
+-- en fin de liste (PG erreur 42P16 sinon). price_resident_cents est donc
+-- ajouté APRÈS booked/remaining, sans toucher à l'ordre existant. Le front
+-- lit par nom (select *), l'ordre des colonnes est sans impact.
 create or replace view public.slot_availability as
 select
   s.id,
@@ -19,10 +23,10 @@ select
   s.end_time,
   s.capacity,
   s.price_cents,
-  s.price_resident_cents,
   s.status,
   coalesce(sum(case when r.status in ('confirmed', 'used', 'pending_payment') then r.nb_adults + r.nb_children else 0 end), 0)::int as booked,
-  greatest(s.capacity - coalesce(sum(case when r.status in ('confirmed', 'used', 'pending_payment') then r.nb_adults + r.nb_children else 0 end), 0), 0)::int as remaining
+  greatest(s.capacity - coalesce(sum(case when r.status in ('confirmed', 'used', 'pending_payment') then r.nb_adults + r.nb_children else 0 end), 0), 0)::int as remaining,
+  s.price_resident_cents
 from public.slots s
 left join public.reservations r on r.slot_id = s.id
 group by s.id;

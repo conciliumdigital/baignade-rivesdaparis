@@ -15,7 +15,7 @@
 | Composant | Statut | URL / Référence |
 |---|---|---|
 | **Site en ligne** | ✅ Online | https://baignade-rivesdaparis.thomas-kolbe.workers.dev |
-| **Domaine custom** | ⏳ À configurer | `baignade.rivesdaparis.fr` (CNAME à pointer vers Cloudflare) |
+| **Domaine custom** | ⏳ À configurer | `baignade.lesrivesdeparis.fr` (CNAME à pointer vers Cloudflare) |
 | **Code source GitHub** | ✅ | https://github.com/conciliumdigital/baignade-rivesdaparis (public) |
 | **Hosting front** | ✅ | Cloudflare Pages (Workers Assets) |
 | **Backend Supabase** | ✅ Frankfurt | Project ref : `nunglkeqekxzpmushxty` |
@@ -40,7 +40,7 @@
 | **Cloudflare** | (à compléter) | https://dash.cloudflare.com |
 | **Brevo** | `baignade-rivesdaparis@tk7.fr` | https://app.brevo.com |
 | **Stripe** | ⏳ à créer par le client (Mairie) | https://dashboard.stripe.com |
-| **Registrar `rivesdaparis.fr`** | (à confirmer) | — |
+| **Registrar `lesrivesdeparis.fr`** | (à confirmer) | — |
 
 ### 2.2 Secrets sensibles (à stocker dans Bitwarden / 1Password — NE JAMAIS commiter)
 
@@ -205,19 +205,19 @@ RLS active sur toutes les tables. Helpers `is_admin()` / `is_staff_or_admin()`.
 
 ### 5.1 ⏳ À faire (par toi)
 
-- [ ] **Pointer le domaine `baignade.rivesdaparis.fr`** vers Cloudflare (CNAME)
-  - Dashboard Cloudflare Pages → onglet **Domains** du projet → **Set up a custom domain** → `baignade.rivesdaparis.fr`
-  - Copier le CNAME donné par Cloudflare → l'ajouter chez le registrar de `rivesdaparis.fr`
+- [ ] **Pointer le domaine `baignade.lesrivesdeparis.fr`** vers Cloudflare (CNAME)
+  - Dashboard Cloudflare Pages → onglet **Domains** du projet → **Set up a custom domain** → `baignade.lesrivesdeparis.fr`
+  - Copier le CNAME donné par Cloudflare → l'ajouter chez le registrar de `lesrivesdeparis.fr`
   - Mettre à jour `APP_URL` dans Supabase :
     ```bash
     export SUPABASE_ACCESS_TOKEN=sbp_xxx
-    ~/.local/bin/supabase secrets set --project-ref nunglkeqekxzpmushxty APP_URL=https://baignade.rivesdaparis.fr
+    ~/.local/bin/supabase secrets set --project-ref nunglkeqekxzpmushxty APP_URL=https://baignade.lesrivesdeparis.fr
     ```
-  - Mettre à jour `VITE_APP_URL` dans Cloudflare Pages (Settings → Environment variables → Production → `VITE_APP_URL=https://baignade.rivesdaparis.fr`)
+  - Mettre à jour `VITE_APP_URL` dans Cloudflare Pages (Settings → Environment variables → Production → `VITE_APP_URL=https://baignade.lesrivesdeparis.fr`)
   - Push un commit trivial pour relancer le build (ou re-déployer manuellement)
 
 - [ ] **Finaliser la vérification du domaine Brevo**
-  - https://app.brevo.com → Senders & IPs → Domains → cliquer **Authenticate** sur `rivesdaparis.fr`
+  - https://app.brevo.com → Senders & IPs → Domains → cliquer **Authenticate** sur `lesrivesdeparis.fr`
   - Vérifier que les 3 enregistrements TXT sont bien dans le DNS
   - Une fois "Verified", les emails de confirmation partiront correctement
 
@@ -372,7 +372,7 @@ touch supabase/migrations/$(date +%Y%m%d%H%M%S)_description.sql
 
 - 📖 **Cahier des charges** : conservé séparément
 - 🌐 **Site prod** : https://baignade-rivesdaparis.thomas-kolbe.workers.dev
-- 🌐 **Site cible** : https://baignade.rivesdaparis.fr (à activer)
+- 🌐 **Site cible** : https://baignade.lesrivesdeparis.fr (à activer)
 - 💻 **Code source** : https://github.com/conciliumdigital/baignade-rivesdaparis
 - 📋 **Issues / TODO** : https://github.com/conciliumdigital/baignade-rivesdaparis/issues
 - 📖 **DEPLOY.md** : runbook complet de déploiement

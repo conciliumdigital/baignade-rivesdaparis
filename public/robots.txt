@@ -4,4 +4,4 @@ Disallow: /admin
 Disallow: /staff
 Disallow: /compte
 
-Sitemap: https://baignade.rivesdaparis.fr/sitemap.xml
+Sitemap: https://baignade.lesrivesdeparis.fr/sitemap.xml

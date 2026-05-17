@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://baignade.rivesdaparis.fr/</loc>
+    <loc>https://baignade.lesrivesdeparis.fr/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://baignade.rivesdaparis.fr/reserver</loc>
+    <loc>https://baignade.lesrivesdeparis.fr/reserver</loc>
     <changefreq>hourly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://baignade.rivesdaparis.fr/infos-pratiques</loc>
+    <loc>https://baignade.lesrivesdeparis.fr/infos-pratiques</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://baignade.rivesdaparis.fr/cgu</loc>
+    <loc>https://baignade.lesrivesdeparis.fr/cgu</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://baignade.rivesdaparis.fr/confidentialite</loc>
+    <loc>https://baignade.lesrivesdeparis.fr/confidentialite</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>

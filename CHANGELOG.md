@@ -4,6 +4,32 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.1.0] — 2026-05-12
+
+### ✨ Tarif habitant Neuilly-sur-Marne
+
+- **Page de réservation** : nouveau bloc « Type de tarif » avec choix `Tarif habitant` / `Tarif normal` (radio-cards, recalcul du prix en temps réel)
+- Si tarif habitant choisi :
+  - Upload d'un **justificatif de domicile** obligatoire (JPG, PNG, WEBP ou PDF, max 5 Mo)
+  - Case **« Je certifie sur l'honneur que je suis domicilié·e à Neuilly-sur-Marne »** (rappel article 441-1 du Code pénal)
+- **Schéma SQL** (migration `20260512000000_resident_proof.sql`) :
+  - `reservations.resident_proof_url` (text) et `reservations.honor_certification` (boolean)
+  - Vue `slot_availability` étendue avec `price_resident_cents`
+  - Bucket Storage privé `resident-proofs` + RLS (upload propriétaire, lecture staff/admin/manager)
+- **Back-office admin** :
+  - Colonne `Tarif` (badge Habitant/Extérieur)
+  - Colonne `Justif.` avec lien « Voir » (URL signée 5 min)
+  - Export CSV enrichi (type usager, présence justificatif)
+- **Scanner staff** :
+  - Affiche le détail famille (X adulte(s), Y enfant(s)) — le QR code gère déjà les inscriptions multiples via `nb_adults + nb_children`
+  - Badge `Tarif habitant` + lien direct vers le justificatif (URL signée par l'Edge Function)
+  - Mention « Justificatif non joint » si manquant
+- **Edge Function `scan-qr`** : génère une URL signée du justificatif côté serveur, retourne `usager_type`, `honor_certification`, `proof_url`
+
+### À appliquer en prod
+- [ ] Exécuter la migration `20260512000000_resident_proof.sql` (SQL Editor Supabase ou `supabase db push`)
+- [ ] Redéployer l'Edge Function `scan-qr` (`supabase functions deploy scan-qr --project-ref nunglkeqekxzpmushxty`)
+
 ## [1.0.2] — 2026-05-11
 
 ### 🚀 Mise en ligne sur Cloudflare Pages

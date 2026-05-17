@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Scanner, type IDetectedBarcode } from '@yudiel/react-qr-scanner';
-import { CheckCircle2, XCircle, AlertTriangle, RotateCcw, History, ScanLine, Loader2 } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertTriangle, RotateCcw, History, ScanLine, Loader2, Home, FileText, ShieldAlert } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { isSupabaseConfigured, supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
 import { formatDate, formatTimeRange } from '../../lib/format';
-import type { ScanResult } from '../../types/database';
+import type { ScanResult, UsagerType } from '../../types/database';
 
 interface ValidationResult {
   result: ScanResult;
@@ -14,10 +14,15 @@ interface ValidationResult {
   reservation?: {
     reference: string;
     nb_persons: number;
+    nb_adults?: number;
+    nb_children?: number;
     date: string;
     start_time: string;
     end_time: string;
     user_name: string;
+    usager_type?: UsagerType;
+    honor_certification?: boolean;
+    proof_url?: string | null;
   };
 }
 
@@ -42,11 +47,16 @@ export function StaffScanner() {
               message: 'Accès autorisé — mode démo',
               reservation: {
                 reference: 'DEMO1234',
-                nb_persons: 3,
+                nb_persons: 4,
+                nb_adults: 2,
+                nb_children: 2,
                 date: new Date().toISOString().slice(0, 10),
                 start_time: '14:00:00',
                 end_time: '16:00:00',
-                user_name: 'Démo Utilisateur',
+                user_name: 'Famille Démo',
+                usager_type: 'habitant',
+                honor_certification: true,
+                proof_url: null,
               },
             }
           : { result: 'invalid', message: 'QR code non reconnu' };
@@ -129,11 +139,41 @@ function ValidationCard({ result, onReset }: { result: ValidationResult; onReset
       <p className="text-white/90 text-sm">{result.message}</p>
 
       {result.reservation && (
-        <div className="bg-white/15 rounded-xl p-4 mt-5 text-left text-sm space-y-1">
+        <div className="bg-white/15 rounded-xl p-4 mt-5 text-left text-sm space-y-1.5">
           <div className="font-semibold text-base">{result.reservation.user_name}</div>
           <div className="opacity-90">Réf : {result.reservation.reference}</div>
           <div className="opacity-90">{formatDate(result.reservation.date)} · {formatTimeRange(result.reservation.start_time, result.reservation.end_time)}</div>
-          <div className="opacity-90">{result.reservation.nb_persons} personne{result.reservation.nb_persons > 1 ? 's' : ''}</div>
+          <div className="opacity-90">
+            {result.reservation.nb_persons} personne{result.reservation.nb_persons > 1 ? 's' : ''}
+            {typeof result.reservation.nb_adults === 'number' && (
+              <span className="opacity-80">
+                {' '}({result.reservation.nb_adults} adulte{result.reservation.nb_adults > 1 ? 's' : ''}
+                {(result.reservation.nb_children ?? 0) > 0 && `, ${result.reservation.nb_children} enfant${result.reservation.nb_children! > 1 ? 's' : ''}`})
+              </span>
+            )}
+          </div>
+
+          {result.reservation.usager_type === 'habitant' && (
+            <div className="mt-2 pt-2 border-t border-white/20 space-y-1.5">
+              <div className="inline-flex items-center gap-1.5 bg-white/25 rounded-md px-2 py-1 text-xs font-semibold">
+                <Home className="w-3.5 h-3.5" /> Tarif habitant — Neuilly-sur-Marne
+              </div>
+              {result.reservation.proof_url ? (
+                <a
+                  href={result.reservation.proof_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-xs underline hover:opacity-90"
+                >
+                  <FileText className="w-3.5 h-3.5" /> Voir le justificatif de domicile
+                </a>
+              ) : (
+                <div className="flex items-center gap-1.5 text-xs opacity-90">
+                  <ShieldAlert className="w-3.5 h-3.5" /> Justificatif non joint
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 

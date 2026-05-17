@@ -27,6 +27,7 @@ function buildDemoSlots(): SlotAvailability[] {
         end_time: t.end,
         capacity,
         price_cents: 500,
+        price_resident_cents: 300,
         status: isClosed ? 'closed' : 'open',
         booked,
         remaining: Math.max(capacity - booked, 0),

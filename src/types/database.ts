@@ -59,6 +59,7 @@ export interface SlotAvailability {
   end_time: string;
   capacity: number;
   price_cents: number;
+  price_resident_cents: number | null;
   status: SlotStatus;
   booked: number;
   remaining: number;
@@ -83,6 +84,8 @@ export interface Reservation {
   notes: string | null;
   cancelled_at: string | null;
   cancellation_reason: string | null;
+  resident_proof_url: string | null;
+  honor_certification: boolean;
   created_at: string;
   updated_at: string;
 }

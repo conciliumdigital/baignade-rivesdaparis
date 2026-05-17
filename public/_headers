@@ -1,4 +1,4 @@
-# Headers de sécurité pour Cloudflare Pages
+# Headers de sécurité (lus par Netlify ; netlify.toml fait foi)
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN

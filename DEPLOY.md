@@ -8,7 +8,7 @@
 
 | Service | Plan | Coût | Limite gratuite |
 |---|---|---|---|
-| **Cloudflare Pages** | Free | 0 € | Bandwidth illimité, builds illimités |
+| **Netlify** | Free | 0 € | Déploiement Git automatique, SSL Let's Encrypt inclus |
 | **Supabase** Free (Frankfurt) | Free | 0 € | 500 MB DB, 50 000 utilisateurs/mois, 500 k Edge Functions |
 | **Brevo** 🇫🇷 (emails) | Free | 0 € | 300 emails/jour |
 | **Stripe** | Standard | 0 € | Commission 1,4 % + 0,25 €/transaction |
@@ -27,9 +27,9 @@
 2. **Brevo** : compte → vérifier le domaine `lesrivesdeparis.fr` → API key — *15 min*
 3. **Stripe** : compte → clés → webhook — *15 min*
 4. **GitHub** : push du code — *5 min*
-5. **Cloudflare Pages** : connect GitHub → déployer avec 4 env vars — *10 min*
+5. **Netlify** : New site from Git → repo → `netlify.toml` auto + 2 env vars Supabase — *10 min*
 6. **Edge Functions Supabase** : `supabase functions deploy` ×4 — *10 min*
-7. **DNS** : pointer `baignade.lesrivesdeparis.fr` vers Cloudflare — *5 min*
+7. **DNS** : ajouter le domaine dans Netlify puis CNAME `baignade` chez OVH — *5 min*
 8. **Test bout-en-bout** : réserver → payer (carte test) → recevoir le QR → scanner — *15 min*
 
 ---
@@ -139,23 +139,24 @@ gh repo create baignade-rivesdaparis --public --source=. --push
 
 ---
 
-## 5. Cloudflare Pages (10 min)
+## 5. Netlify (10 min)
 
-1. https://dash.cloudflare.com → Workers & Pages → Create application → Pages → Connect to Git
+> ℹ️ Hébergement front migré de Cloudflare (Workers Assets) vers Netlify le 2026-05-17.
+
+1. https://app.netlify.com → **Add new site** → **Import an existing project** → connect GitHub
 2. Sélectionner le repo `baignade-rivesdaparis`
-3. **Build settings** :
-   - Framework preset : **Vite**
+3. **Build settings** : Netlify lit automatiquement `netlify.toml` à la racine
    - Build command : `npm run build`
-   - Output directory : `dist`
-   - Root directory (si monorepo) : `Baignade RDP`
-4. **Environment variables** (Production) :
+   - Publish directory : `dist`
+   - Node : 20
+   - SPA fallback + headers : déjà configurés dans `netlify.toml`
+4. **Environment variables** (Site configuration → Environment variables) — les 2 seules lues par le code :
    - `VITE_SUPABASE_URL` = `https://xxx.supabase.co`
-   - `VITE_SUPABASE_ANON_KEY` = `eyJ...`
-   - `VITE_STRIPE_PUBLISHABLE_KEY` = `pk_live_xxx`
-   - `VITE_APP_URL` = `https://baignade.lesrivesdeparis.fr`
-5. Save and Deploy
+   - `VITE_SUPABASE_ANON_KEY` = `sb_publishable_...`
+   - *(plus tard, quand Stripe est prêt : `VITE_STRIPE_PUBLISHABLE_KEY` = `pk_live_xxx`)*
+5. **Deploy site**
 
-Cloudflare construit le site (~2 min), SSL inclus, URL temporaire `*.pages.dev`.
+Netlify construit le site (~1-2 min), SSL Let's Encrypt inclus, URL technique `https://exquisite-sable-8f9d45.netlify.app`. Chaque push sur `main` redéploie automatiquement.
 
 ---
 
@@ -185,17 +186,16 @@ supabase functions deploy send-confirmation-email --no-verify-jwt
 
 ## 7. DNS — pointer le domaine (5 min)
 
-Dans le dashboard Cloudflare Pages :
-- Custom domains → Set up a custom domain → `baignade.lesrivesdeparis.fr`
-- Cloudflare affiche un CNAME à ajouter chez le registrar de `lesrivesdeparis.fr`
+Dans Netlify :
+- Site configuration → **Domain management** → **Add custom domain** → `baignade.lesrivesdeparis.fr`
 
-Chez le registrar :
+La zone DNS de `lesrivesdeparis.fr` reste **100 % chez OVH**. Chez OVH, ajouter un seul enregistrement `CNAME` :
 ```
-Type    Nom         Valeur                          TTL
-CNAME   baignade    <project>.pages.dev.            3600
+Type    Nom         Valeur                                  TTL
+CNAME   baignade    exquisite-sable-8f9d45.netlify.app.     3600
 ```
 
-Propagation DNS : 5 min à 24 h selon les FAI. Cloudflare émet le certificat HTTPS Let's Encrypt automatiquement.
+Propagation DNS : 5 min à 24 h selon les FAI. Netlify émet et renouvelle le certificat HTTPS Let's Encrypt automatiquement.
 
 ---
 
@@ -243,7 +243,7 @@ Workflow standard :
 git add .
 git commit -m "fix: …" # ou feat:/chore:
 git push origin main
-# → Cloudflare Pages auto-redeploy en ~2 min
+# → Netlify auto-redéploie en ~1-2 min
 ```
 
 Pour les Edge Functions :
@@ -257,7 +257,7 @@ supabase functions deploy <function-name>
 
 | Symptôme | Cause probable | Solution |
 |---|---|---|
-| Page blanche | Env vars manquantes | Vérifier les `VITE_*` dans Cloudflare Pages → Settings → Environment variables |
+| Page blanche | Env vars manquantes | Vérifier les `VITE_*` dans Netlify → Site configuration → Environment variables |
 | "Supabase non configuré" en console | Mode démo actif | Idem |
 | Paiement OK mais pas d'email | Brevo key incorrecte ou domaine non vérifié | Logs Supabase Functions + tableau de bord Brevo |
 | Webhook Stripe en erreur | Mauvaise URL ou secret | Stripe Dashboard → Webhooks → onglet "Logs" |
@@ -286,5 +286,5 @@ Le Dockerfile et `nginx.conf` du projet sont prêts pour Scaleway Serverless Con
 - 📖 Doc Supabase : https://supabase.com/docs
 - 📖 Doc Stripe Checkout : https://stripe.com/docs/checkout
 - 📖 Doc Brevo API : https://developers.brevo.com/
-- 📖 Doc Cloudflare Pages : https://developers.cloudflare.com/pages/
+- 📖 Doc Netlify : https://docs.netlify.com/
 - 🇫🇷 DPO Mairie : `dpo@neuillysurmarne.fr`

@@ -14,4 +14,3 @@ coverage
 .supabase
 supabase/.temp/
 .wrangler/
-wrangler.jsonc

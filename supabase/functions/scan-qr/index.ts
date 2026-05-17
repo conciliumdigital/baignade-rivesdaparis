@@ -36,12 +36,21 @@ serve(async (req: Request) => {
     return json({ result: 'invalid', message: 'QR code non reconnu' });
   }
 
+  // Génère une URL signée pour le justificatif si présent (valable 5 min)
+  let proofSignedUrl: string | null = null;
+  if (reservation.resident_proof_url) {
+    const { data: signed } = await supabase.storage
+      .from('resident-proofs')
+      .createSignedUrl(reservation.resident_proof_url, 60 * 5);
+    proofSignedUrl = signed?.signedUrl ?? null;
+  }
+
   if (reservation.status === 'used' || reservation.qr_used_at) {
     await supabase.from('scan_log').insert({ reservation_id: reservation.id, result: 'already_used', scanned_by });
     return json({
       result: 'already_used',
       message: `Déjà scanné le ${new Date(reservation.qr_used_at).toLocaleString('fr-FR')}`,
-      reservation: formatReservation(reservation),
+      reservation: formatReservation(reservation, proofSignedUrl),
     });
   }
 
@@ -54,7 +63,7 @@ serve(async (req: Request) => {
   const today = new Date().toISOString().slice(0, 10);
   if (reservation.slot.date !== today) {
     await supabase.from('scan_log').insert({ reservation_id: reservation.id, result: 'wrong_slot', scanned_by });
-    return json({ result: 'wrong_slot', message: `Créneau prévu le ${reservation.slot.date}`, reservation: formatReservation(reservation) });
+    return json({ result: 'wrong_slot', message: `Créneau prévu le ${reservation.slot.date}`, reservation: formatReservation(reservation, proofSignedUrl) });
   }
 
   // Marquer comme utilisée
@@ -64,17 +73,22 @@ serve(async (req: Request) => {
     .eq('id', reservation.id);
   await supabase.from('scan_log').insert({ reservation_id: reservation.id, result: 'valid', scanned_by });
 
-  return json({ result: 'valid', message: 'Bienvenue !', reservation: formatReservation(reservation) });
+  return json({ result: 'valid', message: 'Bienvenue !', reservation: formatReservation(reservation, proofSignedUrl) });
 });
 
-function formatReservation(r: any) {
+function formatReservation(r: any, proofSignedUrl: string | null = null) {
   return {
     reference: r.reference,
     nb_persons: r.nb_adults + r.nb_children,
+    nb_adults: r.nb_adults,
+    nb_children: r.nb_children,
     date: r.slot.date,
     start_time: r.slot.start_time,
     end_time: r.slot.end_time,
     user_name: `${r.user?.first_name ?? ''} ${r.user?.last_name ?? ''}`.trim() || 'Usager',
+    usager_type: r.usager_type ?? 'exterieur',
+    honor_certification: !!r.honor_certification,
+    proof_url: proofSignedUrl,
   };
 }
 

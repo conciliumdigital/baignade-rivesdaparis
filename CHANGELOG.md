@@ -4,6 +4,29 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.1.3] — 2026-05-17
+
+### 🔒 Correctifs de sécurité
+
+- **Edge Function `scan-qr` — bypass d'autorisation (HIGH)** : l'identité
+  et le rôle de l'agent sont désormais dérivés du JWT du caller, plus
+  jamais du corps de la requête. Échec fermé si non authentifié ou rôle
+  insuffisant (avant : `scanned_by` fourni par l'appelant, et contrôle
+  ignoré si absent → un usager auto-inscrit pouvait griller un QR et
+  obtenir l'URL signée d'un justificatif de domicile / PII).
+- **`scan-qr` — minimisation PII (MEDIUM)** : l'URL signée du justificatif
+  n'est générée qu'après autorisation et uniquement pour un accès
+  `valid` (plus exposée sur `already_used` / `wrong_slot`).
+- **Seed démo `02_seed_backoffice.sql` — comptes privilégiés (HIGH)** :
+  suppression du mot de passe en dur ; comptes de démo rendus non
+  connectables (`banned_until` 2999). La démo back-office se fait avec
+  le compte admin réel de l'opérateur. `README.md` mis à jour.
+
+> ⚠️ Après merge : **redéployer l'Edge Function `scan-qr`** (le correctif
+> ne prend effet qu'au redéploiement). Si `02_seed_backoffice.sql` a déjà
+> été appliqué en prod avec l'ancienne version, lancer `99_cleanup_demo.sql`
+> puis re-seeder.
+
 ## [1.1.2] — 2026-05-17
 
 ### 🚚 Migration d'hébergement Cloudflare → Netlify

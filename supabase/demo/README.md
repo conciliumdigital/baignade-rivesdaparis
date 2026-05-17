@@ -20,13 +20,21 @@ Exécuter dans le SQL Editor Supabase
 > Le seul fichier indispensable est `01`. Le `02` enrichit le back-office
 > mais touche `auth.users` : à lancer une fois, puis `99` pour rejouer.
 
-**Compte administrateur de démo** (créé par `02`) :
-`demo.admin@demo.lesrivesdeparis.fr` — mot de passe `DemoBaignade2026!`
-(rôles également disponibles : `demo.manager@…`, `demo.agent@…` pour le scan).
-Les usagers de démo : `demo.martin@…` (habitant), `demo.petit@…` (extérieur).
+**Connexion pour la démo — utilisez VOTRE compte admin réel.**
+Pour des raisons de sécurité, les comptes de démo créés par `02`
+(`demo.admin@…`, `demo.manager@…`, `demo.agent@…`, `demo.martin@…`,
+`demo.petit@…`) sont **volontairement non connectables** : aucun mot de
+passe et `banned_until` en 2999 (GoTrue refuse toute connexion, mot de
+passe comme Magic Link). Ils servent uniquement de propriétaires des
+données de démo (réservations, avis) pour alimenter le back-office.
 
-> ℹ️ Si la connexion par mot de passe n'est pas activée, utilisez votre
-> compte admin réel (Magic Link + `update profiles set role='admin'…`).
+Pour présenter l'espace admin / le scan, connectez-vous avec **votre
+propre compte réel** promu admin/staff :
+`update public.profiles set role='admin' where email='votre.email@…';`
+(après une 1re connexion Magic Link pour que le profil existe).
+
+> 🔒 On ne crée jamais de compte privilégié connectable avec un secret
+> commité dans le dépôt.
 
 ---
 

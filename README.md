@@ -2,10 +2,9 @@
 
 Application web de réservation pour la zone de baignade estivale de la **Commune de Neuilly-sur-Marne**.
 
-**Stack** : Vite 6 · React 18 · TypeScript · Tailwind · Supabase (Postgres + Auth Magic Link + Edge Functions Deno) · Stripe Checkout · Brevo · Cloudflare Pages.
+**Stack** : Vite 6 · React 18 · TypeScript · Tailwind · Supabase (Postgres + Auth Magic Link + Edge Functions Deno) · Stripe Checkout · Brevo · Netlify.
 
-🌐 **Site en ligne** : https://baignade-rivesdaparis.thomas-kolbe.workers.dev
-🎯 **Site cible** : https://baignade.lesrivesdeparis.fr *(DNS à activer)*
+🌐 **Site en ligne** : https://baignade.lesrivesdeparis.fr
 
 ---
 
@@ -14,7 +13,7 @@ Application web de réservation pour la zone de baignade estivale de la **Commun
 | Fichier | Quand le lire |
 |---|---|
 | **[HANDOFF.md](HANDOFF.md)** | **À LIRE EN PRIORITÉ.** État du projet, comptes, credentials, comment reprendre depuis une nouvelle machine, tâches restantes |
-| **[DEPLOY.md](DEPLOY.md)** | Runbook complet de déploiement (Supabase, Brevo, Stripe, Cloudflare) |
+| **[DEPLOY.md](DEPLOY.md)** | Runbook complet de déploiement (Supabase, Brevo, Stripe, Netlify) |
 | **[CHANGELOG.md](CHANGELOG.md)** | Historique des versions |
 
 ---
@@ -94,7 +93,7 @@ Scanner QR caméra · Validation visuelle vert/orange/rouge < 1s · Bip sonore �
 
 - Hébergement données **UE (Frankfurt)** — Supabase
 - Hébergement emails **France (Paris)** — Brevo
-- Hébergement front **CDN mondial avec PoPs européens** — Cloudflare
+- Hébergement front **CDN mondial avec PoPs européens** — Netlify
 - Cookies strictement nécessaires (banner)
 - Pas de tracking tiers
 - Droit à l'oubli en 1 clic
@@ -119,14 +118,14 @@ npm run build  # vérifier que le build passe
 
 # 3. Commit + push
 git add . && git commit -m "feat: …" && git push origin main
-# → Cloudflare Pages auto-redéploie en ~2 min
+# → Netlify auto-redéploie en ~1-2 min
 ```
 
 ---
 
 ## 💰 Coût
 
-**0 €/mois** en plan free (Cloudflare Pages + Supabase Free + Brevo Free). Coût variable : commission Stripe ~1,4 % + 0,25 € par réservation.
+**0 €/mois** en plan free (Netlify Free + Supabase Free + Brevo Free). Coût variable : commission Stripe ~1,4 % + 0,25 € par réservation.
 
 ---
 

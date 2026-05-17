@@ -4,6 +4,17 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.1.2] — 2026-05-17
+
+### 🚚 Migration d'hébergement Cloudflare → Netlify
+
+- Hébergement front migré de **Cloudflare (Workers Assets)** vers **Netlify** (déploiement Git automatique sur `main`, config `netlify.toml`).
+- Site en ligne sur le domaine cible **`https://baignade.lesrivesdeparis.fr`** (CNAME OVH `baignade` → `exquisite-sable-8f9d45.netlify.app`, la zone DNS reste chez OVH, SSL Let's Encrypt provisionné automatiquement).
+- Suppression de `wrangler.jsonc` (config Cloudflare devenue inutile).
+- `public/_headers` : commentaire rendu générique (fichier compatible Netlify, `netlify.toml` fait foi).
+- Documentation alignée Netlify : `HANDOFF.md`, `DEPLOY.md`, `README.md`.
+- Cloudflare totalement abandonné (intégration Git déconnectée côté dashboard).
+
 ## [1.1.1] — 2026-05-17
 
 ### 🔧 Correction du nom de domaine cible

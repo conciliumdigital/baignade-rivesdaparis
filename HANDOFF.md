@@ -2,11 +2,13 @@
 
 > Document de reprise du projet. Tout ce qu'il faut savoir pour continuer depuis une nouvelle machine, un nouveau collaborateur, ou après une pause.
 
-**Version** : 1.0.1
-**Dernière mise à jour** : 2026-05-11
+**Version** : 1.1.2
+**Dernière mise à jour** : 2026-05-17
 **Client** : Commune de Neuilly-sur-Marne
 **Prestataire** : CONCILIUM
-**Statut** : ✅ En ligne sur Cloudflare (mode pré-production, Stripe en attente du client)
+**Statut** : ✅ En ligne sur Netlify, domaine https://baignade.lesrivesdeparis.fr (mode pré-production, Stripe en attente du client)
+
+> ℹ️ Hébergement front migré de Cloudflare (Workers Assets) vers **Netlify** le 2026-05-17. Cloudflare totalement abandonné.
 
 ---
 
@@ -14,10 +16,10 @@
 
 | Composant | Statut | URL / Référence |
 |---|---|---|
-| **Site en ligne** | ✅ Online | https://baignade-rivesdaparis.thomas-kolbe.workers.dev |
-| **Domaine custom** | ⏳ À configurer | `baignade.lesrivesdeparis.fr` (CNAME à pointer vers Cloudflare) |
+| **Site en ligne** | ✅ Online | https://baignade.lesrivesdeparis.fr |
+| **Domaine custom** | ✅ Fait | `baignade.lesrivesdeparis.fr` (CNAME OVH `baignade` → `exquisite-sable-8f9d45.netlify.app`, SSL Let's Encrypt actif) |
 | **Code source GitHub** | ✅ | https://github.com/conciliumdigital/baignade-rivesdaparis (public) |
-| **Hosting front** | ✅ | Cloudflare Pages (Workers Assets) |
+| **Hosting front** | ✅ | Netlify (auto-deploy sur push `main`, config `netlify.toml`) |
 | **Backend Supabase** | ✅ Frankfurt | Project ref : `nunglkeqekxzpmushxty` |
 | **Auth Magic Link** | ✅ Activé | Email via SMTP Supabase par défaut |
 | **Schéma SQL** | ✅ Appliqué | 9 tables, 1 view, RLS active |
@@ -37,10 +39,10 @@
 |---|---|---|
 | **Supabase** | `baignade-rivesdaparis@tk7.fr` | https://supabase.com/dashboard/project/nunglkeqekxzpmushxty |
 | **GitHub** | `conciliumdigital` | https://github.com/conciliumdigital/baignade-rivesdaparis |
-| **Cloudflare** | (à compléter) | https://dash.cloudflare.com |
+| **Netlify** | (à compléter) | https://app.netlify.com — site `exquisite-sable-8f9d45` |
 | **Brevo** | `baignade-rivesdaparis@tk7.fr` | https://app.brevo.com |
 | **Stripe** | ⏳ à créer par le client (Mairie) | https://dashboard.stripe.com |
-| **Registrar `lesrivesdeparis.fr`** | (à confirmer) | — |
+| **DNS `lesrivesdeparis.fr`** | OVH | Zone DNS 100 % chez OVH — CNAME `baignade` → `exquisite-sable-8f9d45.netlify.app` |
 
 ### 2.2 Secrets sensibles (à stocker dans Bitwarden / 1Password — NE JAMAIS commiter)
 
@@ -136,7 +138,7 @@ export SUPABASE_ACCESS_TOKEN=sbp_xxx  # depuis ton gestionnaire de mots de passe
 
 - **Front** : Vite 6 + React 18 + TypeScript + Tailwind 3 + React Router 6
 - **Backend** : Supabase Frankfurt (PostgreSQL 17 + Auth Magic Link + Edge Functions Deno)
-- **Hosting** : Cloudflare Pages (Workers Assets)
+- **Hosting** : Netlify (auto-deploy sur push `main`, config `netlify.toml`)
 - **Emails** : Brevo (FR, RGPD natif)
 - **Paiement** : Stripe Checkout (à brancher)
 - **QR codes** : génération via `qrcode` (PNG + dataURL), scan via `@yudiel/react-qr-scanner`
@@ -205,16 +207,17 @@ RLS active sur toutes les tables. Helpers `is_admin()` / `is_staff_or_admin()`.
 
 ### 5.1 ⏳ À faire (par toi)
 
-- [ ] **Pointer le domaine `baignade.lesrivesdeparis.fr`** vers Cloudflare (CNAME)
-  - Dashboard Cloudflare Pages → onglet **Domains** du projet → **Set up a custom domain** → `baignade.lesrivesdeparis.fr`
-  - Copier le CNAME donné par Cloudflare → l'ajouter chez le registrar de `lesrivesdeparis.fr`
-  - Mettre à jour `APP_URL` dans Supabase :
+- [x] ✅ **Domaine `baignade.lesrivesdeparis.fr` en ligne** — FAIT
+  - Hébergement Netlify, domaine ajouté dans Netlify → Domain management
+  - Zone DNS 100 % chez **OVH** : un seul `CNAME` `baignade` → `exquisite-sable-8f9d45.netlify.app`
+  - SSL Let's Encrypt provisionné automatiquement par Netlify (actif et valide)
+  - URL Netlify directe (technique, tests) : https://exquisite-sable-8f9d45.netlify.app
+  - `APP_URL` côté Supabase à aligner si besoin :
     ```bash
     export SUPABASE_ACCESS_TOKEN=sbp_xxx
     ~/.local/bin/supabase secrets set --project-ref nunglkeqekxzpmushxty APP_URL=https://baignade.lesrivesdeparis.fr
     ```
-  - Mettre à jour `VITE_APP_URL` dans Cloudflare Pages (Settings → Environment variables → Production → `VITE_APP_URL=https://baignade.lesrivesdeparis.fr`)
-  - Push un commit trivial pour relancer le build (ou re-déployer manuellement)
+  - Env vars front : Netlify → Site configuration → Environment variables (les 2 seules lues par le code sont `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY`)
 
 - [ ] **Finaliser la vérification du domaine Brevo**
   - https://app.brevo.com → Senders & IPs → Domains → cliquer **Authenticate** sur `lesrivesdeparis.fr`
@@ -262,9 +265,9 @@ RLS active sur toutes les tables. Helpers `is_admin()` / `is_staff_or_admin()`.
      STRIPE_SECRET_KEY=sk_live_xxx \
      STRIPE_WEBHOOK_SECRET=whsec_xxx
    ```
-3. Ajouter dans Cloudflare Pages → Settings → Env vars → Production :
+3. Ajouter dans Netlify → Site configuration → Environment variables :
    - `VITE_STRIPE_PUBLISHABLE_KEY=pk_live_xxx`
-4. Push un commit (même trivial) → Cloudflare re-déploie → c'est en ligne avec paiement actif
+4. Push un commit (même trivial) → Netlify re-déploie (~1-2 min) → c'est en ligne avec paiement actif
 
 ---
 
@@ -287,7 +290,7 @@ npm run build
 git add .
 git commit -m "feat|fix|chore: …"
 git push origin main
-# → Cloudflare Pages auto-redéploy en ~2 min
+# → Netlify auto-redéploie en ~1-2 min
 ```
 
 ### 6.2 Modifier une Edge Function
@@ -317,7 +320,7 @@ touch supabase/migrations/$(date +%Y%m%d%H%M%S)_description.sql
 
 ### 7.1 Parcours utilisateur complet
 
-1. Aller sur `https://baignade-rivesdaparis.thomas-kolbe.workers.dev/`
+1. Aller sur `https://baignade.lesrivesdeparis.fr/`
 2. Cliquer "Réserver" → choisir un créneau ouvert
 3. Remplir le formulaire (1-6 personnes)
 4. Cliquer "Payer" → ⚠️ erreur attendue tant que Stripe pas configuré
@@ -345,7 +348,7 @@ touch supabase/migrations/$(date +%Y%m%d%H%M%S)_description.sql
 
 | Outil | URL |
 |---|---|
-| Logs Cloudflare Pages | https://dash.cloudflare.com → Workers & Pages → baignade-rivesdaparis → Deployments |
+| Logs Netlify | https://app.netlify.com → site `exquisite-sable-8f9d45` → Deploys |
 | Logs Edge Functions | https://supabase.com/dashboard/project/nunglkeqekxzpmushxty/functions |
 | Logs DB Supabase | https://supabase.com/dashboard/project/nunglkeqekxzpmushxty/logs/postgres-logs |
 | Délivrabilité Brevo | https://app.brevo.com → Statistics → Transactional |
@@ -357,7 +360,7 @@ touch supabase/migrations/$(date +%Y%m%d%H%M%S)_description.sql
 
 | Symptôme | Cause probable | Solution |
 |---|---|---|
-| Page blanche en prod | Env vars manquantes côté Cloudflare | Vérifier `VITE_*` dans Cloudflare Pages → Settings → Environment variables |
+| Page blanche en prod | Env vars manquantes côté Netlify | Vérifier `VITE_*` dans Netlify → Site configuration → Environment variables |
 | "Supabase non configuré" en console | Mode démo activé | Idem |
 | Magic Link non reçu | Rate limit SMTP Supabase (3/h) | Attendre 1h ou configurer un SMTP custom dans Auth settings |
 | Paiement échoue | Stripe pas branché | Voir section 5.3 |
@@ -371,15 +374,15 @@ touch supabase/migrations/$(date +%Y%m%d%H%M%S)_description.sql
 ## 10. Liens utiles
 
 - 📖 **Cahier des charges** : conservé séparément
-- 🌐 **Site prod** : https://baignade-rivesdaparis.thomas-kolbe.workers.dev
-- 🌐 **Site cible** : https://baignade.lesrivesdeparis.fr (à activer)
+- 🌐 **Site prod** : https://baignade.lesrivesdeparis.fr
+- 🌐 **URL Netlify directe** (tests) : https://exquisite-sable-8f9d45.netlify.app
 - 💻 **Code source** : https://github.com/conciliumdigital/baignade-rivesdaparis
 - 📋 **Issues / TODO** : https://github.com/conciliumdigital/baignade-rivesdaparis/issues
 - 📖 **DEPLOY.md** : runbook complet de déploiement
 - 📖 **CHANGELOG.md** : historique versions
 - 🇫🇷 **Brevo** : https://app.brevo.com
 - 🟦 **Supabase** : https://supabase.com/dashboard/project/nunglkeqekxzpmushxty
-- 🟧 **Cloudflare** : https://dash.cloudflare.com
+- 🟩 **Netlify** : https://app.netlify.com (site `exquisite-sable-8f9d45`)
 
 ---
 

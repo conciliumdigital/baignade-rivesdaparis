@@ -79,7 +79,12 @@ export function AdminSlots() {
                   <td className="px-4 py-3 capitalize">{formatDate(s.date, 'EEE d MMM')}</td>
                   <td className="px-4 py-3 font-medium">{formatTimeRange(s.start_time, s.end_time)}</td>
                   <td className="px-4 py-3">{s.capacity}</td>
-                  <td className="px-4 py-3">{formatPrice(s.price_cents)}</td>
+                  <td className="px-4 py-3">
+                    {formatPrice(s.price_cents)}
+                    {s.price_resident_cents != null && s.price_resident_cents > 0 && (
+                      <span className="text-xs text-slate-500"> · hab. {formatPrice(s.price_resident_cents)}</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     {s.status === 'open' ? <span className="badge-success">Ouvert</span>
                       : s.status === 'closed' ? <span className="badge-danger">Fermé{s.closure_reason && ` · ${s.closure_reason}`}</span>
@@ -111,6 +116,8 @@ function CreateSlotModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
   const [end, setEnd] = useState('12:00');
   const [capacity, setCapacity] = useState(50);
   const [price, setPrice] = useState(500);
+  const [priceResident, setPriceResident] = useState(300);
+  const [priceChild, setPriceChild] = useState(250);
   const [saving, setSaving] = useState(false);
 
   async function handleSave(e: React.FormEvent) {
@@ -122,7 +129,9 @@ function CreateSlotModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
     }
     setSaving(true);
     const { error } = await supabase.from('slots').insert({
-      date, start_time: start, end_time: end, capacity, price_cents: price, status: 'open',
+      date, start_time: start, end_time: end, capacity,
+      price_cents: price, price_resident_cents: priceResident, price_child_cents: priceChild,
+      status: 'open',
     });
     setSaving(false);
     if (error) toast.error(error.message);
@@ -138,7 +147,12 @@ function CreateSlotModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
           <div><label className="label">Fin</label><input type="time" required className="input" value={end} onChange={e => setEnd(e.target.value)} /></div>
         </div>
         <div><label className="label">Capacité</label><input type="number" min={1} className="input" value={capacity} onChange={e => setCapacity(Number(e.target.value))} /></div>
-        <div><label className="label">Tarif (cts)</label><input type="number" min={0} className="input" value={price} onChange={e => setPrice(Number(e.target.value))} /></div>
+        <div className="grid grid-cols-3 gap-3">
+          <div><label className="label">Tarif extérieur (cts)</label><input type="number" min={0} className="input" value={price} onChange={e => setPrice(Number(e.target.value))} /></div>
+          <div><label className="label">Tarif habitant (cts)</label><input type="number" min={0} className="input" value={priceResident} onChange={e => setPriceResident(Number(e.target.value))} /></div>
+          <div><label className="label">Tarif enfant (cts)</label><input type="number" min={0} className="input" value={priceChild} onChange={e => setPriceChild(Number(e.target.value))} /></div>
+        </div>
+        <p className="text-xs text-slate-500">Tarif habitant à 0 → l'option « habitant » est masquée côté usager pour ce créneau.</p>
         <div className="flex justify-end gap-2 pt-2">
           <button type="button" onClick={onClose} className="btn-ghost">Annuler</button>
           <button type="submit" disabled={saving} className="btn-primary">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Créer'}</button>
@@ -153,6 +167,8 @@ function BulkGenerateModal({ onClose, onSaved }: { onClose: () => void; onSaved:
   const [to, setTo] = useState('2026-08-31');
   const [capacity, setCapacity] = useState(50);
   const [price, setPrice] = useState(500);
+  const [priceResident, setPriceResident] = useState(300);
+  const [priceChild, setPriceChild] = useState(250);
   const [saving, setSaving] = useState(false);
 
   const slotTimes = [
@@ -170,7 +186,11 @@ function BulkGenerateModal({ onClose, onSaved }: { onClose: () => void; onSaved:
     const rows: any[] = [];
     for (let d = fromDate; d <= toDate; d = addDays(d, 1)) {
       const dateStr = format(d, 'yyyy-MM-dd');
-      slotTimes.forEach((t) => rows.push({ date: dateStr, start_time: t.start, end_time: t.end, capacity, price_cents: price, status: 'open' }));
+      slotTimes.forEach((t) => rows.push({
+        date: dateStr, start_time: t.start, end_time: t.end, capacity,
+        price_cents: price, price_resident_cents: priceResident, price_child_cents: priceChild,
+        status: 'open',
+      }));
     }
     const { error } = await supabase.from('slots').upsert(rows, { onConflict: 'date,start_time' });
     setSaving(false);
@@ -185,11 +205,13 @@ function BulkGenerateModal({ onClose, onSaved }: { onClose: () => void; onSaved:
           <div><label className="label">Du</label><input type="date" required className="input" value={from} onChange={e => setFrom(e.target.value)} /></div>
           <div><label className="label">Au</label><input type="date" required className="input" value={to} onChange={e => setTo(e.target.value)} /></div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className="label">Capacité par créneau</label><input type="number" min={1} className="input" value={capacity} onChange={e => setCapacity(Number(e.target.value))} /></div>
-          <div><label className="label">Tarif (cts)</label><input type="number" min={0} className="input" value={price} onChange={e => setPrice(Number(e.target.value))} /></div>
+        <div><label className="label">Capacité par créneau</label><input type="number" min={1} className="input" value={capacity} onChange={e => setCapacity(Number(e.target.value))} /></div>
+        <div className="grid grid-cols-3 gap-3">
+          <div><label className="label">Tarif extérieur (cts)</label><input type="number" min={0} className="input" value={price} onChange={e => setPrice(Number(e.target.value))} /></div>
+          <div><label className="label">Tarif habitant (cts)</label><input type="number" min={0} className="input" value={priceResident} onChange={e => setPriceResident(Number(e.target.value))} /></div>
+          <div><label className="label">Tarif enfant (cts)</label><input type="number" min={0} className="input" value={priceChild} onChange={e => setPriceChild(Number(e.target.value))} /></div>
         </div>
-        <p className="text-xs text-slate-500">5 créneaux/jour seront créés (10h, 12h, 14h, 16h, 18h).</p>
+        <p className="text-xs text-slate-500">5 créneaux/jour seront créés (10h, 12h, 14h, 16h, 18h). Tarif habitant à 0 → option « habitant » masquée côté usager.</p>
         <div className="flex justify-end gap-2 pt-2">
           <button type="button" onClick={onClose} className="btn-ghost">Annuler</button>
           <button type="submit" disabled={saving} className="btn-primary">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Générer'}</button>

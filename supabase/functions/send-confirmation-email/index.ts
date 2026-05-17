@@ -22,8 +22,8 @@ serve(async (req: Request) => {
 
   const qrPng = await QRCode.toBuffer(r.qr_code_token, { width: 320, margin: 2 });
   const qrBase64 = btoa(String.fromCharCode(...new Uint8Array(qrPng)));
-  const appUrl = Deno.env.get('APP_URL') ?? 'https://baignade.rivesdaparis.fr';
-  const fromEmail = Deno.env.get('FROM_EMAIL') ?? 'baignade@rivesdaparis.fr';
+  const appUrl = Deno.env.get('APP_URL') ?? 'https://baignade.lesrivesdeparis.fr';
+  const fromEmail = Deno.env.get('FROM_EMAIL') ?? 'baignade@lesrivesdeparis.fr';
   const fromName = Deno.env.get('FROM_NAME') ?? "Baignade Rives d'Paris";
 
   const html = `

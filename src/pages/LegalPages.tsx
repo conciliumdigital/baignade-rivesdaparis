@@ -44,7 +44,7 @@ export function PrivacyPage() {
   return (
     <LegalLayout title="Politique de confidentialité">
       <p>
-        La Commune de Neuilly-sur-Marne s'engage à protéger la vie privée des utilisateurs du service baignade.rivesdaparis.fr conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés.
+        La Commune de Neuilly-sur-Marne s'engage à protéger la vie privée des utilisateurs du service baignade.lesrivesdeparis.fr conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés.
       </p>
       <h2 className="font-display font-bold text-lg mt-6">Responsable de traitement</h2>
       <p>Mairie de Neuilly-sur-Marne — Place Ferdinand Buisson, 93330 Neuilly-sur-Marne.</p>

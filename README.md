@@ -5,7 +5,7 @@ Application web de réservation pour la zone de baignade estivale de la **Commun
 **Stack** : Vite 6 · React 18 · TypeScript · Tailwind · Supabase (Postgres + Auth Magic Link + Edge Functions Deno) · Stripe Checkout · Brevo · Cloudflare Pages.
 
 🌐 **Site en ligne** : https://baignade-rivesdaparis.thomas-kolbe.workers.dev
-🎯 **Site cible** : https://baignade.rivesdaparis.fr *(DNS à activer)*
+🎯 **Site cible** : https://baignade.lesrivesdeparis.fr *(DNS à activer)*
 
 ---
 

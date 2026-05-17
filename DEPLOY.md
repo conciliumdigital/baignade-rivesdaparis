@@ -1,4 +1,4 @@
-# 🚀 Mise en ligne — baignade.rivesdaparis.fr
+# 🚀 Mise en ligne — baignade.lesrivesdeparis.fr
 
 > **Stack budget zéro** : 0 €/mois fixes pour héberger le service. Tu ne payes que les commissions Stripe sur les réservations effectives.
 
@@ -12,7 +12,7 @@
 | **Supabase** Free (Frankfurt) | Free | 0 € | 500 MB DB, 50 000 utilisateurs/mois, 500 k Edge Functions |
 | **Brevo** 🇫🇷 (emails) | Free | 0 € | 300 emails/jour |
 | **Stripe** | Standard | 0 € | Commission 1,4 % + 0,25 €/transaction |
-| **Domaine** `rivesdaparis.fr` | déjà acquis | 0 € | — |
+| **Domaine** `lesrivesdeparis.fr` | déjà acquis | 0 € | — |
 | **Total fixe** | | **0 €/mois** | |
 
 ⚠️ **À savoir** : Supabase Free met le projet en pause après 7 jours sans activité. Hors saison de baignade, il suffit de cliquer sur "Restore" pour le réveiller. Pour passer en illimité, le plan Pro est à 25 $/mois — mais inutile pour démarrer.
@@ -24,12 +24,12 @@
 ## ⚡ TL;DR — ordre de bataille (1 h 30 chrono)
 
 1. **Supabase** : créer le projet UE → appliquer le schéma → récupérer URL + anon key — *15 min*
-2. **Brevo** : compte → vérifier le domaine `rivesdaparis.fr` → API key — *15 min*
+2. **Brevo** : compte → vérifier le domaine `lesrivesdeparis.fr` → API key — *15 min*
 3. **Stripe** : compte → clés → webhook — *15 min*
 4. **GitHub** : push du code — *5 min*
 5. **Cloudflare Pages** : connect GitHub → déployer avec 4 env vars — *10 min*
 6. **Edge Functions Supabase** : `supabase functions deploy` ×4 — *10 min*
-7. **DNS** : pointer `baignade.rivesdaparis.fr` vers Cloudflare — *5 min*
+7. **DNS** : pointer `baignade.lesrivesdeparis.fr` vers Cloudflare — *5 min*
 8. **Test bout-en-bout** : réserver → payer (carte test) → recevoir le QR → scanner — *15 min*
 
 ---
@@ -88,11 +88,11 @@ Settings → API :
 [Brevo (ex-Sendinblue)](https://www.brevo.com/fr/) est une entreprise française basée à Paris, RGPD natif, 300 emails/jour gratuits — largement suffisant.
 
 1. https://www.brevo.com/fr/ → Inscription gratuite
-2. Senders & IPs → Domains → Ajouter `rivesdaparis.fr`
+2. Senders & IPs → Domains → Ajouter `lesrivesdeparis.fr`
 3. Suivre les instructions DNS : ajouter chez ton registrar les enregistrements **SPF**, **DKIM** et **Brevo code** (TXT). Cela authentifie tes envois et évite les spams.
 4. SMTP & API → API Keys → "Generate a new API key" → copier → ce sera `BREVO_API_KEY`
 
-Tu peux aussi configurer l'email d'expédition par défaut : `baignade@rivesdaparis.fr` (à créer chez ton registrar avec une redirection vers la boîte de la commune).
+Tu peux aussi configurer l'email d'expédition par défaut : `baignade@lesrivesdeparis.fr` (à créer chez ton registrar avec une redirection vers la boîte de la commune).
 
 ---
 
@@ -129,7 +129,7 @@ Developers → Webhooks → Add endpoint :
 cd "Baignade RDP"
 git init
 git add .
-git commit -m "feat: MVP initial baignade.rivesdaparis.fr v1.0.0"
+git commit -m "feat: MVP initial baignade.lesrivesdeparis.fr v1.0.0"
 git branch -M main
 gh repo create baignade-rivesdaparis --public --source=. --push
 # ou manuellement :
@@ -152,7 +152,7 @@ gh repo create baignade-rivesdaparis --public --source=. --push
    - `VITE_SUPABASE_URL` = `https://xxx.supabase.co`
    - `VITE_SUPABASE_ANON_KEY` = `eyJ...`
    - `VITE_STRIPE_PUBLISHABLE_KEY` = `pk_live_xxx`
-   - `VITE_APP_URL` = `https://baignade.rivesdaparis.fr`
+   - `VITE_APP_URL` = `https://baignade.lesrivesdeparis.fr`
 5. Save and Deploy
 
 Cloudflare construit le site (~2 min), SSL inclus, URL temporaire `*.pages.dev`.
@@ -168,8 +168,8 @@ cd "Baignade RDP"
 supabase secrets set STRIPE_SECRET_KEY=sk_live_xxx
 supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_xxx
 supabase secrets set BREVO_API_KEY=xkeysib-xxx
-supabase secrets set APP_URL=https://baignade.rivesdaparis.fr
-supabase secrets set FROM_EMAIL=baignade@rivesdaparis.fr
+supabase secrets set APP_URL=https://baignade.lesrivesdeparis.fr
+supabase secrets set FROM_EMAIL=baignade@lesrivesdeparis.fr
 supabase secrets set FROM_NAME="Baignade Rives d'Paris"
 
 # Déployer les 4 functions
@@ -186,8 +186,8 @@ supabase functions deploy send-confirmation-email --no-verify-jwt
 ## 7. DNS — pointer le domaine (5 min)
 
 Dans le dashboard Cloudflare Pages :
-- Custom domains → Set up a custom domain → `baignade.rivesdaparis.fr`
-- Cloudflare affiche un CNAME à ajouter chez le registrar de `rivesdaparis.fr`
+- Custom domains → Set up a custom domain → `baignade.lesrivesdeparis.fr`
+- Cloudflare affiche un CNAME à ajouter chez le registrar de `lesrivesdeparis.fr`
 
 Chez le registrar :
 ```
@@ -201,7 +201,7 @@ Propagation DNS : 5 min à 24 h selon les FAI. Cloudflare émet le certificat HT
 
 ## 8. Test bout-en-bout (15 min)
 
-1. Aller sur `https://baignade.rivesdaparis.fr/` — la landing doit s'afficher
+1. Aller sur `https://baignade.lesrivesdeparis.fr/` — la landing doit s'afficher
 2. **Admin** : se connecter avec l'email admin → Magic Link reçu (Brevo) → admin
 3. **Créer un créneau** : Admin → Créneaux → Génération en masse pour aujourd'hui
 4. **Réserver côté public** : aller sur `/reserver` → sélectionner → payer avec carte test `4242 4242 4242 4242` (CVC 123, date future)
@@ -217,7 +217,7 @@ Si tout fonctionne : **bascule Stripe en live**, recopie les nouvelles clés dan
 - [ ] Supabase région Frankfurt confirmée
 - [ ] Backups Supabase Free actifs (7 jours rétention)
 - [ ] RLS active sur toutes les tables (déjà fait dans le schéma)
-- [ ] Brevo domaine `rivesdaparis.fr` **Verified**
+- [ ] Brevo domaine `lesrivesdeparis.fr` **Verified**
 - [ ] Stripe en **mode live** avec compte commune validé
 - [ ] Webhook Stripe testé (Developers → Webhooks → Send test event)
 - [ ] Au moins 1 compte admin créé

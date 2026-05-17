@@ -4,6 +4,15 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.1.1] — 2026-05-17
+
+### 🔧 Correction du nom de domaine cible
+
+- Le domaine cible était incorrectement renseigné `rivesdaparis.fr` dans tout le projet ; valeur correcte : **`lesrivesdeparis.fr`** (sous-domaine `baignade.lesrivesdeparis.fr`).
+- Corrigé dans : `index.html` (canonical + Open Graph), `public/sitemap.xml`, `public/robots.txt`, fallbacks `APP_URL` des Edge Functions `create-checkout-session` et `send-confirmation-email`, `FROM_EMAIL` (→ `baignade@lesrivesdeparis.fr`), texte de la politique de confidentialité, `.env.example`, documentation (`HANDOFF.md`, `DEPLOY.md`, `README.md`).
+- Identifiants techniques inchangés : repo GitHub `baignade-rivesdaparis`, sous-domaine Cloudflare `…workers.dev`, comptes `baignade-rivesdaparis@tk7.fr`.
+- ⚠️ Actions externes restantes : vérification du domaine `lesrivesdeparis.fr` côté Brevo, et secrets Supabase `APP_URL` / `FROM_EMAIL` à mettre à jour côté serveur.
+
 ## [1.1.0] — 2026-05-12
 
 ### ✨ Tarif habitant Neuilly-sur-Marne

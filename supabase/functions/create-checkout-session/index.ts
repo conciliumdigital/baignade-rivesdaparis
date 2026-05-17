@@ -30,7 +30,7 @@ serve(async (req: Request) => {
     if (error || !reservation) return json({ error: 'Réservation introuvable' }, 404);
     if (reservation.status !== 'pending_payment') return json({ error: 'Statut invalide' }, 400);
 
-    const appUrl = Deno.env.get('APP_URL') ?? 'https://baignade.rivesdaparis.fr';
+    const appUrl = Deno.env.get('APP_URL') ?? 'https://baignade.lesrivesdeparis.fr';
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',

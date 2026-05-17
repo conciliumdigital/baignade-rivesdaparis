@@ -1,0 +1,65 @@
+name: Supabase Keep-Alive
+
+# Empêche la mise en pause automatique du projet Supabase Free
+# (pause après 7 jours sans activité). Tant que le site n'a pas de
+# trafic réel, ce job génère une activité légère quotidienne.
+#
+# Note : la clé `apikey` ci-dessous est la clé *publishable / anon*,
+# publique par design (déjà présente dans le bundle front et dans
+# HANDOFF.md). Ce n'est PAS un secret. Si elle est rotée un jour,
+# définir la variable de dépôt `SUPABASE_ANON_KEY` qui prendra le pas.
+
+on:
+  schedule:
+    # Tous les jours à 07:13 UTC (heure décalée pour éviter les pics
+    # de charge GitHub où les jobs cron sont parfois ignorés).
+    - cron: "13 7 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-keepalive
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    name: Ping Supabase REST + Auth
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SUPABASE_URL: "https://nunglkeqekxzpmushxty.supabase.co"
+      SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY || 'sb_publishable_XHasVadnhVZMoispGMq3aA_GdZEs8xy' }}
+    steps:
+      - name: Requete REST (vue slot_availability)
+        run: |
+          set -euo pipefail
+          code=$(curl -s -o /tmp/rest.json -w "%{http_code}" \
+            --max-time 30 --retry 3 --retry-delay 10 --retry-all-errors \
+            "$SUPABASE_URL/rest/v1/slot_availability?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+          echo "REST HTTP $code"
+          cat /tmp/rest.json || true
+          echo
+          if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
+            echo "::error::REST a repondu $code (attendu 2xx) — la base est peut-etre en pause."
+            exit 1
+          fi
+
+      - name: Healthcheck Auth (GoTrue)
+        run: |
+          set -euo pipefail
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 30 --retry 3 --retry-delay 10 --retry-all-errors \
+            "$SUPABASE_URL/auth/v1/health" \
+            -H "apikey: $SUPABASE_ANON_KEY")
+          echo "Auth health HTTP $code"
+          if [ "$code" -ne 200 ]; then
+            echo "::error::Auth health a repondu $code (attendu 200)."
+            exit 1
+          fi
+
+      - name: Resume
+        run: echo "Supabase actif — timer d'inactivite reinitialise ($(date -u +'%Y-%m-%dT%H:%M:%SZ'))."

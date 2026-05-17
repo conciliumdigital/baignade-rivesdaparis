@@ -4,6 +4,24 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.1.4] — 2026-05-17
+
+### ✨ Tarif habitant / enfant configurable en back-office
+
+- `AdminSlots` : la création de créneaux (à l'unité **et** génération en
+  masse) expose désormais **Tarif extérieur / Tarif habitant / Tarif
+  enfant** (en centimes). Avant : seul le tarif extérieur était saisi,
+  le tarif habitant reposait sur le défaut SQL (300 ct) sans contrôle
+  possible par la commune.
+- Tableau des créneaux : la colonne « Tarif » affiche aussi le tarif
+  habitant (`· hab. X €`) quand il est > 0.
+- Rappel UX : tarif habitant à 0 → l'option « habitant » (et donc
+  l'upload du justificatif + la case sur l'honneur) est masquée côté
+  usager pour ce créneau.
+- `supabase/demo/04_test_resident_slot.sql` : créneau de test avec tarif
+  habitant > 0 (daté J+7) pour valider le formulaire usager
+  (upload justificatif + déclaration sur l'honneur).
+
 ## [1.1.3] — 2026-05-17
 
 ### 🔒 Correctifs de sécurité

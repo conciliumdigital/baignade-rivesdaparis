@@ -7,6 +7,14 @@
 -- alimenter le TABLEAU DE BORD admin (réservations, recettes, no-show,
 -- note moyenne), la liste des réservations et la page satisfaction.
 --
+-- 🔒 SÉCURITÉ — Les comptes de démo sont VOLONTAIREMENT NON CONNECTABLES :
+--    aucun mot de passe (pas de `encrypted_password`) ET `banned_until`
+--    fixé en 2999 → GoTrue refuse toute connexion (mot de passe ET magic
+--    link). Ils servent uniquement de propriétaires FK pour les données
+--    de démo. Pour démontrer le back-office, l'opérateur se connecte avec
+--    SON PROPRE compte admin réel (Magic Link). On ne crée JAMAIS de
+--    compte privilégié connectable avec un secret commité.
+--
 -- ⚠️ AVERTISSEMENTS
 --  - Insère dans auth.users (le trigger on_auth_user_created crée les
 --    profils automatiquement). Le jeu de colonnes auth.users peut varier
@@ -16,6 +24,7 @@
 --    99_cleanup_demo.sql. Un garde-fou `not exists` empêche les doublons
 --    et les conflits avec le trigger anti-overbooking.
 --  - Emails en @demo.lesrivesdeparis.fr, références 'DEMO-…' → purge facile.
+--  - Toujours lancer 99_cleanup_demo.sql avant l'ouverture publique réelle.
 -- =====================================================================
 
 begin;
@@ -24,18 +33,18 @@ begin;
 -- 1) Usagers de démo (auth.users) — le trigger crée les profils
 -- ---------------------------------------------------------------------
 insert into auth.users (
-  instance_id, id, aud, role, email, encrypted_password,
+  instance_id, id, aud, role, email, banned_until,
   email_confirmed_at, created_at, updated_at,
   raw_app_meta_data, raw_user_meta_data,
   confirmation_token, recovery_token, email_change_token_new, email_change
 )
 values
-  ('00000000-0000-0000-0000-000000000000','11111111-1111-1111-1111-111111111111','authenticated','authenticated','demo.admin@demo.lesrivesdeparis.fr',   crypt('DemoBaignade2026!', gen_salt('bf')), now(), now(), now(), '{"provider":"email","providers":["email"]}','{"first_name":"Camille","last_name":"Dubois"}','','','',''),
-  ('00000000-0000-0000-0000-000000000000','22222222-2222-2222-2222-222222222222','authenticated','authenticated','demo.manager@demo.lesrivesdeparis.fr', crypt('DemoBaignade2026!', gen_salt('bf')), now(), now(), now(), '{"provider":"email","providers":["email"]}','{"first_name":"Bruno","last_name":"Lefevre"}','','','',''),
-  ('00000000-0000-0000-0000-000000000000','33333333-3333-3333-3333-333333333333','authenticated','authenticated','demo.agent@demo.lesrivesdeparis.fr',   crypt('DemoBaignade2026!', gen_salt('bf')), now(), now(), now(), '{"provider":"email","providers":["email"]}','{"first_name":"Awa","last_name":"Traore"}','','','',''),
-  ('00000000-0000-0000-0000-000000000000','44444444-4444-4444-4444-444444444444','authenticated','authenticated','demo.martin@demo.lesrivesdeparis.fr',  crypt('DemoBaignade2026!', gen_salt('bf')), now(), now(), now(), '{"provider":"email","providers":["email"]}','{"first_name":"Julie","last_name":"Martin"}','','','',''),
-  ('00000000-0000-0000-0000-000000000000','55555555-5555-5555-5555-555555555555','authenticated','authenticated','demo.bernard@demo.lesrivesdeparis.fr', crypt('DemoBaignade2026!', gen_salt('bf')), now(), now(), now(), '{"provider":"email","providers":["email"]}','{"first_name":"Sophie","last_name":"Bernard"}','','','',''),
-  ('00000000-0000-0000-0000-000000000000','66666666-6666-6666-6666-666666666666','authenticated','authenticated','demo.petit@demo.lesrivesdeparis.fr',   crypt('DemoBaignade2026!', gen_salt('bf')), now(), now(), now(), '{"provider":"email","providers":["email"]}','{"first_name":"Lucas","last_name":"Petit"}','','','','')
+  ('00000000-0000-0000-0000-000000000000','11111111-1111-1111-1111-111111111111','authenticated','authenticated','demo.admin@demo.lesrivesdeparis.fr',   timestamptz '2999-12-31 00:00:00+00', now(), now(), now(), '{"provider":"email","providers":["email"]}','{"first_name":"Camille","last_name":"Dubois"}','','','',''),
+  ('00000000-0000-0000-0000-000000000000','22222222-2222-2222-2222-222222222222','authenticated','authenticated','demo.manager@demo.lesrivesdeparis.fr', timestamptz '2999-12-31 00:00:00+00', now(), now(), now(), '{"provider":"email","providers":["email"]}','{"first_name":"Bruno","last_name":"Lefevre"}','','','',''),
+  ('00000000-0000-0000-0000-000000000000','33333333-3333-3333-3333-333333333333','authenticated','authenticated','demo.agent@demo.lesrivesdeparis.fr',   timestamptz '2999-12-31 00:00:00+00', now(), now(), now(), '{"provider":"email","providers":["email"]}','{"first_name":"Awa","last_name":"Traore"}','','','',''),
+  ('00000000-0000-0000-0000-000000000000','44444444-4444-4444-4444-444444444444','authenticated','authenticated','demo.martin@demo.lesrivesdeparis.fr',  timestamptz '2999-12-31 00:00:00+00', now(), now(), now(), '{"provider":"email","providers":["email"]}','{"first_name":"Julie","last_name":"Martin"}','','','',''),
+  ('00000000-0000-0000-0000-000000000000','55555555-5555-5555-5555-555555555555','authenticated','authenticated','demo.bernard@demo.lesrivesdeparis.fr', timestamptz '2999-12-31 00:00:00+00', now(), now(), now(), '{"provider":"email","providers":["email"]}','{"first_name":"Sophie","last_name":"Bernard"}','','','',''),
+  ('00000000-0000-0000-0000-000000000000','66666666-6666-6666-6666-666666666666','authenticated','authenticated','demo.petit@demo.lesrivesdeparis.fr',   timestamptz '2999-12-31 00:00:00+00', now(), now(), now(), '{"provider":"email","providers":["email"]}','{"first_name":"Lucas","last_name":"Petit"}','','','','')
 on conflict (id) do nothing;
 
 -- ---------------------------------------------------------------------

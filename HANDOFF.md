@@ -2,7 +2,7 @@
 
 > Document de reprise du projet. Tout ce qu'il faut savoir pour continuer depuis une nouvelle machine, un nouveau collaborateur, ou après une pause.
 
-**Version** : 1.1.2
+**Version** : 1.1.3
 **Dernière mise à jour** : 2026-05-17
 **Client** : Commune de Neuilly-sur-Marne
 **Prestataire** : CONCILIUM

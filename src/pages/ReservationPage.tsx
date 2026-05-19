@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { addDays, format, parseISO, startOfWeek } from 'date-fns';
+import { addDays, format, startOfWeek } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Calendar, Clock, Users, AlertCircle, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import { fetchUpcomingSlots } from '../lib/slots';
@@ -197,6 +197,3 @@ function EmptyState() {
     </div>
   );
 }
-
-// helper non utilisé directement mais utile : éviter un warning d'import
-export const _parseISO = parseISO;

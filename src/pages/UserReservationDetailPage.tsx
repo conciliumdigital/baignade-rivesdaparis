@@ -11,6 +11,8 @@ export function UserReservationDetailPage() {
   const [reservation, setReservation] = useState<ReservationWithSlot | null>(null);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [reloadTick, setReloadTick] = useState(0);
 
   useEffect(() => {
     async function load() {
@@ -18,25 +20,44 @@ export function UserReservationDetailPage() {
         setLoading(false);
         return;
       }
-      const { data } = await supabase
+      setLoading(true);
+      setLoadError(false);
+      const { data, error } = await supabase
         .from('reservations')
         .select('*, slot:slots(*)')
         .eq('id', id!)
         .maybeSingle();
+      if (error) {
+        setLoadError(true);
+        setLoading(false);
+        return;
+      }
       if (data) {
         setReservation(data as ReservationWithSlot);
         if (data.qr_code_token) {
-          const url = await QRCode.toDataURL(data.qr_code_token, { width: 320, margin: 2 });
-          setQrUrl(url);
+          try {
+            const url = await QRCode.toDataURL(data.qr_code_token, { width: 320, margin: 2 });
+            setQrUrl(url);
+          } catch {
+            /* QR non généré : la référence reste affichée */
+          }
         }
       }
       setLoading(false);
     }
     load();
-  }, [id]);
+  }, [id, reloadTick]);
 
   if (loading) {
     return <div className="container-app py-20 text-center"><Loader2 className="w-8 h-8 animate-spin text-brand-600 mx-auto" /></div>;
+  }
+  if (loadError) {
+    return (
+      <div className="container-app py-20 text-center max-w-md">
+        <p className="text-slate-600 mb-4">Une erreur réseau est survenue. Votre réservation n'est pas perdue.</p>
+        <button onClick={() => setReloadTick((t) => t + 1)} className="btn-primary">Réessayer</button>
+      </div>
+    );
   }
   if (!reservation) {
     return <div className="container-app py-20 text-center">Réservation introuvable. <Link to="/compte" className="text-brand-700 underline">Retour</Link></div>;

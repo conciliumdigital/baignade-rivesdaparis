@@ -6,6 +6,37 @@ versioning [SemVer](https://semver.org/lang/fr/).
 
 ## [1.1.5] — 2026-05-17
 
+### 🔍 Audit complet — remédiation
+
+**Performance / temps de chargement**
+- `sourcemap:false` en prod (−2,8 Mo, plus de fuite du code source),
+  `manualChunks` (react/supabase isolés cachables), cible es2022.
+- Code-splitting `lazy()`/`Suspense` (App.tsx) : bundle initial public
+  ~222 ko gz → ~26 ko (shell) ; scanner QR/zxing et admin en chunks
+  séparés, hors chemin public.
+- Vidéo hero : rendue desktop only + hors `prefers-reduced-motion`,
+  `preload="metadata"` ; cache `/*.mp4` (30 j) ; mobile garde le dégradé.
+- `@stripe/stripe-js` retiré (inutilisé) ; fonts via `preconnect`+`link`
+  (plus d'`@import` CSS render-blocking).
+
+**Bugs / UX**
+- Créneau non `open` ou complet → écran « non réservable », soumission
+  bloquée (lien direct vers privé/fermé).
+- `pending_payment` : message clair + bouton « Annuler la demande ».
+- Annulation bloquée à moins de 24h ; message honnête (plus de promesse
+  de remboursement automatique tant que Stripe n'est pas branché).
+- Composition adultes/enfants conservée au retour du lien magique.
+- Back-office créneaux : boutons Modifier / Dupliquer fonctionnels.
+- États d'erreur réseau explicites (espace compte, détail réservation,
+  réservations admin, historique scans, tableau de bord).
+- Tableau de bord : taux de remplissage **calculé** (vue
+  `slot_availability`) ; graphes statiques marqués « données
+  illustratives » ; code mort retiré.
+
+> Bug « -50 % enfant » volontairement non traité (exclu sur demande).
+> Sécurité critique (escalade privilège / fraude tarifaire) : voir
+> migration `20260519000000_harden_rls.sql` (PR dédiée).
+
 ### 🏊 Modèle opérationnel réel — Phase 1 (saison 2026)
 
 Modèle confirmé par la commune le 2026-05-17.

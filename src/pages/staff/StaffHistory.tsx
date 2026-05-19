@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { isSupabaseConfigured, supabase } from '../../lib/supabase';
 import { formatDate } from '../../lib/format';
 
@@ -21,11 +22,12 @@ export function StaffHistory() {
         setRows([]);
         return;
       }
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('scan_log')
         .select('id, result, scanned_at, reservation:reservations(reference, slot:slots(date, start_time)), scanner:profiles!scan_log_scanned_by_fkey(first_name, last_name)')
         .order('scanned_at', { ascending: false })
         .limit(200);
+      if (error) toast.error('Erreur de chargement de l\'historique.');
       setRows((data ?? []) as any);
     }
     load();

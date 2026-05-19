@@ -4,6 +4,27 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.1.9] — 2026-05-19
+
+### 🎟️ Codes de réduction
+
+- Nouvelle table `discount_codes` (% ou montant fixe, usages max,
+  période de validité, montant minimum) — migration
+  `20260519200000_discount_codes.sql` (RLS admin).
+- **Sécurité** : la remise est validée et appliquée **côté serveur**
+  via la fonction `compute_discount()` (source unique de vérité) et le
+  trigger `secure_reservation_insert` étendu — le client ne peut pas
+  forcer une remise. Comptage des usages en `AFTER INSERT`.
+- **Formulaire de réservation** : champ « Code de réduction » +
+  bouton Appliquer (aperçu via RPC : ligne remise + nouveau total).
+  Le serveur recalcule à l'identique.
+- **Back-office `/admin/reductions`** : créer / activer-désactiver /
+  supprimer des codes, suivi des usages. Entrée de menu + route lazy.
+
+> ⚠️ Après merge : exécuter `20260519200000_discount_codes.sql`
+> (SQL Editor) puis redéployer (rien à redéployer côté Edge — la
+> logique est en base/trigger).
+
 ## [1.1.8] — 2026-05-19
 
 ### ✏️ E-mails automatiques éditables (back-office)

@@ -1,15 +1,25 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { addDays, format, parseISO, startOfWeek } from 'date-fns';
+import { addDays, format, startOfWeek } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Calendar, Clock, Users, AlertCircle, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import { fetchUpcomingSlots } from '../lib/slots';
 import { formatPrice, formatTimeRange } from '../lib/format';
 import type { SlotAvailability } from '../types/database';
 
+// Début de saison confirmé par la commune : 4 juillet 2026 (mois 0-indexé).
+const SEASON_START = new Date(2026, 6, 4);
+
 export function ReservationPage() {
   const navigate = useNavigate();
-  const [weekStart, setWeekStart] = useState<Date>(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  // Avant l'ouverture, le calendrier s'ouvre directement sur la semaine
+  // du 4 juillet (sinon l'usager ne voit que des semaines vides).
+  // Une fois la saison commencée, on repart du jour courant.
+  const [weekStart, setWeekStart] = useState<Date>(() => {
+    const now = new Date();
+    const anchor = now < SEASON_START ? SEASON_START : now;
+    return startOfWeek(anchor, { weekStartsOn: 1 });
+  });
   const [slots, setSlots] = useState<SlotAvailability[]>([]);
   const [loading, setLoading] = useState(true);
   const [persons, setPersons] = useState(1);
@@ -197,6 +207,3 @@ function EmptyState() {
     </div>
   );
 }
-
-// helper non utilisé directement mais utile : éviter un warning d'import
-export const _parseISO = parseISO;

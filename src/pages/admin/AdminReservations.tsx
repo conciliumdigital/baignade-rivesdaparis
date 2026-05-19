@@ -33,11 +33,12 @@ export function AdminReservations() {
         setLoading(false);
         return;
       }
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('reservations')
         .select('id, reference, status, nb_adults, nb_children, total_amount_cents, usager_type, resident_proof_url, honor_certification, created_at, user:profiles(email, first_name, last_name), slot:slots(date, start_time, end_time)')
         .order('created_at', { ascending: false })
         .limit(500);
+      if (error) toast.error('Erreur de chargement des réservations.');
       setRows((data ?? []) as any);
       setLoading(false);
     }

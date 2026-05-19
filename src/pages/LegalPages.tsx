@@ -87,7 +87,12 @@ export function MentionsLegalesPage() {
       <h2 className="font-display font-bold text-lg mt-6">Conception & développement</h2>
       <p>CONCILIUM — solution numérique de réservation.</p>
       <h2 className="font-display font-bold text-lg mt-6">Hébergement</h2>
-      <p>Supabase (région UE) — Stripe (paiement, conformité PCI DSS).</p>
+      <p>
+        Données hébergées dans l'Union européenne. Les paiements par carte
+        bancaire sont opérés par un prestataire de paiement spécialisé,
+        certifié aux standards internationaux de sécurité des paiements.
+        La commune ne conserve aucune coordonnée bancaire.
+      </p>
     </LegalLayout>
   );
 }

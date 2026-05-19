@@ -21,6 +21,8 @@ export function AccountPage() {
   const { user, profile } = useAuth();
   const [reservations, setReservations] = useState<ReservationWithSlot[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [reloadTick, setReloadTick] = useState(0);
 
   useEffect(() => {
     async function load() {
@@ -29,29 +31,57 @@ export function AccountPage() {
         setLoading(false);
         return;
       }
-      const { data } = await supabase
+      setLoading(true);
+      setLoadError(false);
+      const { data, error } = await supabase
         .from('reservations')
         .select('*, slot:slots(*)')
         .eq('user_id', user!.id)
         .order('created_at', { ascending: false });
-      setReservations((data ?? []) as ReservationWithSlot[]);
+      if (error) {
+        setLoadError(true);
+      } else {
+        setReservations((data ?? []) as ReservationWithSlot[]);
+      }
       setLoading(false);
     }
     if (user) load();
-  }, [user]);
+  }, [user, reloadTick]);
 
-  async function cancelReservation(id: string) {
-    if (!confirm('Confirmer l\'annulation de cette réservation ?')) return;
+  // Heure de début du créneau (pour la règle d'annulation 24h)
+  function slotStart(r: ReservationWithSlot) {
+    return new Date(`${r.slot.date}T${r.slot.start_time}`);
+  }
+
+  async function cancelReservation(r: ReservationWithSlot) {
+    const isPending = r.status === 'pending_payment';
+    // Réservation confirmée : annulation impossible à moins de 24h du créneau
+    if (!isPending) {
+      const msLeft = slotStart(r).getTime() - Date.now();
+      if (msLeft < 24 * 3600 * 1000) {
+        toast.error("L'annulation n'est plus possible à moins de 24h du créneau.");
+        return;
+      }
+    }
+    const msg = isPending
+      ? 'Abandonner cette demande de réservation non payée ?'
+      : "Confirmer l'annulation de cette réservation ?";
+    if (!confirm(msg)) return;
     if (!isSupabaseConfigured) return;
     const { error } = await supabase
       .from('reservations')
       .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
-      .eq('id', id);
-    if (error) toast.error(error.message);
-    else {
-      toast.success('Réservation annulée. Remboursement en cours sous 5 jours ouvrés.');
-      setReservations((prev) => prev.map((r) => (r.id === id ? { ...r, status: 'cancelled' } : r)));
+      .eq('id', r.id);
+    if (error) {
+      toast.error(error.message);
+      return;
     }
+    toast.success(
+      isPending
+        ? 'Demande abandonnée.'
+        : "Demande d'annulation enregistrée. Le remboursement éventuel sera traité par la commune.",
+    );
+    setReservations((prev) => prev.map((x) => (x.id === r.id ? { ...x, status: 'cancelled' } : x)));
   }
 
   return (
@@ -73,6 +103,13 @@ export function AccountPage() {
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="card p-6 h-28 shimmer" />
           ))}
+        </div>
+      ) : loadError ? (
+        <div className="card p-10 text-center">
+          <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto mb-3" />
+          <h2 className="font-display font-bold text-lg mb-1">Impossible de charger vos réservations</h2>
+          <p className="text-sm text-slate-500 mb-5">Une erreur réseau est survenue. Vos réservations ne sont pas perdues.</p>
+          <button onClick={() => setReloadTick((t) => t + 1)} className="btn-primary">Réessayer</button>
         </div>
       ) : reservations.length === 0 ? (
         <div className="card p-10 text-center">
@@ -101,14 +138,24 @@ export function AccountPage() {
                     <li className="font-semibold text-slate-700">{formatPrice(r.total_amount_cents)}</li>
                   </ul>
                 </div>
-                <div className="flex gap-2 flex-shrink-0">
+                <div className="flex flex-col items-stretch sm:items-end gap-2 flex-shrink-0">
                   {r.status === 'confirmed' && (
-                    <Link to={`/compte/reservation/${r.id}`} className="btn-primary text-sm">
+                    <Link to={`/compte/reservation/${r.id}`} className="btn-primary text-sm justify-center">
                       <QrCode className="w-4 h-4" /> Voir QR
                     </Link>
                   )}
+                  {r.status === 'pending_payment' && (
+                    <>
+                      <p className="text-xs text-amber-700 sm:text-right sm:max-w-[13rem]">
+                        Réservation non confirmée tant que le paiement n'est pas réglé.
+                      </p>
+                      <button onClick={() => cancelReservation(r)} className="btn-secondary text-sm justify-center">
+                        Annuler la demande
+                      </button>
+                    </>
+                  )}
                   {isUpcoming && (
-                    <button onClick={() => cancelReservation(r.id)} className="btn-secondary text-sm">
+                    <button onClick={() => cancelReservation(r)} className="btn-secondary text-sm justify-center">
                       Annuler
                     </button>
                   )}

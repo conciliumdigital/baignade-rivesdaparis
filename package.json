@@ -1,7 +1,7 @@
 {
   "name": "baignade-rivesdaparis",
   "private": true,
-  "version": "1.1.4",
+  "version": "1.1.5",
   "type": "module",
   "description": "Application de réservation - Zone de baignade estivale - Neuilly-sur-Marne",
   "scripts": {
@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
-    "@stripe/stripe-js": "^4.7.0",
     "@yudiel/react-qr-scanner": "^2.0.8",
     "date-fns": "^3.6.0",
     "lucide-react": "^0.453.0",

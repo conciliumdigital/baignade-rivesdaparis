@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+/* Polices chargées via <link preconnect/stylesheet> dans index.html
+   (évite le render-blocking d'un @import CSS). */
 
 @tailwind base;
 @tailwind components;

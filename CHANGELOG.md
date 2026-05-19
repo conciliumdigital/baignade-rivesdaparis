@@ -4,6 +4,86 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.1.5] — 2026-05-17
+
+### 🔍 Audit complet — remédiation
+
+**Performance / temps de chargement**
+- `sourcemap:false` en prod (−2,8 Mo, plus de fuite du code source),
+  `manualChunks` (react/supabase isolés cachables), cible es2022.
+- Code-splitting `lazy()`/`Suspense` (App.tsx) : bundle initial public
+  ~222 ko gz → ~26 ko (shell) ; scanner QR/zxing et admin en chunks
+  séparés, hors chemin public.
+- Vidéo hero : rendue desktop only + hors `prefers-reduced-motion`,
+  `preload="metadata"` ; cache `/*.mp4` (30 j) ; mobile garde le dégradé.
+- `@stripe/stripe-js` retiré (inutilisé) ; fonts via `preconnect`+`link`
+  (plus d'`@import` CSS render-blocking).
+
+**Bugs / UX**
+- Créneau non `open` ou complet → écran « non réservable », soumission
+  bloquée (lien direct vers privé/fermé).
+- `pending_payment` : message clair + bouton « Annuler la demande ».
+- Annulation bloquée à moins de 24h ; message honnête (plus de promesse
+  de remboursement automatique tant que Stripe n'est pas branché).
+- Composition adultes/enfants conservée au retour du lien magique.
+- Back-office créneaux : boutons Modifier / Dupliquer fonctionnels.
+- États d'erreur réseau explicites (espace compte, détail réservation,
+  réservations admin, historique scans, tableau de bord).
+- Tableau de bord : taux de remplissage **calculé** (vue
+  `slot_availability`) ; graphes statiques marqués « données
+  illustratives » ; code mort retiré.
+
+> Bug « -50 % enfant » volontairement non traité (exclu sur demande).
+> Sécurité critique (escalade privilège / fraude tarifaire) : voir
+> migration `20260519000000_harden_rls.sql` (PR dédiée).
+
+### 🏊 Modèle opérationnel réel — Phase 1 (saison 2026)
+
+Modèle confirmé par la commune le 2026-05-17.
+
+- `supabase/season_2026.sql` : génération des créneaux réels de la saison
+  **4 juillet → 30 août 2026** (idempotent, tag `SAISON2026`) :
+  - Semaine : 10h–11h **privé** (cours natation + centres loisir, non
+    public) · 11h–12h **public 1 € pour tous** · 12h–14h / 14h–16h /
+    16h–18h public 5 € · nocéen 2 €.
+  - Week-end : 10h–12h / 12h–14h / 14h–16h / 16h–18h / 18h–20h, tout
+    public, 5 € · nocéen 2 € (aucun créneau 1 €).
+  - Capacité 200 / créneau (provisoire).
+- **Réservation — créneau à tarif unique** : l'option « tarif habitant »
+  (et l'upload du justificatif + l'attestation) n'est désormais proposée
+  que si le tarif résident est une **vraie réduction** (`< extérieur`).
+  Sur le créneau 1 € pour tous, l'option habitant est masquée (plus de
+  friction justificatif inutile).
+- **Tarif enfant = tarif adulte** : suppression de la réduction enfant
+  −50 % codée en dur (la commune n'a pas défini de tarif enfant/groupe ;
+  champs adultes/enfants conservés pour une activation ultérieure sans
+  refonte).
+
+### 🐛 Correctifs back-office
+
+- **Équipe** : le bouton « Inviter un membre » était inactif. Il ouvre
+  désormais une fenêtre (e-mail + rôle) qui attribue le rôle au profil
+  correspondant ; message clair si la personne ne s'est pas encore
+  connectée via le lien magique.
+- **Créneaux** : les statuts `private` / `archived` s'affichaient en
+  anglais (valeur brute). Libellés français : « Privé (cours / loisirs) »,
+  « Archivé ». Le bouton ouvrir/fermer est masqué pour ces statuts (évite
+  d'ouvrir au public un créneau réservé aux cours).
+- **Créneaux** : les tarifs étaient saisis en **centimes**. Les champs
+  (création unitaire + génération en masse) sont désormais en **euros**
+  (pas de 0,50 €), convertis en centimes à l'enregistrement.
+
+### 🎬 Hero
+
+- Vidéo de fond sur le hero de la page d'accueil (auto-hébergée
+  `public/hero-baignade.mp4`, source : site officiel de la commune).
+  Lecture auto, muette, en boucle ; voile dégradé pour la lisibilité du
+  texte ; dégradé conservé en fallback.
+
+### Phase 2 (différée, non bloquante)
+- Module d'inscription en ligne aux cours de natation (groupes d'âge
+  6–9 / 10–14, cohortes de 6, alternance 3×/sem sur 2 semaines, nocéens).
+
 ## [1.1.4] — 2026-05-17
 
 ### ✨ Tarif habitant / enfant configurable en back-office

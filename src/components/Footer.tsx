@@ -27,7 +27,7 @@ export function Footer() {
             <li><Link to="/cgu" className="hover:text-white transition">Conditions générales</Link></li>
             <li><Link to="/confidentialite" className="hover:text-white transition">Politique de confidentialité</Link></li>
             <li><Link to="/mentions-legales" className="hover:text-white transition">Mentions légales</Link></li>
-            <li><Link to="/accessibilite" className="hover:text-white transition">Accessibilité (RGAA)</Link></li>
+            <li><Link to="/accessibilite" className="hover:text-white transition">Accessibilité</Link></li>
           </ul>
         </div>
 

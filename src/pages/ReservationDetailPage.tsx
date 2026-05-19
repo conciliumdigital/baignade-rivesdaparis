@@ -17,13 +17,23 @@ export function ReservationDetailPage() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
 
-  const personsFromUrl = Number(searchParams.get('persons') ?? 1);
+  // Composition restituée depuis l'URL (la redirection magic-link la
+  // repasse en query : ?adults=&children=), avec repli sur ?persons=.
+  const clampInt = (v: string | null, lo: number, hi: number, dflt: number) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? Math.min(hi, Math.max(lo, Math.trunc(n))) : dflt;
+  };
+  const adultsFromUrl = clampInt(
+    searchParams.get('adults') ?? searchParams.get('persons'), 1, 6, 1,
+  );
+  const childrenFromUrl = clampInt(searchParams.get('children'), 0, 5, 0);
+
   const [slot, setSlot] = useState<SlotAvailability | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  const [adults, setAdults] = useState(Math.max(1, personsFromUrl));
-  const [children, setChildren] = useState(0);
+  const [adults, setAdults] = useState(adultsFromUrl);
+  const [children, setChildren] = useState(childrenFromUrl);
   const [firstName, setFirstName] = useState(profile?.first_name ?? '');
   const [lastName, setLastName] = useState(profile?.last_name ?? '');
   const [email, setEmail] = useState(profile?.email ?? user?.email ?? '');
@@ -52,14 +62,22 @@ export function ReservationDetailPage() {
   }, [profile, user]);
 
   const isResident = usagerType === 'habitant';
-  const hasResidentPrice = slot?.price_resident_cents != null && slot.price_resident_cents > 0;
+  // Le tarif habitant n'est proposé que s'il constitue une vraie réduction
+  // (résident < extérieur). Sur les créneaux à tarif unique — ex. créneau
+  // 1 € pour tous — l'option « habitant » et le justificatif sont masqués.
+  const hasResidentPrice =
+    slot?.price_resident_cents != null &&
+    slot.price_resident_cents > 0 &&
+    slot.price_resident_cents < slot.price_cents;
 
   const adultPriceCents = useMemo(() => {
     if (!slot) return 0;
     return isResident && hasResidentPrice ? (slot.price_resident_cents as number) : slot.price_cents;
   }, [slot, isResident, hasResidentPrice]);
 
-  const childPriceCents = useMemo(() => Math.round(adultPriceCents * 0.5), [adultPriceCents]);
+  // Tarif enfant : identique à l'adulte pour l'instant (la commune n'a pas
+  // défini de tarif enfant / groupe — à reprendre ultérieurement).
+  const childPriceCents = adultPriceCents;
 
   const totalCents = useMemo(() => {
     return adults * adultPriceCents + children * childPriceCents;
@@ -134,7 +152,7 @@ export function ReservationDetailPage() {
       // 1. Si non connecté → magic link
       if (!user) {
         if (!isSupabaseConfigured) {
-          toast.success('Mode démo : aucune authentification réelle. La réservation passerait par Magic Link → Stripe.');
+          toast.success('Mode démonstration : aucune réservation réelle enregistrée.');
           navigate('/reserver/confirmation/demo');
           return;
         }
@@ -190,7 +208,7 @@ export function ReservationDetailPage() {
       if (checkoutData?.url) {
         window.location.href = checkoutData.url;
       } else {
-        throw new Error('URL Stripe Checkout manquante');
+        throw new Error('Le service de paiement est momentanément indisponible. Merci de réessayer dans quelques instants.');
       }
     } catch (err: any) {
       toast.error(err.message ?? 'Une erreur est survenue.');
@@ -212,6 +230,23 @@ export function ReservationDetailPage() {
       <div className="container-app py-20 text-center">
         <h1 className="text-2xl font-display font-bold mb-2">Créneau introuvable</h1>
         <Link to="/reserver" className="btn-secondary mt-4">Retour aux créneaux</Link>
+      </div>
+    );
+  }
+
+  if (slot.status !== 'open' || slot.remaining <= 0) {
+    const complet = slot.status === 'open' && slot.remaining <= 0;
+    return (
+      <div className="container-app py-20 text-center max-w-lg">
+        <h1 className="text-2xl font-display font-bold mb-2">
+          {complet ? 'Créneau complet' : 'Créneau non réservable'}
+        </h1>
+        <p className="text-slate-600 mb-6">
+          {complet
+            ? "Toutes les places de ce créneau sont déjà réservées."
+            : "Ce créneau n'est pas ouvert à la réservation en ligne."}
+        </p>
+        <Link to="/reserver" className="btn-primary">Voir les créneaux disponibles</Link>
       </div>
     );
   }
@@ -250,7 +285,7 @@ export function ReservationDetailPage() {
               <span className="font-display font-bold text-2xl text-brand-700">{formatPrice(totalCents)}</span>
             </div>
             <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
-              <ShieldCheck className="w-4 h-4" /> Paiement sécurisé Stripe · PCI DSS
+              <ShieldCheck className="w-4 h-4" /> Paiement par carte bancaire sécurisé
             </div>
           </div>
         </aside>
@@ -389,7 +424,7 @@ export function ReservationDetailPage() {
                 <label htmlFor="email" className="label">Email</label>
                 <input id="email" type="email" required className="input" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
                 <p className="text-xs text-slate-500 mt-1.5">
-                  Vous recevrez un lien de connexion sécurisé (Magic Link). Aucun mot de passe à mémoriser.
+                  Vous recevrez un lien de connexion sécurisé par e-mail. Aucun mot de passe à mémoriser.
                 </p>
               </div>
               <div className="sm:col-span-2">
@@ -417,7 +452,7 @@ export function ReservationDetailPage() {
               )}
             </button>
             <p className="text-xs text-center text-slate-500 mt-3">
-              Vous serez redirigé vers Stripe pour finaliser votre paiement en toute sécurité.
+              Vous serez redirigé vers notre prestataire de paiement sécurisé pour régler par carte bancaire.
             </p>
           </section>
         </form>

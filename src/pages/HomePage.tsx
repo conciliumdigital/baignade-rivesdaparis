@@ -1,11 +1,44 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Calendar, Smartphone, ShieldCheck, QrCode, MapPin, Clock, Users, Sparkles } from 'lucide-react';
 
 export function HomePage() {
+  // Vidéo de fond : uniquement sur desktop et hors "réduire les animations"
+  // (sur mobile / data-saver, on garde le dégradé — rendu visuel équivalent,
+  // ~6,5 Mo économisés et LCP préservé).
+  const [showHeroVideo, setShowHeroVideo] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const wideEnough = window.matchMedia('(min-width: 768px)').matches;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setShowHeroVideo(wideEnough && !reducedMotion);
+  }, []);
+
   return (
     <>
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-brand-600 via-brand-700 to-brand-900 text-white">
+        {/* Vidéo de fond (décorative, muette, en boucle) — desktop only */}
+        {showHeroVideo && (
+          <video
+            className="absolute inset-0 w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-hidden="true"
+            tabIndex={-1}
+          >
+            <source src="/hero-baignade.mp4" type="video/mp4" />
+          </video>
+        )}
+        {/* Voile pour garantir la lisibilité du texte par-dessus la vidéo */}
+        <div
+          className="absolute inset-0 bg-gradient-to-br from-brand-800/80 via-brand-800/70 to-brand-900/85"
+          aria-hidden="true"
+        />
+
         <div className="absolute inset-0 opacity-20" aria-hidden="true">
           <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1200 600" fill="none">
             <path d="M0 400 C 200 350 400 450 600 400 S 1000 350 1200 400 L 1200 600 L 0 600 Z" fill="white" fillOpacity=".08" />
@@ -13,7 +46,7 @@ export function HomePage() {
           </svg>
         </div>
 
-        <div className="container-app relative py-20 md:py-28 grid md:grid-cols-2 gap-10 items-center">
+        <div className="container-app relative z-10 py-20 md:py-28 grid md:grid-cols-2 gap-10 items-center">
           <div>
             <span className="badge bg-white/15 text-white border border-white/20 mb-5">
               <Sparkles className="w-3.5 h-3.5" /> Été 2026 — Réservation en ligne
@@ -86,7 +119,7 @@ export function HomePage() {
         <div className="grid md:grid-cols-3 gap-6">
           {[
             { icon: Calendar, title: '1 · Choisissez votre créneau', desc: "Calendrier en temps réel avec le nombre de places restantes pour chaque créneau de 2 heures." },
-            { icon: ShieldCheck, title: '2 · Payez en toute sécurité', desc: 'Paiement par carte bancaire, Apple Pay ou Google Pay via Stripe. Conformité PCI DSS garantie.' },
+            { icon: ShieldCheck, title: '2 · Payez en toute sécurité', desc: 'Paiement en ligne par carte bancaire. Vos coordonnées bancaires ne sont jamais conservées par la commune.' },
             { icon: QrCode, title: '3 · Présentez votre QR code', desc: 'Reçu instantanément par email. Scanné à l\'entrée, validation en moins d\'une seconde.' },
           ].map(({ icon: Icon, title, desc }) => (
             <div key={title} className="card p-6">
@@ -115,7 +148,7 @@ export function HomePage() {
                 'Créneaux dédiés aux groupes et écoles en semaine',
                 'Annulation gratuite jusqu\'à 24h avant le créneau',
                 'Notification automatique en cas de fermeture météo',
-                'Accessibilité conforme RGAA niveau AA',
+                'Site accessible aux personnes en situation de handicap',
               ].map((b) => (
                 <li key={b} className="flex items-start gap-2">
                   <span className="mt-1 w-1.5 h-1.5 rounded-full bg-brand-500 flex-shrink-0" />
@@ -127,13 +160,13 @@ export function HomePage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="card p-5">
               <Smartphone className="w-7 h-7 text-brand-600 mb-2" />
-              <div className="font-bold text-2xl">100%</div>
-              <div className="text-xs text-slate-500">Mobile-first</div>
+              <div className="font-bold text-2xl">Mobile</div>
+              <div className="text-xs text-slate-500">Réservation depuis votre téléphone</div>
             </div>
             <div className="card p-5">
               <ShieldCheck className="w-7 h-7 text-brand-600 mb-2" />
-              <div className="font-bold text-2xl">PCI DSS</div>
-              <div className="text-xs text-slate-500">Paiement sécurisé Stripe</div>
+              <div className="font-bold text-2xl">Sécurisé</div>
+              <div className="text-xs text-slate-500">Paiement par carte bancaire</div>
             </div>
             <div className="card p-5">
               <QrCode className="w-7 h-7 text-brand-600 mb-2" />

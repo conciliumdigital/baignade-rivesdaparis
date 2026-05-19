@@ -8,7 +8,15 @@ export default defineConfig({
     host: true,
   },
   build: {
-    target: 'es2020',
-    sourcemap: true,
+    target: 'es2022',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          supabase: ['@supabase/supabase-js'],
+        },
+      },
+    },
   },
 });

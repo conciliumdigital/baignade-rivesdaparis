@@ -4,6 +4,34 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.1.5] — 2026-05-17
+
+### 🏊 Modèle opérationnel réel — Phase 1 (saison 2026)
+
+Modèle confirmé par la commune le 2026-05-17.
+
+- `supabase/season_2026.sql` : génération des créneaux réels de la saison
+  **4 juillet → 30 août 2026** (idempotent, tag `SAISON2026`) :
+  - Semaine : 10h–11h **privé** (cours natation + centres loisir, non
+    public) · 11h–12h **public 1 € pour tous** · 12h–14h / 14h–16h /
+    16h–18h public 5 € · nocéen 2 €.
+  - Week-end : 10h–12h / 12h–14h / 14h–16h / 16h–18h / 18h–20h, tout
+    public, 5 € · nocéen 2 € (aucun créneau 1 €).
+  - Capacité 200 / créneau (provisoire).
+- **Réservation — créneau à tarif unique** : l'option « tarif habitant »
+  (et l'upload du justificatif + l'attestation) n'est désormais proposée
+  que si le tarif résident est une **vraie réduction** (`< extérieur`).
+  Sur le créneau 1 € pour tous, l'option habitant est masquée (plus de
+  friction justificatif inutile).
+- **Tarif enfant = tarif adulte** : suppression de la réduction enfant
+  −50 % codée en dur (la commune n'a pas défini de tarif enfant/groupe ;
+  champs adultes/enfants conservés pour une activation ultérieure sans
+  refonte).
+
+### Phase 2 (différée, non bloquante)
+- Module d'inscription en ligne aux cours de natation (groupes d'âge
+  6–9 / 10–14, cohortes de 6, alternance 3×/sem sur 2 semaines, nocéens).
+
 ## [1.1.4] — 2026-05-17
 
 ### ✨ Tarif habitant / enfant configurable en back-office

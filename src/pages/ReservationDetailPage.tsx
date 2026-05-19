@@ -52,14 +52,22 @@ export function ReservationDetailPage() {
   }, [profile, user]);
 
   const isResident = usagerType === 'habitant';
-  const hasResidentPrice = slot?.price_resident_cents != null && slot.price_resident_cents > 0;
+  // Le tarif habitant n'est proposé que s'il constitue une vraie réduction
+  // (résident < extérieur). Sur les créneaux à tarif unique — ex. créneau
+  // 1 € pour tous — l'option « habitant » et le justificatif sont masqués.
+  const hasResidentPrice =
+    slot?.price_resident_cents != null &&
+    slot.price_resident_cents > 0 &&
+    slot.price_resident_cents < slot.price_cents;
 
   const adultPriceCents = useMemo(() => {
     if (!slot) return 0;
     return isResident && hasResidentPrice ? (slot.price_resident_cents as number) : slot.price_cents;
   }, [slot, isResident, hasResidentPrice]);
 
-  const childPriceCents = useMemo(() => Math.round(adultPriceCents * 0.5), [adultPriceCents]);
+  // Tarif enfant : identique à l'adulte pour l'instant (la commune n'a pas
+  // défini de tarif enfant / groupe — à reprendre ultérieurement).
+  const childPriceCents = adultPriceCents;
 
   const totalCents = useMemo(() => {
     return adults * adultPriceCents + children * childPriceCents;

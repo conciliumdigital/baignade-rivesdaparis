@@ -9,8 +9,8 @@ export function Header() {
   const navigate = useNavigate();
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `px-3 py-2 rounded-lg text-sm font-medium transition ${
-      isActive ? 'text-brand-700 bg-brand-50' : 'text-slate-700 hover:text-brand-700 hover:bg-slate-100'
+    `link-underline relative px-1.5 py-2 text-sm transition-colors ${
+      isActive ? 'text-brand-700 font-semibold' : 'text-slate-600 font-medium hover:text-slate-900'
     }`;
 
   async function handleSignOut() {
@@ -23,14 +23,14 @@ export function Header() {
     <header className="sticky top-0 z-40 bg-white/85 backdrop-blur border-b border-slate-100">
       <div className="container-app flex items-center justify-between h-16">
         <Link to="/" className="flex items-center gap-2.5 group" aria-label="Accueil Baignade Rives d'Paris">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-soft">
+          <div className="w-9 h-9 rounded-lg bg-brand-800 flex items-center justify-center transition-transform group-hover:-translate-y-0.5">
             <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor" aria-hidden="true">
               <path d="M2 17c2 0 2-1 4-1s2 1 4 1 2-1 4-1 2 1 4 1 2-1 4-1v3c-2 0-2-1-4-1s-2 1-4 1-2-1-4-1-2 1-4 1-2-1-4-1v-2zM2 12c2 0 2-1 4-1s2 1 4 1 2-1 4-1 2 1 4 1 2-1 4-1v3c-2 0-2-1-4-1s-2 1-4 1-2-1-4-1-2 1-4 1-2-1-4-1v-2z" />
             </svg>
           </div>
           <div className="leading-tight">
-            <div className="font-display font-bold text-slate-900 text-[15px]">Baignade Rives d'Paris</div>
-            <div className="text-[11px] text-slate-500 -mt-0.5">Neuilly-sur-Marne</div>
+            <div className="font-display font-semibold text-slate-900 text-[17px]">Baignade Rives d'Paris</div>
+            <div className="text-[10px] uppercase tracking-[0.14em] text-slate-500 mt-0.5">Ville de Neuilly-sur-Marne</div>
           </div>
         </Link>
 

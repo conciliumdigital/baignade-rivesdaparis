@@ -4,6 +4,28 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.2.0] — 2026-05-19
+
+### 🎨 Refonte design — direction institutionnelle & éditoriale
+
+Objectif : « dé-IA-iser » l'interface, identité plus civique, micro-effets.
+
+- **Fondations** : police de titres **Fraunces** (serif éditorial) +
+  Inter corps ; palette/ombres/rayons affinés ; `prefers-reduced-motion`
+  respecté ; `::selection`, focus soignés.
+- **Micro-interactions** (zéro dépendance) : composant `<Reveal>`
+  (apparition au scroll, IntersectionObserver), soulignés de liens
+  animés (`.link-underline`), survol de cartes (`.card-hover`), retour
+  tactile des boutons (press), apparition du hero (`fade-up` échelonné).
+- **Page d'accueil** refondue : hero éditorial sobre (suppression de la
+  fausse carte « Aujourd'hui », du badge à paillettes et des dégradés
+  multi-stops), sections numérotées moins génériques, listes éditoriales.
+- **En-tête** : logo aplati, navigation à soulignés animés, signature
+  « Ville de Neuilly-sur-Marne ».
+- **Emoji décoratifs retirés** de l'UI (📬 connexion/e-mail envoyé,
+  👋 espace compte, 🏊‍♀️ sujet de campagne).
+- Tout le back-office hérite des `.btn`/`.card`/typo affinés.
+
 ## [1.1.9] — 2026-05-19
 
 ### 🎟️ Codes de réduction

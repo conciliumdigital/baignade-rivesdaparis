@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Calendar, Smartphone, ShieldCheck, QrCode, MapPin, Clock, Users, Sparkles } from 'lucide-react';
+import { Calendar, ShieldCheck, QrCode, MapPin, Clock, Users, ArrowRight } from 'lucide-react';
+import { Reveal } from '../components/Reveal';
 
 export function HomePage() {
-  // Vidéo de fond : uniquement sur desktop et hors "réduire les animations"
-  // (sur mobile / data-saver, on garde le dégradé — rendu visuel équivalent,
-  // ~6,5 Mo économisés et LCP préservé).
+  // Vidéo de fond : desktop uniquement et hors « réduire les animations »
+  // (mobile / data-saver → fond sobre, ~6,5 Mo économisés, LCP préservé).
   const [showHeroVideo, setShowHeroVideo] = useState(false);
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
@@ -16,9 +16,8 @@ export function HomePage() {
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-brand-600 via-brand-700 to-brand-900 text-white">
-        {/* Vidéo de fond (décorative, muette, en boucle) — desktop only */}
+      {/* ── Hero éditorial ───────────────────────────────────────── */}
+      <section className="relative overflow-hidden bg-brand-900 text-white">
         {showHeroVideo && (
           <video
             className="absolute inset-0 w-full h-full object-cover"
@@ -33,162 +32,125 @@ export function HomePage() {
             <source src="/hero-baignade.mp4" type="video/mp4" />
           </video>
         )}
-        {/* Voile pour garantir la lisibilité du texte par-dessus la vidéo */}
-        <div
-          className="absolute inset-0 bg-gradient-to-br from-brand-800/80 via-brand-800/70 to-brand-900/85"
-          aria-hidden="true"
-        />
+        {/* Voile sobre (un seul ton) pour la lisibilité */}
+        <div className="absolute inset-0 bg-brand-950/60" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-900 via-brand-900/20 to-transparent" aria-hidden="true" />
 
-        <div className="absolute inset-0 opacity-20" aria-hidden="true">
-          <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1200 600" fill="none">
-            <path d="M0 400 C 200 350 400 450 600 400 S 1000 350 1200 400 L 1200 600 L 0 600 Z" fill="white" fillOpacity=".08" />
-            <path d="M0 450 C 200 400 400 500 600 450 S 1000 400 1200 450 L 1200 600 L 0 600 Z" fill="white" fillOpacity=".06" />
-          </svg>
-        </div>
-
-        <div className="container-app relative z-10 py-20 md:py-28 grid md:grid-cols-2 gap-10 items-center">
-          <div>
-            <span className="badge bg-white/15 text-white border border-white/20 mb-5">
-              <Sparkles className="w-3.5 h-3.5" /> Été 2026 — Réservation en ligne
-            </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold leading-tight mb-5">
-              Plongez dans l'été <br className="hidden md:inline" />
-              <span className="text-sand-200">à Neuilly-sur-Marne</span>
-            </h1>
-            <p className="text-lg text-brand-50/90 leading-relaxed mb-8 max-w-xl">
-              Réservez votre créneau de baignade dans la zone estivale aménagée par la Commune.
-              Calendrier en temps réel, paiement sécurisé, QR code à présenter sur place. C'est tout.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link to="/reserver" className="btn-primary btn-lg bg-white text-brand-700 hover:bg-brand-50">
-                <Calendar className="w-5 h-5" /> Voir les créneaux
-              </Link>
-              <Link to="/infos-pratiques" className="btn-lg btn bg-transparent border border-white/30 text-white hover:bg-white/10">
-                Infos pratiques
-              </Link>
-            </div>
-
-            <div className="mt-10 grid grid-cols-3 gap-4 text-sm">
-              <div className="flex items-center gap-2"><MapPin className="w-4 h-4 text-sand-300" /> Berge de la Marne</div>
-              <div className="flex items-center gap-2"><Clock className="w-4 h-4 text-sand-300" /> Juillet & août</div>
-              <div className="flex items-center gap-2"><Users className="w-4 h-4 text-sand-300" /> Encadré & sécurisé</div>
-            </div>
+        <div className="container-app relative z-10 py-24 md:py-36 max-w-3xl">
+          <p className="text-xs uppercase tracking-[0.22em] text-brand-200 mb-5 animate-fade-up">
+            Ville de Neuilly-sur-Marne · Été 2026
+          </p>
+          <h1
+            className="text-4xl md:text-6xl font-display font-semibold leading-[1.05] mb-6 animate-fade-up"
+            style={{ animationDelay: '60ms' }}
+          >
+            La baignade en bord de Marne,
+            <br className="hidden md:inline" /> sur réservation.
+          </h1>
+          <p
+            className="text-lg text-white/85 leading-relaxed mb-9 max-w-xl animate-fade-up"
+            style={{ animationDelay: '120ms' }}
+          >
+            Réservez votre créneau dans la zone de baignade estivale aménagée par
+            la Commune. Calendrier en temps réel, paiement sécurisé, accès par
+            QR code à présenter sur place.
+          </p>
+          <div className="flex flex-wrap gap-3 animate-fade-up" style={{ animationDelay: '180ms' }}>
+            <Link to="/reserver" className="btn-primary btn-lg bg-white text-brand-800 hover:bg-brand-50">
+              <Calendar className="w-5 h-5" /> Voir les créneaux
+            </Link>
+            <Link to="/infos-pratiques" className="btn-lg btn bg-transparent border border-white/35 text-white hover:bg-white/10">
+              Informations pratiques
+            </Link>
           </div>
 
-          <div className="relative">
-            <div className="card p-6 bg-white/95 backdrop-blur text-slate-800 max-w-md mx-auto md:ml-auto">
-              <div className="flex items-center justify-between mb-4">
-                <div className="font-display font-bold text-lg">Aujourd'hui</div>
-                <span className="badge-success">3 créneaux dispo</span>
-              </div>
-              <ul className="space-y-2.5">
-                {[
-                  { time: '10h00 – 12h00', remaining: 12, total: 50 },
-                  { time: '12h00 – 14h00', remaining: 4, total: 50 },
-                  { time: '14h00 – 16h00', remaining: 0, total: 50 },
-                  { time: '16h00 – 18h00', remaining: 28, total: 50 },
-                ].map((s) => (
-                  <li
-                    key={s.time}
-                    className={`flex items-center justify-between rounded-xl border px-4 py-2.5 ${
-                      s.remaining === 0 ? 'border-slate-200 bg-slate-50 text-slate-400' : 'border-brand-100 bg-brand-50/40'
-                    }`}
-                  >
-                    <span className="font-medium">{s.time}</span>
-                    {s.remaining === 0 ? (
-                      <span className="text-xs">Complet</span>
-                    ) : (
-                      <span className="text-xs font-semibold text-brand-700">{s.remaining} places</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-              <Link to="/reserver" className="btn-primary w-full mt-5 justify-center">Réserver maintenant</Link>
-            </div>
+          <div
+            className="mt-14 flex flex-wrap gap-x-10 gap-y-3 text-sm text-white/80 border-t border-white/15 pt-6 animate-fade-up"
+            style={{ animationDelay: '240ms' }}
+          >
+            <span className="inline-flex items-center gap-2"><MapPin className="w-4 h-4 text-brand-200" /> Berge de la Marne</span>
+            <span className="inline-flex items-center gap-2"><Clock className="w-4 h-4 text-brand-200" /> Juillet &amp; août</span>
+            <span className="inline-flex items-center gap-2"><Users className="w-4 h-4 text-brand-200" /> Encadré par des maîtres-nageurs</span>
           </div>
         </div>
       </section>
 
-      {/* Étapes */}
-      <section className="container-app py-20">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-3xl md:text-4xl font-display font-bold mb-3">Réservation en 3 minutes</h2>
-          <p className="text-slate-600">Un parcours simple, accessible depuis votre mobile.</p>
-        </div>
+      {/* ── Étapes ───────────────────────────────────────────────── */}
+      <section className="container-app py-24">
+        <Reveal>
+          <p className="text-xs uppercase tracking-[0.2em] text-brand-700 mb-3">Comment ça marche</p>
+          <h2 className="text-3xl md:text-4xl font-display font-semibold mb-12 max-w-xl">
+            Réserver prend moins de trois minutes.
+          </h2>
+        </Reveal>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-x-10 gap-y-12">
           {[
-            { icon: Calendar, title: '1 · Choisissez votre créneau', desc: "Calendrier en temps réel avec le nombre de places restantes pour chaque créneau de 2 heures." },
-            { icon: ShieldCheck, title: '2 · Payez en toute sécurité', desc: 'Paiement en ligne par carte bancaire. Vos coordonnées bancaires ne sont jamais conservées par la commune.' },
-            { icon: QrCode, title: '3 · Présentez votre QR code', desc: 'Reçu instantanément par email. Scanné à l\'entrée, validation en moins d\'une seconde.' },
-          ].map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="card p-6">
-              <div className="w-12 h-12 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center mb-4">
-                <Icon className="w-6 h-6" />
+            { n: '01', icon: Calendar, title: 'Choisissez votre créneau', desc: "Le calendrier affiche en temps réel les places restantes pour chaque créneau de deux heures." },
+            { n: '02', icon: ShieldCheck, title: 'Payez en toute sécurité', desc: 'Paiement en ligne par carte bancaire. La commune ne conserve aucune coordonnée bancaire.' },
+            { n: '03', icon: QrCode, title: 'Présentez votre QR code', desc: "Reçu instantanément par e-mail, scanné à l'entrée — validation en moins d'une seconde." },
+          ].map((s, i) => (
+            <Reveal key={s.n} delay={i * 90}>
+              <div className="border-t-2 border-slate-900 pt-5">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="font-display text-3xl text-slate-300">{s.n}</span>
+                  <s.icon className="w-5 h-5 text-brand-700" />
+                </div>
+                <h3 className="font-display text-xl font-semibold mb-2">{s.title}</h3>
+                <p className="text-slate-600 text-sm leading-relaxed">{s.desc}</p>
               </div>
-              <h3 className="font-display font-bold text-lg mb-1.5">{title}</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">{desc}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>
 
-      {/* Avantages */}
+      {/* ── Engagements ──────────────────────────────────────────── */}
       <section className="bg-white border-y border-slate-100">
-        <div className="container-app py-20 grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Conçu pour vous simplifier l'été</h2>
-            <p className="text-slate-600 leading-relaxed mb-6">
-              La zone de baignade aménagée par la Commune de Neuilly-sur-Marne accueille petits et grands de juillet à août, avec un encadrement professionnel.
-              Le système de réservation préalable garantit fluidité, sécurité et qualité de service.
+        <div className="container-app py-24 grid md:grid-cols-2 gap-x-16 gap-y-10 items-start">
+          <Reveal>
+            <p className="text-xs uppercase tracking-[0.2em] text-brand-700 mb-3">Un service public</p>
+            <h2 className="text-3xl md:text-4xl font-display font-semibold mb-5 leading-tight">
+              Pensé pour les Nocéens, ouvert à tous.
+            </h2>
+            <p className="text-slate-600 leading-relaxed">
+              La zone de baignade aménagée par la Commune de Neuilly-sur-Marne
+              accueille petits et grands de juillet à août, avec un encadrement
+              professionnel. La réservation préalable garantit fluidité,
+              sécurité et qualité de service.
             </p>
-            <ul className="space-y-3 text-sm">
+          </Reveal>
+          <Reveal delay={120}>
+            <ul className="divide-y divide-slate-100 border-y border-slate-100">
               {[
                 'Tarif préférentiel pour les habitants de Neuilly-sur-Marne',
-                'Créneaux dédiés aux groupes et écoles en semaine',
-                'Annulation gratuite jusqu\'à 24h avant le créneau',
+                'Créneaux dédiés aux groupes et aux écoles en semaine',
+                "Annulation gratuite jusqu'à 24 heures avant le créneau",
                 'Notification automatique en cas de fermeture météo',
-                'Site accessible aux personnes en situation de handicap',
+                'Service accessible aux personnes en situation de handicap',
               ].map((b) => (
-                <li key={b} className="flex items-start gap-2">
-                  <span className="mt-1 w-1.5 h-1.5 rounded-full bg-brand-500 flex-shrink-0" />
-                  <span>{b}</span>
+                <li key={b} className="flex items-start gap-3 py-3.5">
+                  <ArrowRight className="w-4 h-4 text-brand-600 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-slate-700">{b}</span>
                 </li>
               ))}
             </ul>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="card p-5">
-              <Smartphone className="w-7 h-7 text-brand-600 mb-2" />
-              <div className="font-bold text-2xl">Mobile</div>
-              <div className="text-xs text-slate-500">Réservation depuis votre téléphone</div>
-            </div>
-            <div className="card p-5">
-              <ShieldCheck className="w-7 h-7 text-brand-600 mb-2" />
-              <div className="font-bold text-2xl">Sécurisé</div>
-              <div className="text-xs text-slate-500">Paiement par carte bancaire</div>
-            </div>
-            <div className="card p-5">
-              <QrCode className="w-7 h-7 text-brand-600 mb-2" />
-              <div className="font-bold text-2xl">&lt; 1s</div>
-              <div className="text-xs text-slate-500">Validation à l'entrée</div>
-            </div>
-            <div className="card p-5">
-              <Sparkles className="w-7 h-7 text-brand-600 mb-2" />
-              <div className="font-bold text-2xl">RGPD</div>
-              <div className="text-xs text-slate-500">Hébergement UE</div>
-            </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* CTA final */}
-      <section className="container-app py-20 text-center">
-        <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Prêt à plonger ?</h2>
-        <p className="text-slate-600 max-w-xl mx-auto mb-7">
-          Les créneaux sont publiés tout l'été. Réservez le vôtre dès maintenant.
-        </p>
-        <Link to="/reserver" className="btn-primary btn-lg">Réserver mon créneau</Link>
+      {/* ── Appel final ──────────────────────────────────────────── */}
+      <section className="container-app py-24">
+        <Reveal>
+          <div className="rounded-2xl bg-brand-900 text-white px-8 py-14 md:px-16 md:py-20 text-center card-hover">
+            <h2 className="text-3xl md:text-4xl font-display font-semibold mb-4">Prêt à plonger&nbsp;?</h2>
+            <p className="text-white/80 max-w-xl mx-auto mb-8">
+              Les créneaux sont publiés tout l'été. Réservez le vôtre dès maintenant.
+            </p>
+            <Link to="/reserver" className="btn-primary btn-lg bg-white text-brand-800 hover:bg-brand-50">
+              Réserver mon créneau <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </Reveal>
       </section>
     </>
   );

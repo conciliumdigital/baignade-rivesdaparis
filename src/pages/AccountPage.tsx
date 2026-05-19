@@ -87,9 +87,9 @@ export function AccountPage() {
   return (
     <div className="container-app py-10 max-w-5xl">
       <header className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-display font-bold mb-1">Mon espace</h1>
+        <h1 className="text-3xl md:text-4xl font-display font-semibold mb-1">Mon espace</h1>
         <p className="text-slate-600">
-          Bonjour {profile?.first_name || 'à vous'} 👋 — voici vos réservations et informations personnelles.
+          Bonjour {profile?.first_name || 'à vous'} — voici vos réservations et vos informations personnelles.
         </p>
       </header>
 

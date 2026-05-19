@@ -38,7 +38,6 @@ export function LoginPage() {
 
         {sent ? (
           <div className="text-center space-y-4">
-            <div className="text-5xl">📬</div>
             <p className="text-sm text-slate-700">
               Un lien de connexion a été envoyé à <strong>{email}</strong>.
               <br />Vérifiez votre boîte de réception (et vos spams).

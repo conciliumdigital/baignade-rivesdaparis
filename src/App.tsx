@@ -53,10 +53,9 @@ function NotFoundPage() {
 
 function EmailSentPage() {
   return (
-    <div className="container-app py-20 text-center max-w-md">
-      <div className="text-5xl mb-4">📬</div>
-      <h1 className="text-2xl font-display font-bold mb-2">Vérifiez votre email</h1>
-      <p className="text-slate-600 text-sm">Un lien de connexion vous a été envoyé. Cliquez dessus pour finaliser votre réservation.</p>
+    <div className="container-app py-24 text-center max-w-md">
+      <h1 className="text-2xl md:text-3xl font-display font-semibold mb-3">Vérifiez votre boîte mail</h1>
+      <p className="text-slate-600 text-sm leading-relaxed">Un lien de connexion sécurisé vient de vous être envoyé. Cliquez dessus pour finaliser votre réservation.</p>
     </div>
   );
 }

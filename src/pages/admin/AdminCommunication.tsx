@@ -3,7 +3,7 @@ import { Send, Eye, Mail, Users, Calendar } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const TEMPLATES = [
-  { id: 'reminder_j1', name: 'Rappel J-1', subject: 'Demain : votre baignade à Neuilly-sur-Marne 🏊‍♀️' },
+  { id: 'reminder_j1', name: 'Rappel J-1', subject: 'Demain : votre baignade à Neuilly-sur-Marne' },
   { id: 'reminder_h1', name: 'Rappel H-1', subject: 'Votre créneau commence dans 1 heure' },
   { id: 'closure', name: 'Fermeture météo', subject: 'Information importante : créneau modifié' },
   { id: 'satisfaction', name: 'Satisfaction', subject: 'Donnez-nous votre avis sur votre baignade' },

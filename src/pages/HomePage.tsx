@@ -1,24 +1,38 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Calendar, Smartphone, ShieldCheck, QrCode, MapPin, Clock, Users, Sparkles } from 'lucide-react';
 
 export function HomePage() {
+  // Vidéo de fond : uniquement sur desktop et hors "réduire les animations"
+  // (sur mobile / data-saver, on garde le dégradé — rendu visuel équivalent,
+  // ~6,5 Mo économisés et LCP préservé).
+  const [showHeroVideo, setShowHeroVideo] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const wideEnough = window.matchMedia('(min-width: 768px)').matches;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setShowHeroVideo(wideEnough && !reducedMotion);
+  }, []);
+
   return (
     <>
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-brand-600 via-brand-700 to-brand-900 text-white">
-        {/* Vidéo de fond (décorative, muette, en boucle) */}
-        <video
-          className="absolute inset-0 w-full h-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          aria-hidden="true"
-          tabIndex={-1}
-        >
-          <source src="/hero-baignade.mp4" type="video/mp4" />
-        </video>
+        {/* Vidéo de fond (décorative, muette, en boucle) — desktop only */}
+        {showHeroVideo && (
+          <video
+            className="absolute inset-0 w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-hidden="true"
+            tabIndex={-1}
+          >
+            <source src="/hero-baignade.mp4" type="video/mp4" />
+          </video>
+        )}
         {/* Voile pour garantir la lisibilité du texte par-dessus la vidéo */}
         <div
           className="absolute inset-0 bg-gradient-to-br from-brand-800/80 via-brand-800/70 to-brand-900/85"

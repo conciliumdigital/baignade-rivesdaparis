@@ -28,6 +28,20 @@ Modèle confirmé par la commune le 2026-05-17.
   champs adultes/enfants conservés pour une activation ultérieure sans
   refonte).
 
+### 🐛 Correctifs back-office
+
+- **Équipe** : le bouton « Inviter un membre » était inactif. Il ouvre
+  désormais une fenêtre (e-mail + rôle) qui attribue le rôle au profil
+  correspondant ; message clair si la personne ne s'est pas encore
+  connectée via le lien magique.
+- **Créneaux** : les statuts `private` / `archived` s'affichaient en
+  anglais (valeur brute). Libellés français : « Privé (cours / loisirs) »,
+  « Archivé ». Le bouton ouvrir/fermer est masqué pour ces statuts (évite
+  d'ouvrir au public un créneau réservé aux cours).
+- **Créneaux** : les tarifs étaient saisis en **centimes**. Les champs
+  (création unitaire + génération en masse) sont désormais en **euros**
+  (pas de 0,50 €), convertis en centimes à l'enregistrement.
+
 ### Phase 2 (différée, non bloquante)
 - Module d'inscription en ligne aux cours de natation (groupes d'âge
   6–9 / 10–14, cohortes de 6, alternance 3×/sem sur 2 semaines, nocéens).

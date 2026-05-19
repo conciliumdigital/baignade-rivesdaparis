@@ -88,12 +88,16 @@ export function AdminSlots() {
                   <td className="px-4 py-3">
                     {s.status === 'open' ? <span className="badge-success">Ouvert</span>
                       : s.status === 'closed' ? <span className="badge-danger">Fermé{s.closure_reason && ` · ${s.closure_reason}`}</span>
+                      : s.status === 'private' ? <span className="badge-info">Privé (cours / loisirs)</span>
+                      : s.status === 'archived' ? <span className="badge-muted">Archivé</span>
                       : <span className="badge-muted">{s.status}</span>}
                   </td>
                   <td className="px-4 py-3 text-right space-x-1">
-                    <button onClick={() => toggleSlot(s)} className="btn-ghost text-xs" title={s.status === 'open' ? 'Fermer' : 'Ouvrir'}>
-                      {s.status === 'open' ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
-                    </button>
+                    {(s.status === 'open' || s.status === 'closed') && (
+                      <button onClick={() => toggleSlot(s)} className="btn-ghost text-xs" title={s.status === 'open' ? 'Fermer' : 'Ouvrir'}>
+                        {s.status === 'open' ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                      </button>
+                    )}
                     <button className="btn-ghost text-xs" title="Modifier"><Pencil className="w-4 h-4" /></button>
                     <button className="btn-ghost text-xs" title="Dupliquer"><Copy className="w-4 h-4" /></button>
                   </td>
@@ -115,9 +119,10 @@ function CreateSlotModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
   const [start, setStart] = useState('10:00');
   const [end, setEnd] = useState('12:00');
   const [capacity, setCapacity] = useState(50);
-  const [price, setPrice] = useState(500);
-  const [priceResident, setPriceResident] = useState(300);
-  const [priceChild, setPriceChild] = useState(250);
+  // Tarifs saisis en EUROS (convertis en centimes à l'enregistrement).
+  const [price, setPrice] = useState(5);
+  const [priceResident, setPriceResident] = useState(3);
+  const [priceChild, setPriceChild] = useState(2.5);
   const [saving, setSaving] = useState(false);
 
   async function handleSave(e: React.FormEvent) {
@@ -130,7 +135,9 @@ function CreateSlotModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
     setSaving(true);
     const { error } = await supabase.from('slots').insert({
       date, start_time: start, end_time: end, capacity,
-      price_cents: price, price_resident_cents: priceResident, price_child_cents: priceChild,
+      price_cents: Math.round(price * 100),
+      price_resident_cents: Math.round(priceResident * 100),
+      price_child_cents: Math.round(priceChild * 100),
       status: 'open',
     });
     setSaving(false);
@@ -148,11 +155,11 @@ function CreateSlotModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
         </div>
         <div><label className="label">Capacité</label><input type="number" min={1} className="input" value={capacity} onChange={e => setCapacity(Number(e.target.value))} /></div>
         <div className="grid grid-cols-3 gap-3">
-          <div><label className="label">Tarif extérieur (cts)</label><input type="number" min={0} className="input" value={price} onChange={e => setPrice(Number(e.target.value))} /></div>
-          <div><label className="label">Tarif habitant (cts)</label><input type="number" min={0} className="input" value={priceResident} onChange={e => setPriceResident(Number(e.target.value))} /></div>
-          <div><label className="label">Tarif enfant (cts)</label><input type="number" min={0} className="input" value={priceChild} onChange={e => setPriceChild(Number(e.target.value))} /></div>
+          <div><label className="label">Tarif extérieur (€)</label><input type="number" min={0} step={0.5} className="input" value={price} onChange={e => setPrice(Number(e.target.value))} /></div>
+          <div><label className="label">Tarif habitant (€)</label><input type="number" min={0} step={0.5} className="input" value={priceResident} onChange={e => setPriceResident(Number(e.target.value))} /></div>
+          <div><label className="label">Tarif enfant (€)</label><input type="number" min={0} step={0.5} className="input" value={priceChild} onChange={e => setPriceChild(Number(e.target.value))} /></div>
         </div>
-        <p className="text-xs text-slate-500">Tarif habitant à 0 → l'option « habitant » est masquée côté usager pour ce créneau.</p>
+        <p className="text-xs text-slate-500">Tarif habitant ≥ tarif extérieur → l'option « habitant » est masquée côté usager (pas de réduction).</p>
         <div className="flex justify-end gap-2 pt-2">
           <button type="button" onClick={onClose} className="btn-ghost">Annuler</button>
           <button type="submit" disabled={saving} className="btn-primary">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Créer'}</button>
@@ -166,9 +173,10 @@ function BulkGenerateModal({ onClose, onSaved }: { onClose: () => void; onSaved:
   const [from, setFrom] = useState('2026-07-01');
   const [to, setTo] = useState('2026-08-31');
   const [capacity, setCapacity] = useState(50);
-  const [price, setPrice] = useState(500);
-  const [priceResident, setPriceResident] = useState(300);
-  const [priceChild, setPriceChild] = useState(250);
+  // Tarifs saisis en EUROS (convertis en centimes à l'enregistrement).
+  const [price, setPrice] = useState(5);
+  const [priceResident, setPriceResident] = useState(3);
+  const [priceChild, setPriceChild] = useState(2.5);
   const [saving, setSaving] = useState(false);
 
   const slotTimes = [
@@ -188,7 +196,9 @@ function BulkGenerateModal({ onClose, onSaved }: { onClose: () => void; onSaved:
       const dateStr = format(d, 'yyyy-MM-dd');
       slotTimes.forEach((t) => rows.push({
         date: dateStr, start_time: t.start, end_time: t.end, capacity,
-        price_cents: price, price_resident_cents: priceResident, price_child_cents: priceChild,
+        price_cents: Math.round(price * 100),
+        price_resident_cents: Math.round(priceResident * 100),
+        price_child_cents: Math.round(priceChild * 100),
         status: 'open',
       }));
     }
@@ -207,11 +217,11 @@ function BulkGenerateModal({ onClose, onSaved }: { onClose: () => void; onSaved:
         </div>
         <div><label className="label">Capacité par créneau</label><input type="number" min={1} className="input" value={capacity} onChange={e => setCapacity(Number(e.target.value))} /></div>
         <div className="grid grid-cols-3 gap-3">
-          <div><label className="label">Tarif extérieur (cts)</label><input type="number" min={0} className="input" value={price} onChange={e => setPrice(Number(e.target.value))} /></div>
-          <div><label className="label">Tarif habitant (cts)</label><input type="number" min={0} className="input" value={priceResident} onChange={e => setPriceResident(Number(e.target.value))} /></div>
-          <div><label className="label">Tarif enfant (cts)</label><input type="number" min={0} className="input" value={priceChild} onChange={e => setPriceChild(Number(e.target.value))} /></div>
+          <div><label className="label">Tarif extérieur (€)</label><input type="number" min={0} step={0.5} className="input" value={price} onChange={e => setPrice(Number(e.target.value))} /></div>
+          <div><label className="label">Tarif habitant (€)</label><input type="number" min={0} step={0.5} className="input" value={priceResident} onChange={e => setPriceResident(Number(e.target.value))} /></div>
+          <div><label className="label">Tarif enfant (€)</label><input type="number" min={0} step={0.5} className="input" value={priceChild} onChange={e => setPriceChild(Number(e.target.value))} /></div>
         </div>
-        <p className="text-xs text-slate-500">5 créneaux/jour seront créés (10h, 12h, 14h, 16h, 18h). Tarif habitant à 0 → option « habitant » masquée côté usager.</p>
+        <p className="text-xs text-slate-500">5 créneaux/jour seront créés (10h, 12h, 14h, 16h, 18h). Tarif habitant ≥ extérieur → option « habitant » masquée côté usager.</p>
         <div className="flex justify-end gap-2 pt-2">
           <button type="button" onClick={onClose} className="btn-ghost">Annuler</button>
           <button type="submit" disabled={saving} className="btn-primary">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Générer'}</button>

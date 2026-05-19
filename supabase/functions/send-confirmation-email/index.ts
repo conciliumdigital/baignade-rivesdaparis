@@ -39,8 +39,9 @@ serve(async (req: Request) => {
       <p>Bonjour ${r.user?.first_name ?? ''},</p>
       <p>Votre réservation est confirmée. Présentez ce QR code à l'accueil le jour de votre visite.</p>
       <div style="text-align:center;margin:24px 0">
-        <img src="cid:qrcode" alt="QR code" style="width:240px;height:240px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:8px" />
+        <img src="data:image/png;base64,${qrBase64}" alt="QR code de votre réservation" width="240" height="240" style="width:240px;height:240px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:8px" />
         <div style="font-family:monospace;font-size:14px;margin-top:8px;color:#64748b">Réf. ${r.reference}</div>
+        <div style="font-size:12px;margin-top:6px;color:#94a3b8">QR code également en pièce jointe de cet e-mail.</div>
       </div>
       <table style="width:100%;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;padding:12px 0;font-size:14px">
         <tr><td style="padding:6px 0;color:#64748b">Date</td><td style="text-align:right;font-weight:600">${r.slot.date}</td></tr>

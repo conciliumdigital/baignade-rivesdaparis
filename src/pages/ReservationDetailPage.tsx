@@ -17,13 +17,23 @@ export function ReservationDetailPage() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
 
-  const personsFromUrl = Number(searchParams.get('persons') ?? 1);
+  // Composition restituée depuis l'URL (la redirection magic-link la
+  // repasse en query : ?adults=&children=), avec repli sur ?persons=.
+  const clampInt = (v: string | null, lo: number, hi: number, dflt: number) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? Math.min(hi, Math.max(lo, Math.trunc(n))) : dflt;
+  };
+  const adultsFromUrl = clampInt(
+    searchParams.get('adults') ?? searchParams.get('persons'), 1, 6, 1,
+  );
+  const childrenFromUrl = clampInt(searchParams.get('children'), 0, 5, 0);
+
   const [slot, setSlot] = useState<SlotAvailability | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  const [adults, setAdults] = useState(Math.max(1, personsFromUrl));
-  const [children, setChildren] = useState(0);
+  const [adults, setAdults] = useState(adultsFromUrl);
+  const [children, setChildren] = useState(childrenFromUrl);
   const [firstName, setFirstName] = useState(profile?.first_name ?? '');
   const [lastName, setLastName] = useState(profile?.last_name ?? '');
   const [email, setEmail] = useState(profile?.email ?? user?.email ?? '');
@@ -220,6 +230,23 @@ export function ReservationDetailPage() {
       <div className="container-app py-20 text-center">
         <h1 className="text-2xl font-display font-bold mb-2">Créneau introuvable</h1>
         <Link to="/reserver" className="btn-secondary mt-4">Retour aux créneaux</Link>
+      </div>
+    );
+  }
+
+  if (slot.status !== 'open' || slot.remaining <= 0) {
+    const complet = slot.status === 'open' && slot.remaining <= 0;
+    return (
+      <div className="container-app py-20 text-center max-w-lg">
+        <h1 className="text-2xl font-display font-bold mb-2">
+          {complet ? 'Créneau complet' : 'Créneau non réservable'}
+        </h1>
+        <p className="text-slate-600 mb-6">
+          {complet
+            ? "Toutes les places de ce créneau sont déjà réservées."
+            : "Ce créneau n'est pas ouvert à la réservation en ligne."}
+        </p>
+        <Link to="/reserver" className="btn-primary">Voir les créneaux disponibles</Link>
       </div>
     );
   }

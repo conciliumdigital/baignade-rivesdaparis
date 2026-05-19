@@ -11,6 +11,7 @@ export function AdminSlots() {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [showBulk, setShowBulk] = useState(false);
+  const [editing, setEditing] = useState<{ slot: Slot; mode: 'edit' | 'duplicate' } | null>(null);
 
   async function loadSlots() {
     setLoading(true);
@@ -98,8 +99,8 @@ export function AdminSlots() {
                         {s.status === 'open' ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
                       </button>
                     )}
-                    <button className="btn-ghost text-xs" title="Modifier"><Pencil className="w-4 h-4" /></button>
-                    <button className="btn-ghost text-xs" title="Dupliquer"><Copy className="w-4 h-4" /></button>
+                    <button onClick={() => setEditing({ slot: s, mode: 'edit' })} className="btn-ghost text-xs" title="Modifier"><Pencil className="w-4 h-4" /></button>
+                    <button onClick={() => setEditing({ slot: s, mode: 'duplicate' })} className="btn-ghost text-xs" title="Dupliquer"><Copy className="w-4 h-4" /></button>
                   </td>
                 </tr>
               ))}
@@ -109,44 +110,68 @@ export function AdminSlots() {
       )}
 
       {showCreate && <CreateSlotModal onClose={() => setShowCreate(false)} onSaved={loadSlots} />}
+      {editing && (
+        <CreateSlotModal
+          slot={editing.slot}
+          mode={editing.mode}
+          onClose={() => setEditing(null)}
+          onSaved={loadSlots}
+        />
+      )}
       {showBulk && <BulkGenerateModal onClose={() => setShowBulk(false)} onSaved={loadSlots} />}
     </div>
   );
 }
 
-function CreateSlotModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
-  const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
-  const [start, setStart] = useState('10:00');
-  const [end, setEnd] = useState('12:00');
-  const [capacity, setCapacity] = useState(50);
+function CreateSlotModal({
+  onClose, onSaved, slot, mode = 'create',
+}: {
+  onClose: () => void;
+  onSaved: () => void;
+  slot?: Slot;
+  mode?: 'create' | 'edit' | 'duplicate';
+}) {
+  const [date, setDate] = useState(slot ? slot.date : format(new Date(), 'yyyy-MM-dd'));
+  const [start, setStart] = useState(slot ? slot.start_time.slice(0, 5) : '10:00');
+  const [end, setEnd] = useState(slot ? slot.end_time.slice(0, 5) : '12:00');
+  const [capacity, setCapacity] = useState(slot ? slot.capacity : 50);
   // Tarifs saisis en EUROS (convertis en centimes à l'enregistrement).
-  const [price, setPrice] = useState(5);
-  const [priceResident, setPriceResident] = useState(3);
-  const [priceChild, setPriceChild] = useState(2.5);
+  const [price, setPrice] = useState(slot ? slot.price_cents / 100 : 5);
+  const [priceResident, setPriceResident] = useState(slot ? (slot.price_resident_cents ?? 0) / 100 : 3);
+  const [priceChild, setPriceChild] = useState(slot ? (slot.price_child_cents ?? 0) / 100 : 2.5);
   const [saving, setSaving] = useState(false);
+
+  const titles = { create: 'Nouveau créneau', edit: 'Modifier le créneau', duplicate: 'Dupliquer le créneau' };
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     if (!isSupabaseConfigured) {
-      toast.success('Mode démo : créneau virtuel créé');
+      toast.success('Mode démo : créneau virtuel enregistré');
       onClose();
       return;
     }
     setSaving(true);
-    const { error } = await supabase.from('slots').insert({
+    const payload = {
       date, start_time: start, end_time: end, capacity,
       price_cents: Math.round(price * 100),
       price_resident_cents: Math.round(priceResident * 100),
       price_child_cents: Math.round(priceChild * 100),
-      status: 'open',
-    });
+    };
+    const { error } =
+      mode === 'edit' && slot
+        ? await supabase.from('slots').update(payload).eq('id', slot.id)
+        : await supabase.from('slots').insert({ ...payload, status: 'open' });
     setSaving(false);
     if (error) toast.error(error.message);
-    else { toast.success('Créneau créé'); onSaved(); onClose(); }
+    else {
+      toast.success(mode === 'edit' ? 'Créneau modifié' : 'Créneau créé');
+      onSaved();
+      onClose();
+    }
   }
 
   return (
-    <Modal title="Nouveau créneau" onClose={onClose}>
+    <Modal title={titles[mode]} onClose={onClose}>
       <form onSubmit={handleSave} className="space-y-3">
         <div><label className="label">Date</label><input type="date" required className="input" value={date} onChange={e => setDate(e.target.value)} /></div>
         <div className="grid grid-cols-2 gap-3">
@@ -162,7 +187,7 @@ function CreateSlotModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
         <p className="text-xs text-slate-500">Tarif habitant ≥ tarif extérieur → l'option « habitant » est masquée côté usager (pas de réduction).</p>
         <div className="flex justify-end gap-2 pt-2">
           <button type="button" onClick={onClose} className="btn-ghost">Annuler</button>
-          <button type="submit" disabled={saving} className="btn-primary">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Créer'}</button>
+          <button type="submit" disabled={saving} className="btn-primary">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : (mode === 'edit' ? 'Enregistrer' : 'Créer')}</button>
         </div>
       </form>
     </Modal>

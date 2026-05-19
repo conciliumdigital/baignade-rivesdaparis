@@ -2,8 +2,8 @@
 
 > Document de reprise du projet. Tout ce qu'il faut savoir pour continuer depuis une nouvelle machine, un nouveau collaborateur, ou après une pause.
 
-**Version** : 1.1.5
-**Dernière mise à jour** : 2026-05-17
+**Version** : 1.1.6
+**Dernière mise à jour** : 2026-05-19
 **Client** : Commune de Neuilly-sur-Marne
 **Prestataire** : CONCILIUM
 **Statut** : ✅ En ligne sur Netlify, domaine https://baignade.lesrivesdeparis.fr (mode pré-production, Stripe en attente du client)

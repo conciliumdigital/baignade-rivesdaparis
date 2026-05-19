@@ -4,6 +4,28 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.1.8] — 2026-05-19
+
+### ✏️ E-mails automatiques éditables (back-office)
+
+- Nouvelle table `email_templates` (5 modèles : confirmation, rappel
+  J-1/H-1, fermeture météo, satisfaction) — migration
+  `20260519100000_email_templates.sql` (RLS admin, seed par défaut).
+- **Nouvelle page `/admin/emails`** : édition de l'objet + du corps via
+  un **éditeur WYSIWYG** (zéro dépendance, contentEditable), aide
+  variables, **aperçu live** dans le gabarit, « Réinitialiser au
+  défaut ». Entrée de menu « E-mails auto ».
+- `send-confirmation-email` : charge le modèle `confirmation` depuis la
+  base, substitue les variables ({{prenom}}…), l'injecte dans un
+  **gabarit sûr** (en-tête, QR, pied contrôlés par le code). Repli sur
+  le défaut codé si la table est absente. Valeurs usager **échappées**
+  (anti-injection HTML dans l'e-mail).
+- Seul le **contenu** est éditable ; la structure e-mail reste non
+  cassable.
+
+> ⚠️ Après merge : exécuter `20260519100000_email_templates.sql`
+> (SQL Editor) puis redéployer `send-confirmation-email`.
+
 ## [1.1.7] — 2026-05-19
 
 ### ✉️ E-mail de confirmation

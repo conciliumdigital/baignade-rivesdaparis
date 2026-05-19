@@ -36,6 +36,7 @@ const AdminStaff = named(() => import('./pages/admin/AdminStaff'), 'AdminStaff')
 const AdminSettings = named(() => import('./pages/admin/AdminSettings'), 'AdminSettings');
 const AdminHelp = named(() => import('./pages/admin/AdminHelp'), 'AdminHelp');
 const AdminEmailTemplates = named(() => import('./pages/admin/AdminEmailTemplates'), 'AdminEmailTemplates');
+const AdminDiscounts = named(() => import('./pages/admin/AdminDiscounts'), 'AdminDiscounts');
 
 const StaffScanner = named(() => import('./pages/staff/StaffScanner'), 'StaffScanner');
 const StaffHistory = named(() => import('./pages/staff/StaffHistory'), 'StaffHistory');
@@ -104,6 +105,7 @@ export default function App() {
           <Route path="/admin/satisfaction" element={<AdminSatisfaction />} />
           <Route path="/admin/staff" element={<AdminStaff />} />
           <Route path="/admin/emails" element={<AdminEmailTemplates />} />
+          <Route path="/admin/reductions" element={<AdminDiscounts />} />
           <Route path="/admin/parametres" element={<AdminSettings />} />
           <Route path="/admin/aide" element={<AdminHelp />} />
         </Route>

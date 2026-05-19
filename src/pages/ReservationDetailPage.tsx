@@ -86,6 +86,29 @@ export function ReservationDetailPage() {
   const totalPersons = adults + children;
   const insufficient = slot && totalPersons > slot.remaining;
 
+  // --- Code de réduction (aperçu ; le serveur recalcule à l'identique) ---
+  const [promoCode, setPromoCode] = useState('');
+  const [promo, setPromo] = useState<{ valid: boolean; discount_cents: number; label?: string; reason: string } | null>(null);
+  const [checkingPromo, setCheckingPromo] = useState(false);
+  // Si le montant change, l'aperçu doit être revalidé
+  useEffect(() => { setPromo(null); }, [totalCents]);
+  const discountCents = promo?.valid ? promo.discount_cents : 0;
+  const finalTotalCents = Math.max(totalCents - discountCents, 0);
+
+  async function applyPromo() {
+    const code = promoCode.trim();
+    if (!code) return;
+    if (!isSupabaseConfigured) {
+      setPromo({ valid: false, discount_cents: 0, reason: 'indisponible en mode démo' });
+      return;
+    }
+    setCheckingPromo(true);
+    const { data, error } = await supabase.rpc('compute_discount', { p_code: code, p_amount_cents: totalCents });
+    setCheckingPromo(false);
+    if (error) { toast.error('Vérification du code impossible.'); return; }
+    setPromo(data as { valid: boolean; discount_cents: number; label?: string; reason: string });
+  }
+
   function onProofChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0] ?? null;
     if (!f) {
@@ -179,6 +202,7 @@ export function ReservationDetailPage() {
           status: 'pending_payment',
           usager_type: usagerType,
           honor_certification: isResident ? honorCert : false,
+          discount_code: promo?.valid ? promoCode.trim().toUpperCase() : null,
         })
         .select()
         .single();
@@ -280,9 +304,45 @@ export function ReservationDetailPage() {
                 </div>
               )}
             </div>
+
+            <div className="mt-4 pt-4 border-t border-slate-100">
+              <label className="label">Code de réduction</label>
+              <div className="flex gap-2">
+                <input
+                  className="input uppercase"
+                  placeholder="Ex : ETE2026"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={applyPromo}
+                  disabled={checkingPromo || !promoCode.trim()}
+                  className="btn-secondary text-sm flex-shrink-0"
+                >
+                  {checkingPromo ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Appliquer'}
+                </button>
+              </div>
+              {promo && (
+                promo.valid ? (
+                  <p className="text-xs text-emerald-700 mt-1.5">
+                    ✓ Réduction appliquée{promo.label ? ` — ${promo.label}` : ''} : −{formatPrice(promo.discount_cents)}
+                  </p>
+                ) : (
+                  <p className="text-xs text-red-600 mt-1.5">Code non valable : {promo.reason}</p>
+                )
+              )}
+            </div>
+
+            {discountCents > 0 && (
+              <div className="mt-3 flex justify-between text-sm text-emerald-700">
+                <span>Réduction</span>
+                <span>−{formatPrice(discountCents)}</span>
+              </div>
+            )}
             <div className="border-t border-slate-100 mt-4 pt-4 flex justify-between items-center">
               <span className="font-semibold">Total</span>
-              <span className="font-display font-bold text-2xl text-brand-700">{formatPrice(totalCents)}</span>
+              <span className="font-display font-bold text-2xl text-brand-700">{formatPrice(finalTotalCents)}</span>
             </div>
             <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
               <ShieldCheck className="w-4 h-4" /> Paiement par carte bancaire sécurisé

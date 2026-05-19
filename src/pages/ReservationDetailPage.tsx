@@ -5,6 +5,7 @@ import { ArrowLeft, Calendar, Clock, MapPin, Users, CreditCard, ShieldCheck, Loa
 import { fetchSlotById } from '../lib/slots';
 import { formatDate, formatPrice, formatTimeRange } from '../lib/format';
 import { useAuth } from '../lib/auth';
+import { AnimatedPrice } from '../components/AnimatedPrice';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import type { SlotAvailability, UsagerType } from '../types/database';
 
@@ -342,7 +343,7 @@ export function ReservationDetailPage() {
             )}
             <div className="border-t border-slate-100 mt-4 pt-4 flex justify-between items-center">
               <span className="font-semibold">Total</span>
-              <span className="font-display font-bold text-2xl text-brand-700">{formatPrice(finalTotalCents)}</span>
+              <AnimatedPrice cents={finalTotalCents} className="font-display font-bold text-2xl text-brand-700" />
             </div>
             <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
               <ShieldCheck className="w-4 h-4" /> Paiement par carte bancaire sécurisé

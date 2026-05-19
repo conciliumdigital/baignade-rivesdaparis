@@ -49,10 +49,15 @@ export default {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
         },
+        'price-pop': {
+          '0%': { opacity: '0.4', transform: 'translateY(4px) scale(0.96)' },
+          '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
       },
       animation: {
         'fade-up': 'fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both',
         'fade-in': 'fade-in 0.5s ease-out both',
+        'price-pop': 'price-pop 0.28s cubic-bezier(0.16, 1, 0.3, 1) both',
       },
     },
   },

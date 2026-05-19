@@ -16,7 +16,12 @@ Objectif : « dé-IA-iser » l'interface, identité plus civique, micro-effets.
 - **Micro-interactions** (zéro dépendance) : composant `<Reveal>`
   (apparition au scroll, IntersectionObserver), soulignés de liens
   animés (`.link-underline`), survol de cartes (`.card-hover`), retour
-  tactile des boutons (press), apparition du hero (`fade-up` échelonné).
+  tactile des boutons (press), apparition du hero (`fade-up` échelonné),
+  **transition de prix** (`<AnimatedPrice>` — le total du tunnel pulse à
+  chaque changement de quantité/code promo).
+- **Fix** : `.claude/launch.json` → `runtimeExecutable: "npm"` (PATH,
+  portable) au lieu d'un chemin absolu Intel cassé sur Apple Silicon
+  (le serveur de dev/preview ne démarrait plus).
 - **Page d'accueil** refondue : hero éditorial sobre (suppression de la
   fausse carte « Aujourd'hui », du badge à paillettes et des dégradés
   multi-stops), sections numérotées moins génériques, listes éditoriales.

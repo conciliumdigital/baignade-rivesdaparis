@@ -1,5 +1,5 @@
 import { NavLink, Outlet, Link } from 'react-router-dom';
-import { LayoutDashboard, CalendarDays, ClipboardList, Mail, Star, Users2, Settings, ArrowLeft, HelpCircle } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, ClipboardList, Mail, MailCheck, Star, Users2, Settings, ArrowLeft, HelpCircle } from 'lucide-react';
 import { Footer } from '../components/Footer';
 
 export function AdminLayout() {
@@ -27,6 +27,7 @@ export function AdminLayout() {
             <NavLink to="/admin/creneaux" className={itemClass}><CalendarDays className="w-4 h-4" /> Créneaux</NavLink>
             <NavLink to="/admin/reservations" className={itemClass}><ClipboardList className="w-4 h-4" /> Réservations</NavLink>
             <NavLink to="/admin/communication" className={itemClass}><Mail className="w-4 h-4" /> Communication</NavLink>
+            <NavLink to="/admin/emails" className={itemClass}><MailCheck className="w-4 h-4" /> E-mails auto</NavLink>
             <NavLink to="/admin/satisfaction" className={itemClass}><Star className="w-4 h-4" /> Satisfaction</NavLink>
             <NavLink to="/admin/staff" className={itemClass}><Users2 className="w-4 h-4" /> Équipe</NavLink>
             <NavLink to="/admin/parametres" className={itemClass}><Settings className="w-4 h-4" /> Paramètres</NavLink>

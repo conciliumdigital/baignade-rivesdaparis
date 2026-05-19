@@ -4,6 +4,24 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.1.6] — 2026-05-19
+
+### 🛂 Contrôle d'accès — UX scan + aide
+
+- **Scanner staff optimisé** : feedback **haptique (vibration)** +
+  **bip distinct** OK / refus ; **reprise automatique du scan** après
+  un accès valide (l'agent enchaîne sans toucher l'écran) ; anti
+  double-scan du même QR ; résultat **plein écran** très lisible
+  (vert / orange / rouge) ; **compteur d'entrées** de session ;
+  légende couleurs sous le scanner. Les cas orange/rouge restent
+  affichés jusqu'à action de l'agent.
+- **Nouvelle rubrique d'aide back-office** (`/admin/aide`) : guide
+  complet du scan (mise en place, signification des couleurs, tarif
+  habitant & justificatif, dépannage caméra/rôle/réseau) + entrée de
+  menu « Aide — Scan QR ».
+- `scan-qr` appelé sans `scanned_by` côté client (identité dérivée du
+  JWT côté serveur — cohérent avec le durcissement sécurité).
+
 ## [1.1.5] — 2026-05-17
 
 ### 🔍 Audit complet — remédiation

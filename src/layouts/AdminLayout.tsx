@@ -1,5 +1,5 @@
 import { NavLink, Outlet, Link } from 'react-router-dom';
-import { LayoutDashboard, CalendarDays, ClipboardList, Mail, Star, Users2, Settings, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, ClipboardList, Mail, Star, Users2, Settings, ArrowLeft, HelpCircle } from 'lucide-react';
 import { Footer } from '../components/Footer';
 
 export function AdminLayout() {
@@ -30,6 +30,7 @@ export function AdminLayout() {
             <NavLink to="/admin/satisfaction" className={itemClass}><Star className="w-4 h-4" /> Satisfaction</NavLink>
             <NavLink to="/admin/staff" className={itemClass}><Users2 className="w-4 h-4" /> Équipe</NavLink>
             <NavLink to="/admin/parametres" className={itemClass}><Settings className="w-4 h-4" /> Paramètres</NavLink>
+            <NavLink to="/admin/aide" className={itemClass}><HelpCircle className="w-4 h-4" /> Aide — Scan QR</NavLink>
           </nav>
         </aside>
 

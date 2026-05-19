@@ -34,6 +34,7 @@ const AdminCommunication = named(() => import('./pages/admin/AdminCommunication'
 const AdminSatisfaction = named(() => import('./pages/admin/AdminSatisfaction'), 'AdminSatisfaction');
 const AdminStaff = named(() => import('./pages/admin/AdminStaff'), 'AdminStaff');
 const AdminSettings = named(() => import('./pages/admin/AdminSettings'), 'AdminSettings');
+const AdminHelp = named(() => import('./pages/admin/AdminHelp'), 'AdminHelp');
 
 const StaffScanner = named(() => import('./pages/staff/StaffScanner'), 'StaffScanner');
 const StaffHistory = named(() => import('./pages/staff/StaffHistory'), 'StaffHistory');
@@ -102,6 +103,7 @@ export default function App() {
           <Route path="/admin/satisfaction" element={<AdminSatisfaction />} />
           <Route path="/admin/staff" element={<AdminStaff />} />
           <Route path="/admin/parametres" element={<AdminSettings />} />
+          <Route path="/admin/aide" element={<AdminHelp />} />
         </Route>
 
         {/* Staff scan QR */}

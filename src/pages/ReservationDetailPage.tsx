@@ -142,7 +142,7 @@ export function ReservationDetailPage() {
       // 1. Si non connecté → magic link
       if (!user) {
         if (!isSupabaseConfigured) {
-          toast.success('Mode démo : aucune authentification réelle. La réservation passerait par Magic Link → Stripe.');
+          toast.success('Mode démonstration : aucune réservation réelle enregistrée.');
           navigate('/reserver/confirmation/demo');
           return;
         }
@@ -198,7 +198,7 @@ export function ReservationDetailPage() {
       if (checkoutData?.url) {
         window.location.href = checkoutData.url;
       } else {
-        throw new Error('URL Stripe Checkout manquante');
+        throw new Error('Le service de paiement est momentanément indisponible. Merci de réessayer dans quelques instants.');
       }
     } catch (err: any) {
       toast.error(err.message ?? 'Une erreur est survenue.');
@@ -258,7 +258,7 @@ export function ReservationDetailPage() {
               <span className="font-display font-bold text-2xl text-brand-700">{formatPrice(totalCents)}</span>
             </div>
             <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
-              <ShieldCheck className="w-4 h-4" /> Paiement sécurisé Stripe · PCI DSS
+              <ShieldCheck className="w-4 h-4" /> Paiement par carte bancaire sécurisé
             </div>
           </div>
         </aside>
@@ -397,7 +397,7 @@ export function ReservationDetailPage() {
                 <label htmlFor="email" className="label">Email</label>
                 <input id="email" type="email" required className="input" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
                 <p className="text-xs text-slate-500 mt-1.5">
-                  Vous recevrez un lien de connexion sécurisé (Magic Link). Aucun mot de passe à mémoriser.
+                  Vous recevrez un lien de connexion sécurisé par e-mail. Aucun mot de passe à mémoriser.
                 </p>
               </div>
               <div className="sm:col-span-2">
@@ -425,7 +425,7 @@ export function ReservationDetailPage() {
               )}
             </button>
             <p className="text-xs text-center text-slate-500 mt-3">
-              Vous serez redirigé vers Stripe pour finaliser votre paiement en toute sécurité.
+              Vous serez redirigé vers notre prestataire de paiement sécurisé pour régler par carte bancaire.
             </p>
           </section>
         </form>

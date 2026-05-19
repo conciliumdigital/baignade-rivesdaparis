@@ -42,6 +42,13 @@ Modèle confirmé par la commune le 2026-05-17.
   (création unitaire + génération en masse) sont désormais en **euros**
   (pas de 0,50 €), convertis en centimes à l'enregistrement.
 
+### 🎬 Hero
+
+- Vidéo de fond sur le hero de la page d'accueil (auto-hébergée
+  `public/hero-baignade.mp4`, source : site officiel de la commune).
+  Lecture auto, muette, en boucle ; voile dégradé pour la lisibilité du
+  texte ; dégradé conservé en fallback.
+
 ### Phase 2 (différée, non bloquante)
 - Module d'inscription en ligne aux cours de natation (groupes d'âge
   6–9 / 10–14, cohortes de 6, alternance 3×/sem sur 2 semaines, nocéens).

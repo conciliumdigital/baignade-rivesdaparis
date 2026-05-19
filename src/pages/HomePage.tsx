@@ -6,6 +6,25 @@ export function HomePage() {
     <>
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-brand-600 via-brand-700 to-brand-900 text-white">
+        {/* Vidéo de fond (décorative, muette, en boucle) */}
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+          tabIndex={-1}
+        >
+          <source src="/hero-baignade.mp4" type="video/mp4" />
+        </video>
+        {/* Voile pour garantir la lisibilité du texte par-dessus la vidéo */}
+        <div
+          className="absolute inset-0 bg-gradient-to-br from-brand-800/80 via-brand-800/70 to-brand-900/85"
+          aria-hidden="true"
+        />
+
         <div className="absolute inset-0 opacity-20" aria-hidden="true">
           <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1200 600" fill="none">
             <path d="M0 400 C 200 350 400 450 600 400 S 1000 350 1200 400 L 1200 600 L 0 600 Z" fill="white" fillOpacity=".08" />
@@ -13,7 +32,7 @@ export function HomePage() {
           </svg>
         </div>
 
-        <div className="container-app relative py-20 md:py-28 grid md:grid-cols-2 gap-10 items-center">
+        <div className="container-app relative z-10 py-20 md:py-28 grid md:grid-cols-2 gap-10 items-center">
           <div>
             <span className="badge bg-white/15 text-white border border-white/20 mb-5">
               <Sparkles className="w-3.5 h-3.5" /> Été 2026 — Réservation en ligne

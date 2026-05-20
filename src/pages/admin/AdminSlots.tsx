@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Plus, Pencil, Lock, Unlock, Loader2, Copy, CalendarDays } from 'lucide-react';
+import { Plus, Pencil, Lock, Unlock, Loader2, Copy, CalendarDays, CloudRain, BellRing } from 'lucide-react';
 import { isSupabaseConfigured, supabase } from '../../lib/supabase';
 import { formatDate, formatPrice, formatTimeRange } from '../../lib/format';
 import { addDays, format } from 'date-fns';
@@ -8,10 +8,12 @@ import type { Slot } from '../../types/database';
 
 export function AdminSlots() {
   const [slots, setSlots] = useState<Slot[]>([]);
+  const [waitlistCounts, setWaitlistCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [showBulk, setShowBulk] = useState(false);
   const [editing, setEditing] = useState<{ slot: Slot; mode: 'edit' | 'duplicate' } | null>(null);
+  const [closing, setClosing] = useState<Slot | null>(null);
 
   async function loadSlots() {
     setLoading(true);
@@ -26,19 +28,35 @@ export function AdminSlots() {
       .gte('date', new Date().toISOString().slice(0, 10))
       .order('date')
       .order('start_time');
-    setSlots((data ?? []) as Slot[]);
+    const list = (data ?? []) as Slot[];
+    setSlots(list);
+
+    // Compteurs liste d'attente par créneau
+    if (list.length > 0) {
+      const ids = list.map((s) => s.id);
+      const { data: wl } = await supabase
+        .from('waitlist')
+        .select('slot_id')
+        .in('slot_id', ids)
+        .eq('status', 'waiting');
+      const counts: Record<string, number> = {};
+      (wl ?? []).forEach((row: any) => {
+        counts[row.slot_id] = (counts[row.slot_id] ?? 0) + 1;
+      });
+      setWaitlistCounts(counts);
+    }
     setLoading(false);
   }
 
   useEffect(() => { loadSlots(); }, []);
 
-  async function toggleSlot(slot: Slot) {
+  async function reopenSlot(slot: Slot) {
     if (!isSupabaseConfigured) return;
-    const newStatus = slot.status === 'open' ? 'closed' : 'open';
-    const reason = newStatus === 'closed' ? prompt('Motif de fermeture ?') ?? '' : null;
-    const { error } = await supabase.from('slots').update({ status: newStatus, closure_reason: reason }).eq('id', slot.id);
+    const { error } = await supabase.from('slots')
+      .update({ status: 'open', closure_reason: null })
+      .eq('id', slot.id);
     if (error) toast.error(error.message);
-    else { toast.success(newStatus === 'closed' ? 'Créneau fermé' : 'Créneau rouvert'); loadSlots(); }
+    else { toast.success('Créneau rouvert'); loadSlots(); }
   }
 
   return (
@@ -94,9 +112,22 @@ export function AdminSlots() {
                       : <span className="badge-muted">{s.status}</span>}
                   </td>
                   <td className="px-4 py-3 text-right space-x-1">
-                    {(s.status === 'open' || s.status === 'closed') && (
-                      <button onClick={() => toggleSlot(s)} className="btn-ghost text-xs" title={s.status === 'open' ? 'Fermer' : 'Ouvrir'}>
-                        {s.status === 'open' ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                    {waitlistCounts[s.id] > 0 && (
+                      <span
+                        className="inline-flex items-center gap-1 text-xs text-amber-700 mr-2"
+                        title="Personnes en liste d'attente"
+                      >
+                        <BellRing className="w-3.5 h-3.5" /> {waitlistCounts[s.id]}
+                      </span>
+                    )}
+                    {s.status === 'open' && (
+                      <button onClick={() => setClosing(s)} className="btn-ghost text-xs" title="Fermer (météo)">
+                        <Lock className="w-4 h-4" />
+                      </button>
+                    )}
+                    {s.status === 'closed' && (
+                      <button onClick={() => reopenSlot(s)} className="btn-ghost text-xs" title="Rouvrir">
+                        <Unlock className="w-4 h-4" />
                       </button>
                     )}
                     <button onClick={() => setEditing({ slot: s, mode: 'edit' })} className="btn-ghost text-xs" title="Modifier"><Pencil className="w-4 h-4" /></button>
@@ -119,7 +150,69 @@ export function AdminSlots() {
         />
       )}
       {showBulk && <BulkGenerateModal onClose={() => setShowBulk(false)} onSaved={loadSlots} />}
+      {closing && (
+        <CloseSlotModal
+          slot={closing}
+          onClose={() => setClosing(null)}
+          onSaved={() => { setClosing(null); loadSlots(); }}
+        />
+      )}
     </div>
+  );
+}
+
+// Fermeture météo : motif libre + confirmation.
+// Le trigger SQL `notify_on_slot_closed` enfile automatiquement un
+// e-mail `closure` pour chaque réservation confirmée/pending/used.
+function CloseSlotModal({
+  slot, onClose, onSaved,
+}: { slot: Slot; onClose: () => void; onSaved: () => void }) {
+  const [reason, setReason] = useState('Fermeture météo');
+  const [saving, setSaving] = useState(false);
+
+  async function handleClose(e: React.FormEvent) {
+    e.preventDefault();
+    if (!isSupabaseConfigured) { toast.success('Mode démo'); onSaved(); return; }
+    setSaving(true);
+    const { error } = await supabase.from('slots')
+      .update({ status: 'closed', closure_reason: reason.trim() || 'Fermeture météo' })
+      .eq('id', slot.id);
+    setSaving(false);
+    if (error) toast.error(error.message);
+    else { toast.success('Créneau fermé. Les clients concernés vont être notifiés.'); onSaved(); }
+  }
+
+  return (
+    <Modal title="Fermer le créneau" onClose={onClose}>
+      <form onSubmit={handleClose} className="space-y-4">
+        <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-sm flex items-start gap-2">
+          <CloudRain className="w-5 h-5 text-amber-700 flex-shrink-0 mt-0.5" />
+          <div>
+            <div className="font-semibold text-amber-900">{formatDate(slot.date)} · {formatTimeRange(slot.start_time, slot.end_time)}</div>
+            <div className="text-amber-800 mt-1">
+              Les personnes ayant déjà réservé recevront automatiquement un e-mail
+              d'information (modèle « Fermeture météo », éditable dans
+              <em> Communication › E-mails auto</em>).
+            </div>
+          </div>
+        </div>
+        <div>
+          <label className="label">Motif (visible en interne ; les clients reçoivent le modèle d'e-mail standard)</label>
+          <input
+            className="input"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Ex : orages annoncés, qualité de l'eau, événement…"
+          />
+        </div>
+        <div className="flex justify-end gap-2 pt-2">
+          <button type="button" onClick={onClose} className="btn-ghost">Annuler</button>
+          <button type="submit" disabled={saving} className="btn-primary">
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Fermer le créneau'}
+          </button>
+        </div>
+      </form>
+    </Modal>
   );
 }
 

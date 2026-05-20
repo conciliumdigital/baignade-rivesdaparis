@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Calendar, Clock, MapPin, Users, CreditCard, ShieldCheck, Loader2, Upload, FileCheck2, X } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MapPin, Users, CreditCard, ShieldCheck, Loader2, Upload, FileCheck2, X, BellRing, Check } from 'lucide-react';
 import { fetchSlotById } from '../lib/slots';
 import { formatDate, formatPrice, formatTimeRange } from '../lib/format';
 import { useAuth } from '../lib/auth';
@@ -261,15 +261,19 @@ export function ReservationDetailPage() {
 
   if (slot.status !== 'open' || slot.remaining <= 0) {
     const complet = slot.status === 'open' && slot.remaining <= 0;
+    if (complet) {
+      return (
+        <WaitlistCard
+          slot={slot}
+          defaultPersons={Math.max(1, adultsFromUrl + childrenFromUrl)}
+        />
+      );
+    }
     return (
       <div className="container-app py-20 text-center max-w-lg">
-        <h1 className="text-2xl font-display font-bold mb-2">
-          {complet ? 'Créneau complet' : 'Créneau non réservable'}
-        </h1>
+        <h1 className="text-2xl font-display font-bold mb-2">Créneau non réservable</h1>
         <p className="text-slate-600 mb-6">
-          {complet
-            ? "Toutes les places de ce créneau sont déjà réservées."
-            : "Ce créneau n'est pas ouvert à la réservation en ligne."}
+          Ce créneau n'est pas ouvert à la réservation en ligne.
         </p>
         <Link to="/reserver" className="btn-primary">Voir les créneaux disponibles</Link>
       </div>
@@ -517,6 +521,136 @@ export function ReservationDetailPage() {
             </p>
           </section>
         </form>
+      </div>
+    </div>
+  );
+}
+
+// Carte d'inscription en liste d'attente — affichée quand le créneau est
+// complet (status='open' & remaining=0). Le serveur revérifie ces deux
+// conditions (RPC join_waitlist SECURITY DEFINER) ; le client ne fait
+// que présenter le formulaire.
+function WaitlistCard({ slot, defaultPersons }: { slot: SlotAvailability; defaultPersons: number }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [persons, setPersons] = useState(Math.min(6, Math.max(1, defaultPersons)));
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState(false);
+
+  async function handleJoin() {
+    if (!isSupabaseConfigured) {
+      toast.success('Mode démonstration : inscription liste d\'attente fictive.');
+      setDone(true);
+      return;
+    }
+    if (!user) {
+      // Connexion requise — magic link avec retour sur ce créneau
+      const redirectUrl = `${window.location.origin}/reserver/${slot.id}?adults=${persons}&children=0`;
+      const email = window.prompt('Pour rejoindre la liste d\'attente, indiquez votre e-mail :')?.trim();
+      if (!email) return;
+      setSubmitting(true);
+      const { error } = await supabase.auth.signInWithOtp({
+        email, options: { emailRedirectTo: redirectUrl },
+      });
+      setSubmitting(false);
+      if (error) { toast.error(error.message); return; }
+      toast.success('Lien de connexion envoyé. Une fois connecté·e, vous pourrez confirmer votre inscription.');
+      navigate('/connexion/email-envoye');
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await supabase.rpc('join_waitlist', {
+      p_slot_id: slot.id,
+      p_persons: persons,
+    });
+    setSubmitting(false);
+    if (error) {
+      const msgs: Record<string, string> = {
+        SLOT_NOT_FULL: 'Bonne nouvelle : il reste des places ! Vous pouvez réserver directement.',
+        SLOT_NOT_OPEN: 'Ce créneau n\'accepte plus d\'inscription en liste d\'attente.',
+        SLOT_IN_PAST: 'Ce créneau est déjà passé.',
+        SLOT_NOT_FOUND: 'Créneau introuvable.',
+        INVALID_PERSONS: 'Nombre de personnes invalide.',
+      };
+      toast.error(msgs[error.message] ?? error.message);
+      return;
+    }
+    setDone(true);
+    toast.success('Inscription confirmée. Vous serez prévenu·e par e-mail dès qu\'une place se libère.');
+  }
+
+  if (done) {
+    return (
+      <div className="container-app py-20 max-w-lg">
+        <div className="card p-8 text-center">
+          <div className="inline-flex w-14 h-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 mb-4">
+            <Check className="w-7 h-7" />
+          </div>
+          <h1 className="text-2xl font-display font-bold mb-2">Inscription enregistrée</h1>
+          <p className="text-slate-600 mb-6">
+            Vous êtes en liste d'attente pour le créneau du <strong>{formatDate(slot.date)}</strong>,
+            de {formatTimeRange(slot.start_time, slot.end_time)}.
+            Dès qu'une place se libère, vous recevez un e-mail (vous avez alors 24 h pour réserver).
+          </p>
+          <div className="flex flex-wrap gap-2 justify-center">
+            <Link to="/reserver" className="btn-secondary">Voir d'autres créneaux</Link>
+            <Link to="/compte" className="btn-primary">Mes inscriptions</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container-app py-20 max-w-lg">
+      <div className="card p-8">
+        <div className="inline-flex w-12 h-12 items-center justify-center rounded-full bg-brand-50 text-brand-700 mb-4">
+          <BellRing className="w-6 h-6" />
+        </div>
+        <h1 className="text-2xl font-display font-bold mb-1">Créneau complet</h1>
+        <p className="text-slate-600 mb-2">
+          {formatDate(slot.date)} · {formatTimeRange(slot.start_time, slot.end_time)}
+        </p>
+        <p className="text-sm text-slate-600 leading-relaxed mb-6">
+          Toutes les places sont réservées. Inscrivez-vous en liste d'attente :
+          si une réservation est annulée, nous vous prévenons aussitôt par e-mail.
+          Vous disposerez alors de 24 h pour finaliser votre réservation.
+        </p>
+
+        <div className="mb-5">
+          <label className="label" htmlFor="wl-persons">Nombre de personnes</label>
+          <select
+            id="wl-persons"
+            className="input"
+            value={persons}
+            onChange={(e) => setPersons(Number(e.target.value))}
+          >
+            {[1,2,3,4,5,6].map((n) => <option key={n} value={n}>{n}</option>)}
+          </select>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleJoin}
+          disabled={submitting}
+          className="btn-primary btn-lg w-full justify-center"
+        >
+          {submitting ? (
+            <><Loader2 className="w-5 h-5 animate-spin" /> Inscription…</>
+          ) : (
+            <><BellRing className="w-5 h-5" /> M'inscrire en liste d'attente</>
+          )}
+        </button>
+
+        <p className="text-xs text-slate-500 mt-4 text-center">
+          Service gratuit. Vous pouvez vous désinscrire à tout moment depuis votre espace.
+        </p>
+
+        <div className="mt-6 pt-6 border-t border-slate-100 text-center">
+          <Link to="/reserver" className="text-sm text-brand-700 hover:underline">
+            Voir tous les créneaux disponibles
+          </Link>
+        </div>
       </div>
     </div>
   );

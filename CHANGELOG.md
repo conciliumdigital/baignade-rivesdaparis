@@ -4,6 +4,49 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.3.0] — 2026-05-20
+
+### 🌊 Opérations saisonnières — liste d'attente, rappels auto, fermeture météo
+
+Trois fonctionnalités demandées (#20, #21, #22) en un seul lot cohérent :
+- **Liste d'attente** : sur un créneau complet, la page de réservation
+  bascule sur un formulaire « M'inscrire en liste d'attente »
+  (nombre de personnes). RPC `join_waitlist` / `leave_waitlist` côté
+  serveur (SECURITY DEFINER) — le client ne peut pas s'inscrire
+  s'il reste des places, si le créneau est fermé ou passé.
+  Section dédiée dans *Mon espace* : voir ses inscriptions, se désinscrire,
+  réserver directement quand une place se libère.
+- **Notification automatique de place libérée** : trigger
+  `notify_on_reservation_freed` (AFTER UPDATE/DELETE sur `reservations`)
+  qui détecte un statut occupant → libérateur (`cancelled`, `refunded`,
+  `expired`, `no_show`) et enfile un e-mail `waitlist_offered` pour la
+  première personne en file ayant un nombre de places suffisant.
+  Validité de l'offre : 24 h.
+- **Rappels J-1 et H-1** : Edge Function `send-reminders` (mode `j1`,
+  `h1` ou `both`) qui scanne les réservations confirmées dont le créneau
+  démarre dans la fenêtre cible et enfile une ligne dans `notification_log`.
+  Idempotent (filtre les `sent`/`pending` existants). À planifier en cron
+  Supabase (1×/jour à 18h CET pour J-1, toutes les 30 min pour H-1).
+- **Fermeture météo (admin)** : la modale de fermeture remplace le
+  `prompt()`. Le trigger `notify_on_slot_closed` enfile automatiquement
+  un e-mail `closure` (template existant) pour chaque réservation
+  confirmée/pending/used du créneau. Compteur de personnes en liste
+  d'attente affiché par créneau côté admin.
+- **Worker générique d'envoi** : Edge Function `process-notifications`
+  qui dépile `notification_log` (status='pending', `channel='email'`,
+  templates `reminder_j1`, `reminder_h1`, `closure`, `waitlist_offered`,
+  `satisfaction`). Réutilise le même gabarit sûr et les mêmes
+  fournisseurs (Brevo prioritaire, Resend fallback) que
+  `send-confirmation-email`. À planifier en cron (toutes les 5 min).
+- **Template `waitlist_offered`** ajouté à `email_templates` (éditable
+  comme les autres).
+- **Vue `waitlist_admin`** : liste d'attente jointe avec slot + profil
+  (pour future page de pilotage si besoin).
+
+> ⚠️ Après merge : exécuter `20260520000000_season_ops.sql` (SQL Editor)
+> puis déployer les deux Edge Functions `process-notifications` et
+> `send-reminders`. Planifier les CRON Supabase (voir HANDOFF §3).
+
 ## [1.2.1] — 2026-05-20
 
 ### 🎨 Accent couleur sur fonds sombres

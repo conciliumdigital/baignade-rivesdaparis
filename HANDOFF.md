@@ -22,12 +22,86 @@
 | **Hosting front** | ✅ | Netlify (auto-deploy sur push `main`, config `netlify.toml`) |
 | **Backend Supabase** | ✅ Frankfurt | Project ref : `nunglkeqekxzpmushxty` |
 | **Auth Magic Link** | ✅ Activé | Email via SMTP Supabase par défaut |
-| **Schéma SQL** | ✅ Appliqué | 9 tables, 1 view, RLS active |
-| **Edge Functions** | ✅ 4 déployées | `create-checkout-session`, `stripe-webhook`, `scan-qr`, `send-confirmation-email` |
-| **Emails transactionnels** | ✅ Brevo configuré | 🇫🇷 Paris, 300 mails/jour gratuits |
+| **Schéma SQL** | ✅ Appliqué (sauf `discount_codes`) | 11 tables + vues, RLS + triggers sécurité |
+| **Edge Functions** | ✅ 4 (scan-qr & email à jour) | `create-checkout-session`, `stripe-webhook`, `scan-qr`, `send-confirmation-email` |
+| **Codes de réduction** | ⏳ Migration à exécuter | `20260519200000_discount_codes.sql` (cf. §1bis) |
+| **Emails transactionnels** | ⏳ Prêt, non actif | Code OK ; nécessite Stripe (déclencheur) + domaine Brevo vérifié |
 | **Vérification domaine Brevo** | ⏳ À finaliser | DNS TXT (SPF + DKIM + Brevo code) à ajouter chez le registrar |
 | **Paiement Stripe** | ⏳ En attente | Client doit créer son compte commune |
 | **Coût mensuel actuel** | **0 €/mois** | — |
+
+---
+
+## 1bis. 🔖 Reprise — état au 2026-05-19 (fin de session)
+
+> Lire **en premier** en reprenant le projet. Beaucoup de choses ont été
+> livrées ; voici l'état exact et la **seule action en attente**.
+
+### ✅ En ligne (v1.1.9, `main`, déployé Netlify)
+- **Modèle opérationnel réel** appliqué : saison **4 juil → 30 août 2026**
+  (semaine : 10-11 privé cours/loisirs, 11-12 public **1 €**, 12-14/14-16/
+  16-18 5 €·nocéen 2 € ; week-end 10-12…18-20 5 €·nocéen 2 €). Données
+  démo/test purgées. Calendrier public s'ouvre sur la semaine du 4 juil
+  tant qu'on est avant la saison.
+- **Sécurité durcie** (SQL appliqué) : triggers anti-escalade de
+  privilège + anti-fraude tarifaire (`prevent_privilege_self_escalation`,
+  `secure_reservation_insert/update`). `scan-qr` redéployée (identité
+  dérivée du JWT, fail-closed). Comptes démo non connectables.
+- **Audit complet** remédié : perf (bundle public ~26 ko gz,
+  code-splitting, sourcemap off, vidéo hero conditionnelle), bugs/UX
+  (garde-fous créneau, sortie pending_payment, annulation 24h, magic-link,
+  édition/duplication créneaux, états d'erreur), jargon public retiré.
+- **Tarifs configurables** en back-office (extérieur/habitant/enfant, €).
+- **Scanner optimisé** : vibration + bip distincts, reprise auto après
+  accès valide, anti double-scan, plein écran, compteur. + page d'aide
+  `/admin/aide`.
+- **E-mails auto éditables** : table `email_templates`, page
+  `/admin/emails` (WYSIWYG + aperçu), `send-confirmation-email` charge le
+  modèle + gabarit sûr (SQL appliqué + fonction redéployée).
+- **Codes de réduction** : table `discount_codes`, page
+  `/admin/reductions`, champ « code » dans le tunnel, validation
+  **serveur** (fonction `compute_discount` + trigger).
+
+### ⏳ SEULE action manuelle en attente
+Exécuter dans le **SQL Editor** Supabase :
+**`supabase/migrations/20260519200000_discount_codes.sql`**
+(mergé en `main` mais le SQL n'est pas appliqué tant qu'on ne l'exécute
+pas). Sans ça : page `/admin/reductions` affiche « migration à exécuter »
+et les codes promo ne fonctionnent pas. Rien à redéployer côté Edge.
+
+### 🧾 Migrations SQL — état d'application
+| Migration | Appliquée en prod ? |
+|---|---|
+| `20260505000000_initial_schema` | ✅ |
+| `20260512000000_resident_proof` | ✅ |
+| `20260519000000_harden_rls` (sécurité) | ✅ |
+| `20260519100000_email_templates` | ✅ |
+| `20260519200000_discount_codes` | ⏳ **À EXÉCUTER** |
+
+### 🔌 Edge Functions — état de déploiement
+`scan-qr` ✅ redéployée (version sécurisée) · `send-confirmation-email`
+✅ redéployée (templates) · `create-checkout-session` / `stripe-webhook`
+inchangées (attendent Stripe).
+
+### 🧹 Housekeeping
+- PR GitHub **#1 « Add Cloudflare Workers configuration »** = obsolète
+  (Cloudflare abandonné) → **à fermer**.
+- `MCP Supabase` connecté au mauvais compte (`3018 CRM`/`allo-touquet`)
+  → toute opération SQL/Edge se fait **à la main** par Thomas (dashboard).
+
+### 🚧 Bloquants restants (hors code, côté mairie / décision)
+- **Stripe** : compte commune à créer (paiement réel + remboursements).
+  Tant qu'absent : aucune réservation confirmée, aucun e-mail (normal —
+  pas de confirmation sans paiement).
+- **Brevo** : domaine `lesrivesdeparis.fr` à vérifier (SPF/DKIM chez OVH).
+- **Capacité réelle** par créneau (200 provisoire) à confirmer après
+  mesures des bassins.
+- **Tarif enfant / groupe** non décidé (actuellement enfant = adulte ;
+  bug d'affichage « -50 % » volontairement laissé, exclu par Thomas).
+- **Validation juridique DPO** (CGU / mentions / RGPD).
+- **Phase 2** : module d'inscription en ligne aux **cours de natation**
+  (groupes 6-9 / 10-14, cohortes de 6, 3×/sem alternance 2 sem) — spec
+  capturée, chantier dédié à cadrer.
 
 ---
 
@@ -189,8 +263,15 @@ baignade-rivesdaparis/
 - `email_campaigns` — communication ciblée
 - `notification_log` — historique des emails envoyés
 - `site_settings` — config dynamique de la commune
+- `email_templates` — modèles d'e-mails auto éditables (back-office)
+- `discount_codes` — codes de réduction (% ou fixe, usages, validité)
 
 RLS active sur toutes les tables. Helpers `is_admin()` / `is_staff_or_admin()`.
+**Triggers de sécurité** (migration `20260519000000_harden_rls`) :
+`prevent_privilege_self_escalation` (profiles), `secure_reservation_insert`
+(recalcul du total serveur + remise), `secure_reservation_update`
+(usager limité à l'annulation). `reservations.total_amount_cents` n'est
+**jamais** fiable depuis le client — recalculé par le trigger.
 
 ### 4.4 Edge Functions
 
@@ -198,8 +279,13 @@ RLS active sur toutes les tables. Helpers `is_admin()` / `is_staff_or_admin()`.
 |---|---|---|---|
 | `create-checkout-session` | ❌ | front | Crée une session Stripe Checkout |
 | `stripe-webhook` | ❌ | Stripe | Réceptionne paiement → génère QR token → trigger email |
-| `scan-qr` | ✅ | staff app | Valide QR + marque utilisé + journalise |
-| `send-confirmation-email` | ❌ | autre function | Envoie mail conf via Brevo avec QR en pièce jointe |
+| `scan-qr` | ✅ | staff app | Valide QR + marque utilisé. **Identité/rôle dérivés du JWT** (jamais du body), fail-closed 401/403 |
+| `send-confirmation-email` | ❌ | autre function | Charge le modèle `email_templates`, gabarit sûr, QR inline + pièce jointe (Brevo/Resend) |
+
+> ⚠️ Toute modification d'une Edge Function nécessite un **redéploiement**
+> manuel (le merge GitHub ne déploie pas les functions). De même, toute
+> nouvelle **migration SQL** doit être exécutée à la main dans le SQL
+> Editor (MCP Supabase sur mauvais compte).
 
 ---
 
@@ -231,22 +317,15 @@ RLS active sur toutes les tables. Helpers `is_admin()` / `is_staff_or_admin()`.
     ```
   - (Tu dois d'abord t'être connecté une fois via Magic Link pour que le profil soit auto-créé par le trigger)
 
-- [ ] **Générer les créneaux pour la saison**
-  - Via le back-office : `/admin/creneaux` → **Génération en masse**
-  - Ou via SQL :
-    ```sql
-    insert into slots (date, start_time, end_time, capacity, price_cents, status)
-    select
-      d::date,
-      t::time,
-      (t::time + interval '2 hours')::time,
-      50,
-      500,
-      'open'
-    from generate_series('2026-07-01'::date, '2026-08-31'::date, '1 day') d,
-         (values ('10:00'), ('12:00'), ('14:00'), ('16:00'), ('18:00')) ts(t)
-    on conflict do nothing;
-    ```
+- [x] ✅ **Créneaux de la saison générés** — modèle réel confirmé par la
+  commune (semaine vs week-end, créneau 1 €, 10-11 privé). Script de
+  référence versionné : **`supabase/season_2026.sql`** (idempotent, tag
+  `notes='SAISON2026'`). Pour régénérer/étendre : ré-exécuter ce script,
+  ou back-office `/admin/creneaux` (tarifs en € désormais).
+
+- [ ] **⏳ Exécuter la migration codes de réduction**
+  `supabase/migrations/20260519200000_discount_codes.sql` dans le SQL
+  Editor (seule migration en attente — voir §1bis).
 
 ### 5.2 ⏳ En attente du client (Mairie de Neuilly-sur-Marne)
 

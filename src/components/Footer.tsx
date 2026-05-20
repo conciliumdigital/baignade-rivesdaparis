@@ -13,7 +13,7 @@ export function Footer() {
         </div>
 
         <div>
-          <h2 className="font-semibold mb-3 text-sm uppercase tracking-wide" style={{ color: '#1ECDEB' }}>Réserver</h2>
+          <h2 className="font-semibold mb-3 text-sm uppercase tracking-wide" style={{ color: '#F5C111' }}>Réserver</h2>
           <ul className="space-y-2 text-sm">
             <li><Link to="/reserver" className="hover:text-white transition">Voir les créneaux</Link></li>
             <li><Link to="/infos-pratiques" className="hover:text-white transition">Informations pratiques</Link></li>
@@ -22,7 +22,7 @@ export function Footer() {
         </div>
 
         <div>
-          <h2 className="font-semibold mb-3 text-sm uppercase tracking-wide" style={{ color: '#1ECDEB' }}>Légal</h2>
+          <h2 className="font-semibold mb-3 text-sm uppercase tracking-wide" style={{ color: '#F5C111' }}>Légal</h2>
           <ul className="space-y-2 text-sm">
             <li><Link to="/cgu" className="hover:text-white transition">Conditions générales</Link></li>
             <li><Link to="/confidentialite" className="hover:text-white transition">Politique de confidentialité</Link></li>
@@ -32,7 +32,7 @@ export function Footer() {
         </div>
 
         <div>
-          <h2 className="font-semibold mb-3 text-sm uppercase tracking-wide" style={{ color: '#1ECDEB' }}>Contact</h2>
+          <h2 className="font-semibold mb-3 text-sm uppercase tracking-wide" style={{ color: '#F5C111' }}>Contact</h2>
           <ul className="space-y-2 text-sm text-slate-400">
             <li>Mairie de Neuilly-sur-Marne</li>
             <li>Place Ferdinand Buisson</li>

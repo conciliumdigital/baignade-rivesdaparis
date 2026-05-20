@@ -148,7 +148,7 @@ serve(async () => {
 <html lang="fr"><body style="font-family:Inter,Arial,sans-serif;background:#f1f5f9;margin:0;padding:24px;color:#0f172a">
 <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(2,132,199,.1)">
   <div style="background:linear-gradient(135deg,#0284c7,#0c4a6e);color:#fff;padding:28px 32px">
-    <h1 style="margin:0;font-size:22px;color:#1ECDEB">Baignade Rives d'Paris</h1>
+    <h1 style="margin:0;font-size:22px;color:#F5C111">Baignade Rives d'Paris</h1>
     <p style="margin:6px 0 0;opacity:.9;font-size:14px">Neuilly-sur-Marne</p>
   </div>
   <div style="padding:28px 32px;font-size:14px;line-height:1.55">${bodyContent}</div>

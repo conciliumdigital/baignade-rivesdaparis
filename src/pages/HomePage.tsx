@@ -42,7 +42,7 @@ export function HomePage() {
           </p>
           <h1
             className="text-4xl md:text-6xl font-display font-semibold leading-[1.05] mb-6 animate-fade-up"
-            style={{ animationDelay: '60ms', color: '#1ECDEB' }}
+            style={{ animationDelay: '60ms', color: '#F5C111' }}
           >
             La baignade en bord de Marne,
             <br className="hidden md:inline" /> sur réservation.
@@ -142,7 +142,7 @@ export function HomePage() {
       <section className="container-app py-24">
         <Reveal>
           <div className="rounded-2xl bg-brand-900 text-white px-8 py-14 md:px-16 md:py-20 text-center card-hover">
-            <h2 className="text-3xl md:text-4xl font-display font-semibold mb-4" style={{ color: '#1ECDEB' }}>Prêt à plonger&nbsp;?</h2>
+            <h2 className="text-3xl md:text-4xl font-display font-semibold mb-4" style={{ color: '#F5C111' }}>Prêt à plonger&nbsp;?</h2>
             <p className="text-white/80 max-w-xl mx-auto mb-8">
               Les créneaux sont publiés tout l'été. Réservez le vôtre dès maintenant.
             </p>

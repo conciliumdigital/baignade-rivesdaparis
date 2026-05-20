@@ -4,6 +4,16 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.3.1] — 2026-05-20
+
+### 🎨 Accent jaune solaire
+
+- Couleur d'accent **#F5C111** (jaune solaire) en lieu et place du cyan
+  #1ECDEB sur tous les titres en fond foncé : hero h1, h2 « Prêt à
+  plonger ? » (carte `bg-brand-900`), trois rubriques du pied de page
+  (`bg-slate-900`), titre du gabarit e-mail. Plus chaleureux, plus
+  estival ; meilleur contraste sur bleu marine.
+
 ## [1.3.0] — 2026-05-20
 
 ### 🌊 Opérations saisonnières — liste d'attente, rappels auto, fermeture météo

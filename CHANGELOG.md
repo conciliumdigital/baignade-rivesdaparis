@@ -4,6 +4,17 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.2.1] — 2026-05-20
+
+### 🎨 Accent couleur sur fonds sombres
+
+- Couleur d'accent **#1ECDEB** appliquée au titre principal du hero
+  (« La baignade en bord de Marne, sur réservation. »), au titre de la
+  section « Prêt à plonger ? » (carte `bg-brand-900`) et aux trois
+  rubriques du pied de page (« Réserver », « Légal », « Contact »,
+  fond `bg-slate-900`). Ressort vif sur fond bleu marine, contraste
+  conservé pour l'accessibilité.
+
 ## [1.2.0] — 2026-05-19
 
 ### 🎨 Refonte design — direction institutionnelle & éditoriale

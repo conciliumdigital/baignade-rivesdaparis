@@ -4,6 +4,44 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.2.1] — 2026-05-20
+
+### 🎨 Accent couleur sur fonds sombres
+
+- Couleur d'accent **#1ECDEB** appliquée au titre principal du hero
+  (« La baignade en bord de Marne, sur réservation. »), au titre de la
+  section « Prêt à plonger ? » (carte `bg-brand-900`) et aux trois
+  rubriques du pied de page (« Réserver », « Légal », « Contact »,
+  fond `bg-slate-900`). Ressort vif sur fond bleu marine, contraste
+  conservé pour l'accessibilité.
+
+## [1.2.0] — 2026-05-19
+
+### 🎨 Refonte design — direction institutionnelle & éditoriale
+
+Objectif : « dé-IA-iser » l'interface, identité plus civique, micro-effets.
+
+- **Fondations** : police de titres **Fraunces** (serif éditorial) +
+  Inter corps ; palette/ombres/rayons affinés ; `prefers-reduced-motion`
+  respecté ; `::selection`, focus soignés.
+- **Micro-interactions** (zéro dépendance) : composant `<Reveal>`
+  (apparition au scroll, IntersectionObserver), soulignés de liens
+  animés (`.link-underline`), survol de cartes (`.card-hover`), retour
+  tactile des boutons (press), apparition du hero (`fade-up` échelonné),
+  **transition de prix** (`<AnimatedPrice>` — le total du tunnel pulse à
+  chaque changement de quantité/code promo).
+- **Fix** : `.claude/launch.json` → `runtimeExecutable: "npm"` (PATH,
+  portable) au lieu d'un chemin absolu Intel cassé sur Apple Silicon
+  (le serveur de dev/preview ne démarrait plus).
+- **Page d'accueil** refondue : hero éditorial sobre (suppression de la
+  fausse carte « Aujourd'hui », du badge à paillettes et des dégradés
+  multi-stops), sections numérotées moins génériques, listes éditoriales.
+- **En-tête** : logo aplati, navigation à soulignés animés, signature
+  « Ville de Neuilly-sur-Marne ».
+- **Emoji décoratifs retirés** de l'UI (📬 connexion/e-mail envoyé,
+  👋 espace compte, 🏊‍♀️ sujet de campagne).
+- Tout le back-office hérite des `.btn`/`.card`/typo affinés.
+
 ## [1.1.9] — 2026-05-19
 
 ### 🎟️ Codes de réduction

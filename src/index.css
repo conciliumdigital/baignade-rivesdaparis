@@ -21,8 +21,28 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  h1, h2, h3, h4, h5 {
-    @apply font-display tracking-tight;
+  /* Titres éditoriaux (serif Fraunces) — identité civique */
+  h1, h2, h3 {
+    @apply font-display tracking-tight text-slate-900;
+    font-optical-sizing: auto;
+  }
+  h1 { letter-spacing: -0.02em; }
+  h4, h5 {
+    @apply font-sans font-semibold tracking-tight text-slate-900;
+  }
+
+  ::selection {
+    @apply bg-brand-600/15 text-brand-900;
+  }
+
+  /* Respect de « réduire les animations » (accessibilité) */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
   }
 
   /* A11y: focus visible amélioré */
@@ -38,10 +58,10 @@
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed select-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.97] active:translate-y-px;
   }
   .btn-primary {
-    @apply btn bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 shadow-soft hover:shadow-elevated;
+    @apply btn bg-brand-700 text-white hover:bg-brand-800 active:bg-brand-900 shadow-soft hover:shadow-elevated;
   }
   .btn-secondary {
     @apply btn bg-white text-brand-700 border border-brand-200 hover:bg-brand-50;
@@ -91,4 +111,51 @@
   background: linear-gradient(90deg, #f1f5f9 0px, #e2e8f0 200px, #f1f5f9 400px);
   background-size: 800px 100%;
   animation: shimmer 1.4s linear infinite;
+}
+
+/* --- Micro-interactions --- */
+
+/* Carte qui se soulève légèrement au survol */
+.card-hover {
+  @apply transition duration-300;
+}
+.card-hover:hover {
+  @apply -translate-y-0.5 shadow-elevated;
+}
+
+/* Lien avec soulignement animé (gauche → droite) */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 1.5px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.link-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Apparition au scroll (piloté par le composant <Reveal/>) */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
 }

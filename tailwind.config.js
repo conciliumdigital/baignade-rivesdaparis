@@ -27,16 +27,37 @@ export default {
         },
       },
       fontFamily: {
+        // Corps : Inter (neutre, lisible). Titres : Fraunces (serif
+        // éditorial, identité civique — moins « template SaaS/IA »).
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['Fraunces', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
       },
       boxShadow: {
-        soft: '0 2px 8px -2px rgba(2, 132, 199, 0.08), 0 4px 16px -4px rgba(2, 132, 199, 0.06)',
-        elevated: '0 8px 24px -8px rgba(2, 132, 199, 0.18)',
+        soft: '0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 14px -6px rgba(15, 23, 42, 0.08)',
+        elevated: '0 10px 30px -12px rgba(15, 23, 42, 0.18)',
       },
       borderRadius: {
-        xl: '0.875rem',
-        '2xl': '1.25rem',
+        xl: '0.75rem',
+        '2xl': '1rem',
+      },
+      keyframes: {
+        'fade-up': {
+          '0%': { opacity: '0', transform: 'translateY(14px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'fade-in': {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        'price-pop': {
+          '0%': { opacity: '0.4', transform: 'translateY(4px) scale(0.96)' },
+          '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
+      },
+      animation: {
+        'fade-up': 'fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both',
+        'fade-in': 'fade-in 0.5s ease-out both',
+        'price-pop': 'price-pop 0.28s cubic-bezier(0.16, 1, 0.3, 1) both',
       },
     },
   },

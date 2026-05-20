@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, MapPin, QrCode, Inbox, AlertTriangle } from 'lucide-react';
+import { Calendar, Clock, MapPin, QrCode, Inbox, AlertTriangle, BellRing, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../lib/auth';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
@@ -17,9 +17,21 @@ const STATUS_LABELS: Record<ReservationStatus, { label: string; cls: string }> =
   expired: { label: 'Expirée', cls: 'badge-muted' },
 };
 
+type WaitlistRow = {
+  id: string;
+  slot_id: string;
+  nb_persons: number;
+  status: string;
+  notified_at: string | null;
+  expires_at: string | null;
+  created_at: string;
+  slot: { date: string; start_time: string; end_time: string; status: string };
+};
+
 export function AccountPage() {
   const { user, profile } = useAuth();
   const [reservations, setReservations] = useState<ReservationWithSlot[]>([]);
+  const [waitlist, setWaitlist] = useState<WaitlistRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [reloadTick, setReloadTick] = useState(0);
@@ -28,25 +40,45 @@ export function AccountPage() {
     async function load() {
       if (!isSupabaseConfigured) {
         setReservations([]);
+        setWaitlist([]);
         setLoading(false);
         return;
       }
       setLoading(true);
       setLoadError(false);
-      const { data, error } = await supabase
-        .from('reservations')
-        .select('*, slot:slots(*)')
-        .eq('user_id', user!.id)
-        .order('created_at', { ascending: false });
-      if (error) {
+      const [resR, resW] = await Promise.all([
+        supabase
+          .from('reservations')
+          .select('*, slot:slots(*)')
+          .eq('user_id', user!.id)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('waitlist')
+          .select('id, slot_id, nb_persons, status, notified_at, expires_at, created_at, slot:slots(date, start_time, end_time, status)')
+          .eq('user_id', user!.id)
+          .order('created_at', { ascending: false }),
+      ]);
+      if (resR.error) {
         setLoadError(true);
       } else {
-        setReservations((data ?? []) as ReservationWithSlot[]);
+        setReservations((resR.data ?? []) as ReservationWithSlot[]);
+      }
+      if (!resW.error) {
+        setWaitlist((resW.data ?? []) as unknown as WaitlistRow[]);
       }
       setLoading(false);
     }
     if (user) load();
   }, [user, reloadTick]);
+
+  async function leaveWaitlist(slot_id: string) {
+    if (!isSupabaseConfigured) return;
+    if (!confirm('Retirer cette inscription de la liste d\'attente ?')) return;
+    const { error } = await supabase.rpc('leave_waitlist', { p_slot_id: slot_id });
+    if (error) { toast.error(error.message); return; }
+    toast.success('Inscription retirée.');
+    setWaitlist((prev) => prev.filter((w) => w.slot_id !== slot_id));
+  }
 
   // Heure de début du créneau (pour la règle d'annulation 24h)
   function slotStart(r: ReservationWithSlot) {
@@ -164,6 +196,49 @@ export function AccountPage() {
             );
           })}
         </div>
+      )}
+
+      {waitlist.length > 0 && (
+        <section className="mt-10">
+          <h2 className="font-display font-semibold text-xl mb-3 flex items-center gap-2">
+            <BellRing className="w-5 h-5 text-brand-700" /> Mes inscriptions en liste d'attente
+          </h2>
+          <div className="space-y-3">
+            {waitlist.map((w) => {
+              const offered = w.status === 'offered' && w.notified_at;
+              const expired = w.expires_at && new Date(w.expires_at) < new Date();
+              return (
+                <article key={w.id} className="card p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      {offered && !expired ? (
+                        <span className="badge-success">Place disponible — réservez sous 24h</span>
+                      ) : expired ? (
+                        <span className="badge-muted">Délai dépassé</span>
+                      ) : (
+                        <span className="badge-info">En attente</span>
+                      )}
+                    </div>
+                    <div className="font-display font-semibold">{formatDate(w.slot.date)}</div>
+                    <div className="text-sm text-slate-600">
+                      {formatTimeRange(w.slot.start_time, w.slot.end_time)} · {w.nb_persons} personne{w.nb_persons > 1 ? 's' : ''}
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:items-end gap-2 flex-shrink-0">
+                    {offered && !expired && (
+                      <Link to={`/reserver/${w.slot_id}?adults=${w.nb_persons}&children=0`} className="btn-primary text-sm justify-center">
+                        Réserver maintenant
+                      </Link>
+                    )}
+                    <button onClick={() => leaveWaitlist(w.slot_id)} className="btn-ghost text-xs justify-center" title="Me désinscrire">
+                      <X className="w-4 h-4" /> Me désinscrire
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
       )}
 
       {!isSupabaseConfigured && (

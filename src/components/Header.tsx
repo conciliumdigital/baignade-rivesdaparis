@@ -21,7 +21,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 bg-white/85 backdrop-blur border-b border-slate-100">
-      <div className="container-app flex items-center justify-between h-16">
+      <div className="w-full px-6 lg:px-10 flex items-center justify-between h-16">
         <Link to="/" className="flex items-center gap-2.5 group" aria-label="Accueil Baignade Rives d'Paris">
           <div className="w-9 h-9 rounded-lg bg-brand-800 flex items-center justify-center transition-transform group-hover:-translate-y-0.5">
             <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor" aria-hidden="true">
@@ -82,7 +82,7 @@ export function Header() {
 
       {open && (
         <div className="md:hidden border-t border-slate-100 bg-white">
-          <nav className="container-app py-3 flex flex-col gap-1">
+          <nav className="w-full px-6 lg:px-10 py-3 flex flex-col gap-1">
             <NavLink to="/" end className={navLinkClass} onClick={() => setOpen(false)}>Accueil</NavLink>
             <NavLink to="/reserver" className={navLinkClass} onClick={() => setOpen(false)}>Réserver</NavLink>
             <NavLink to="/infos-pratiques" className={navLinkClass} onClick={() => setOpen(false)}>Infos pratiques</NavLink>

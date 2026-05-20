@@ -4,6 +4,16 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.3.2] — 2026-05-20
+
+### 🧭 En-tête pleine largeur
+
+- La barre de navigation utilise désormais toute la largeur disponible
+  (padding latéral `px-6 lg:px-10`) au lieu d'être contrainte par le
+  conteneur `container-app` (max-width 1200 px). Logo collé à gauche,
+  actions à droite — plus aéré sur grands écrans. Le contenu des pages
+  reste, lui, dans le conteneur classique.
+
 ## [1.3.1] — 2026-05-20
 
 ### 🎨 Accent jaune solaire

@@ -34,7 +34,7 @@ const DEFAULTS: Record<string, { subject: string; body_html: string }> = {
   },
   closure: {
     subject: 'Information importante — créneau du {{date}} modifié',
-    body_html: '<p>Bonjour {{prenom}},</p><p>En raison des conditions météo, votre créneau du <strong>{{date}}</strong> ({{horaire}}) est impacté. Vous serez recontacté·e pour un report ou un remboursement.</p><p>Merci de votre compréhension.</p>',
+    body_html: '<p>Bonjour {{prenom}},</p><p>En raison des conditions météo, votre créneau du <strong>{{date}}</strong> ({{horaire}}) est impacté. Vous serez recontacté pour un report ou un remboursement.</p><p>Merci de votre compréhension.</p>',
   },
   satisfaction: {
     subject: 'Votre avis sur votre baignade du {{date}}',

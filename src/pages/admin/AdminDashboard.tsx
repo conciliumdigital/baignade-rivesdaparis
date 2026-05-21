@@ -111,9 +111,9 @@ export function AdminDashboard() {
         </section>
 
         <section className="card p-6">
-          <h2 className="font-display font-bold mb-3">Répartition Nocéen·ne·s / extérieur·e·s <span className="text-xs font-normal text-slate-400">(données illustratives)</span></h2>
+          <h2 className="font-display font-bold mb-3">Répartition Nocéens / extérieurs <span className="text-xs font-normal text-slate-400">(données illustratives)</span></h2>
           <div className="space-y-3 mt-4">
-            {[{ label: 'Nocéen·ne·s (Neuilly-sur-Marne)', pct: 62, cls: 'bg-brand-500' }, { label: 'Extérieur·e·s', pct: 31, cls: 'bg-sand-400' }, { label: 'Groupes / écoles', pct: 7, cls: 'bg-emerald-500' }].map((s) => (
+            {[{ label: 'Nocéens (Neuilly-sur-Marne)', pct: 62, cls: 'bg-brand-500' }, { label: 'Extérieurs', pct: 31, cls: 'bg-sand-400' }, { label: 'Groupes / écoles', pct: 7, cls: 'bg-emerald-500' }].map((s) => (
               <div key={s.label}>
                 <div className="flex justify-between text-sm mb-1"><span>{s.label}</span><span className="font-semibold">{s.pct}%</span></div>
                 <div className="h-2 rounded-full bg-slate-100 overflow-hidden">

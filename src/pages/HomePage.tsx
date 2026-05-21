@@ -122,7 +122,7 @@ export function HomePage() {
           <Reveal delay={120}>
             <ul className="divide-y divide-slate-100 border-y border-slate-100">
               {[
-                'Tarif préférentiel pour les Nocéennes et Nocéens (habitant·e·s de Neuilly-sur-Marne)',
+                'Tarif préférentiel pour les Nocéens (habitants de Neuilly-sur-Marne)',
                 'Créneaux dédiés aux groupes et aux écoles en semaine',
                 "Annulation gratuite jusqu'à 24 heures avant le créneau",
                 'Notification automatique en cas de fermeture météo',

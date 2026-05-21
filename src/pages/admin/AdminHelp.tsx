@@ -60,7 +60,7 @@ export function AdminHelp() {
           Pour une réservation au <strong>tarif Nocéen</strong>, l'écran affiche un badge
           « Tarif Nocéen — Neuilly-sur-Marne » et un lien <strong>« Voir le justificatif de
           domicile »</strong>. En cas de contrôle, vous pouvez l'ouvrir. La mention
-          <em> « Justificatif non joint »</em> signale une réservation Nocéen·ne sans pièce —
+          <em> « Justificatif non joint »</em> signale une réservation Nocéen sans pièce jointe —
           à signaler à un responsable si nécessaire.
         </p>
       </section>

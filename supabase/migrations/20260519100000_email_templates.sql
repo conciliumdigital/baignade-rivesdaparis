@@ -60,7 +60,7 @@ insert into public.email_templates (key, name, subject, body_html) values
   'closure',
   'Fermeture météo',
   'Information importante — créneau du {{date}} modifié',
-  '<p>Bonjour {{prenom}},</p><p>En raison des conditions météo, votre créneau du <strong>{{date}}</strong> ({{horaire}}) est impacté. Vous serez recontacté·e pour un report ou un remboursement.</p><p>Merci de votre compréhension.</p>'
+  '<p>Bonjour {{prenom}},</p><p>En raison des conditions météo, votre créneau du <strong>{{date}}</strong> ({{horaire}}) est impacté. Vous serez recontacté pour un report ou un remboursement.</p><p>Merci de votre compréhension.</p>'
 ),
 (
   'satisfaction',

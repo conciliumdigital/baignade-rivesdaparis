@@ -14,3 +14,8 @@ coverage
 .supabase
 supabase/.temp/
 .wrangler/
+
+# Captures & artefacts locaux
+captures/
+*.tsbuildinfo
+.claude/settings.local.json

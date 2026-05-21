@@ -14,7 +14,7 @@ export function InfosPage() {
           Berge de la Marne — entrée principale par le quai des Berges, à 5 min à pied du RER A station Neuilly-Plaisance.
         </InfoCard>
         <InfoCard icon={Clock} title="Horaires & saison">
-          Ouvert du 1<sup>er</sup> juillet au 31 août, tous les jours de 10h à 20h. Créneaux fixes de 2 heures.
+          Ouvert du 4 juillet au 30 août, tous les jours de 10h à 20h. Créneaux fixes de 2 heures.
         </InfoCard>
         <InfoCard icon={ShieldAlert} title="Sécurité & encadrement">
           Surveillance assurée par des MNS BNSSA toute la journée. Trousses de premiers secours, défibrillateur, douches et vestiaires sur place.

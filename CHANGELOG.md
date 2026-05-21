@@ -4,6 +4,25 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.3.3] — 2026-05-20
+
+### 📝 Saison 2026 — précisions client
+
+- **Période d'ouverture corrigée** : du **4 juillet au 30 août 2026**
+  (au lieu de « juillet & août ») — accueil, infos pratiques, génération
+  en masse des créneaux côté admin.
+- **Renommage « habitants » → « Nocéen·ne·s »** dans toute l'interface
+  publique et le back-office : badge tarif, libellés de cartes, page
+  d'aide agents, écran scanner, tableau de bord. L'identifiant interne
+  `'habitant'` (base de données, types) est conservé pour ne pas casser
+  les réservations existantes ; seuls les libellés visibles changent.
+  Sur les premières occurrences pédagogiques, le terme est doublé de
+  « habitant·e·s de Neuilly-sur-Marne » entre parenthèses pour les
+  visiteurs non familiers du gentilé.
+- (À appliquer manuellement en base, voir SQL fourni) : créneaux du
+  4 juillet à 0,00 € pour tous (inauguration), suppression des créneaux
+  du 31 août.
+
 ## [1.3.2] — 2026-05-20
 
 ### 🧭 En-tête pleine largeur

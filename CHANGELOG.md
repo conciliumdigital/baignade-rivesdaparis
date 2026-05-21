@@ -4,6 +4,28 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.3.4] — 2026-05-20
+
+### ✍️ Masculin générique partout
+
+Suppression de toute trace d'écriture inclusive (point médian, doublets,
+parenthèses, tirets) dans l'ensemble de l'interface, des modèles d'e-mails
+et des messages serveur — application stricte de la préférence
+linguistique de la commande.
+
+- Interface publique : « Nocéens » au lieu de « Nocéen·ne·s » /
+  « Nocéennes et Nocéens », « habitants » au lieu de « habitant·e·s »,
+  « Habitant de Neuilly-sur-Marne », « domicilié » sur la
+  certification sur l'honneur, « vous serez prévenu » / « connecté »
+  dans les notifications.
+- Back-office : badge « Nocéen », « Répartition Nocéens / extérieurs »,
+  fallback du modèle e-mail « fermeture météo » au masculin.
+- Migration `20260520100000_remove_inclusive_writing.sql` : `UPDATE`
+  idempotent sur les modèles `closure` et `waitlist_offered` déjà
+  présents en base (l'`ON CONFLICT DO NOTHING` des seeds ne réécrasait
+  pas les valeurs). Garde-fou `raise notice` si une autre forme
+  inclusive subsiste.
+
 ## [1.3.3] — 2026-05-20
 
 ### 📝 Saison 2026 — précisions client

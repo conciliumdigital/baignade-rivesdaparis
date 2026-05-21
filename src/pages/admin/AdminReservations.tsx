@@ -198,7 +198,7 @@ export function AdminReservations() {
 
 function UsagerBadge({ type }: { type: UsagerType }) {
   const map: Record<UsagerType, { label: string; cls: string; icon: typeof Home | null }> = {
-    habitant: { label: 'Nocéen·ne', cls: 'badge bg-emerald-50 text-emerald-700 border border-emerald-200', icon: Home },
+    habitant: { label: 'Nocéen', cls: 'badge bg-emerald-50 text-emerald-700 border border-emerald-200', icon: Home },
     exterieur: { label: 'Extérieur', cls: 'badge-muted', icon: null },
     groupe: { label: 'Groupe', cls: 'badge-info', icon: null },
     ecole: { label: 'École', cls: 'badge-info', icon: null },

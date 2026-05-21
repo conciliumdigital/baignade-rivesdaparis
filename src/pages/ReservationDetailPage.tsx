@@ -299,7 +299,7 @@ export function ReservationDetailPage() {
             </ul>
             <div className="space-y-1.5 text-sm">
               <div className="flex justify-between">
-                <span>Adultes × {adults} {isResident && <span className="text-xs text-emerald-700 font-medium">(Nocéen·ne)</span>}</span>
+                <span>Adultes × {adults} {isResident && <span className="text-xs text-emerald-700 font-medium">(Nocéen)</span>}</span>
                 <span>{formatPrice(adults * adultPriceCents)}</span>
               </div>
               {children > 0 && (
@@ -360,7 +360,7 @@ export function ReservationDetailPage() {
           <section className="card p-6">
             <h2 className="font-display font-bold text-lg mb-1">Type de tarif</h2>
             <p className="text-sm text-slate-500 mb-4">
-              Les Nocéennes et Nocéens (habitant·e·s de Neuilly-sur-Marne) bénéficient d'un tarif réduit sur présentation d'un justificatif de domicile.
+              Les Nocéens (habitants de Neuilly-sur-Marne) bénéficient d'un tarif réduit sur présentation d'un justificatif de domicile.
             </p>
             <div className="grid sm:grid-cols-2 gap-3">
               <TarifCard
@@ -374,7 +374,7 @@ export function ReservationDetailPage() {
                 selected={isResident}
                 onSelect={() => setUsagerType('habitant')}
                 title="Tarif Nocéen"
-                subtitle="Habitant·e de Neuilly-sur-Marne"
+                subtitle="Habitant de Neuilly-sur-Marne"
                 price={hasResidentPrice ? formatPrice(slot.price_resident_cents as number) : formatPrice(slot.price_cents)}
                 disabled={!hasResidentPrice}
                 disabledReason="Tarif réduit non disponible pour ce créneau"
@@ -430,7 +430,7 @@ export function ReservationDetailPage() {
                     className="mt-1"
                   />
                   <span>
-                    Je certifie sur l'honneur être domicilié·e à Neuilly-sur-Marne et reconnais que toute déclaration mensongère peut entraîner l'annulation de la réservation sans remboursement, conformément à l'article 441-1 du Code pénal.
+                    Je certifie sur l'honneur être domicilié à Neuilly-sur-Marne et reconnais que toute déclaration mensongère peut entraîner l'annulation de la réservation sans remboursement, conformément à l'article 441-1 du Code pénal.
                   </span>
                 </label>
               </div>
@@ -554,7 +554,7 @@ function WaitlistCard({ slot, defaultPersons }: { slot: SlotAvailability; defaul
       });
       setSubmitting(false);
       if (error) { toast.error(error.message); return; }
-      toast.success('Lien de connexion envoyé. Une fois connecté·e, vous pourrez confirmer votre inscription.');
+      toast.success('Lien de connexion envoyé. Une fois connecté, vous pourrez confirmer votre inscription.');
       navigate('/connexion/email-envoye');
       return;
     }
@@ -576,7 +576,7 @@ function WaitlistCard({ slot, defaultPersons }: { slot: SlotAvailability; defaul
       return;
     }
     setDone(true);
-    toast.success('Inscription confirmée. Vous serez prévenu·e par e-mail dès qu\'une place se libère.');
+    toast.success('Inscription confirmée. Vous serez prévenu par e-mail dès qu\'une place se libère.');
   }
 
   if (done) {

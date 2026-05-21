@@ -236,7 +236,7 @@ insert into public.email_templates (key, name, subject, body_html) values
   'Place libérée (liste d''attente)',
   'Une place s''est libérée pour votre créneau du {{date}}',
   '<p>Bonjour {{prenom}},</p>'
-  '<p>Bonne nouvelle : une place vient de se libérer sur le créneau du <strong>{{date}}</strong> ({{horaire}}) pour lequel vous êtes inscrit·e en liste d''attente.</p>'
+  '<p>Bonne nouvelle : une place vient de se libérer sur le créneau du <strong>{{date}}</strong> ({{horaire}}) pour lequel vous êtes inscrit en liste d''attente.</p>'
   '<p>Vous disposez de <strong>24 heures</strong> pour réserver depuis votre espace : <a href="{{lien_compte}}">finaliser ma réservation</a>.</p>'
   '<p>Au-delà, la place sera proposée à la personne suivante.</p>'
 )

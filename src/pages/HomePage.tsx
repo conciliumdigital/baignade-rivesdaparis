@@ -69,7 +69,7 @@ export function HomePage() {
             style={{ animationDelay: '240ms' }}
           >
             <span className="inline-flex items-center gap-2"><MapPin className="w-4 h-4 text-brand-200" /> Berge de la Marne</span>
-            <span className="inline-flex items-center gap-2"><Clock className="w-4 h-4 text-brand-200" /> Juillet &amp; août</span>
+            <span className="inline-flex items-center gap-2"><Clock className="w-4 h-4 text-brand-200" /> Du 4 juillet au 30 août</span>
             <span className="inline-flex items-center gap-2"><Users className="w-4 h-4 text-brand-200" /> Encadré par des maîtres-nageurs</span>
           </div>
         </div>
@@ -114,15 +114,15 @@ export function HomePage() {
             </h2>
             <p className="text-slate-600 leading-relaxed">
               La zone de baignade aménagée par la Commune de Neuilly-sur-Marne
-              accueille petits et grands de juillet à août, avec un encadrement
-              professionnel. La réservation préalable garantit fluidité,
-              sécurité et qualité de service.
+              accueille petits et grands du 4 juillet au 30 août, avec un
+              encadrement professionnel. La réservation préalable garantit
+              fluidité, sécurité et qualité de service.
             </p>
           </Reveal>
           <Reveal delay={120}>
             <ul className="divide-y divide-slate-100 border-y border-slate-100">
               {[
-                'Tarif préférentiel pour les habitants de Neuilly-sur-Marne',
+                'Tarif préférentiel pour les Nocéennes et Nocéens (habitant·e·s de Neuilly-sur-Marne)',
                 'Créneaux dédiés aux groupes et aux écoles en semaine',
                 "Annulation gratuite jusqu'à 24 heures avant le créneau",
                 'Notification automatique en cas de fermeture météo',

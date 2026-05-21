@@ -190,7 +190,7 @@ function ValidationCard({ result, onReset, autoResume }: { result: ValidationRes
             {result.reservation.usager_type === 'habitant' && (
               <div className="mt-2 pt-2 border-t border-white/20 space-y-1.5">
                 <div className="inline-flex items-center gap-1.5 bg-white/25 rounded-md px-2 py-1 text-xs font-semibold">
-                  <Home className="w-3.5 h-3.5" /> Tarif habitant — Neuilly-sur-Marne
+                  <Home className="w-3.5 h-3.5" /> Tarif Nocéen — Neuilly-sur-Marne
                 </div>
                 {result.reservation.proof_url ? (
                   <a href={result.reservation.proof_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs underline hover:opacity-90">

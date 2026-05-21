@@ -274,10 +274,10 @@ function CreateSlotModal({
         <div><label className="label">Capacité</label><input type="number" min={1} className="input" value={capacity} onChange={e => setCapacity(Number(e.target.value))} /></div>
         <div className="grid grid-cols-3 gap-3">
           <div><label className="label">Tarif extérieur (€)</label><input type="number" min={0} step={0.5} className="input" value={price} onChange={e => setPrice(Number(e.target.value))} /></div>
-          <div><label className="label">Tarif habitant (€)</label><input type="number" min={0} step={0.5} className="input" value={priceResident} onChange={e => setPriceResident(Number(e.target.value))} /></div>
+          <div><label className="label">Tarif Nocéen (€)</label><input type="number" min={0} step={0.5} className="input" value={priceResident} onChange={e => setPriceResident(Number(e.target.value))} /></div>
           <div><label className="label">Tarif enfant (€)</label><input type="number" min={0} step={0.5} className="input" value={priceChild} onChange={e => setPriceChild(Number(e.target.value))} /></div>
         </div>
-        <p className="text-xs text-slate-500">Tarif habitant ≥ tarif extérieur → l'option « habitant » est masquée côté usager (pas de réduction).</p>
+        <p className="text-xs text-slate-500">Tarif Nocéen ≥ tarif extérieur → l'option « Nocéen » est masquée côté usager (pas de réduction).</p>
         <div className="flex justify-end gap-2 pt-2">
           <button type="button" onClick={onClose} className="btn-ghost">Annuler</button>
           <button type="submit" disabled={saving} className="btn-primary">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : (mode === 'edit' ? 'Enregistrer' : 'Créer')}</button>
@@ -288,8 +288,8 @@ function CreateSlotModal({
 }
 
 function BulkGenerateModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
-  const [from, setFrom] = useState('2026-07-01');
-  const [to, setTo] = useState('2026-08-31');
+  const [from, setFrom] = useState('2026-07-04');
+  const [to, setTo] = useState('2026-08-30');
   const [capacity, setCapacity] = useState(50);
   // Tarifs saisis en EUROS (convertis en centimes à l'enregistrement).
   const [price, setPrice] = useState(5);
@@ -336,10 +336,10 @@ function BulkGenerateModal({ onClose, onSaved }: { onClose: () => void; onSaved:
         <div><label className="label">Capacité par créneau</label><input type="number" min={1} className="input" value={capacity} onChange={e => setCapacity(Number(e.target.value))} /></div>
         <div className="grid grid-cols-3 gap-3">
           <div><label className="label">Tarif extérieur (€)</label><input type="number" min={0} step={0.5} className="input" value={price} onChange={e => setPrice(Number(e.target.value))} /></div>
-          <div><label className="label">Tarif habitant (€)</label><input type="number" min={0} step={0.5} className="input" value={priceResident} onChange={e => setPriceResident(Number(e.target.value))} /></div>
+          <div><label className="label">Tarif Nocéen (€)</label><input type="number" min={0} step={0.5} className="input" value={priceResident} onChange={e => setPriceResident(Number(e.target.value))} /></div>
           <div><label className="label">Tarif enfant (€)</label><input type="number" min={0} step={0.5} className="input" value={priceChild} onChange={e => setPriceChild(Number(e.target.value))} /></div>
         </div>
-        <p className="text-xs text-slate-500">5 créneaux/jour seront créés (10h, 12h, 14h, 16h, 18h). Tarif habitant ≥ extérieur → option « habitant » masquée côté usager.</p>
+        <p className="text-xs text-slate-500">5 créneaux/jour seront créés (10h, 12h, 14h, 16h, 18h). Tarif Nocéen ≥ extérieur → option « Nocéen » masquée côté usager.</p>
         <div className="flex justify-end gap-2 pt-2">
           <button type="button" onClick={onClose} className="btn-ghost">Annuler</button>
           <button type="submit" disabled={saving} className="btn-primary">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Générer'}</button>

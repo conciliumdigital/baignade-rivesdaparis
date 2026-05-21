@@ -55,12 +55,12 @@ export function AdminHelp() {
       </section>
 
       <section className="card p-6 mb-5">
-        <h2 className="font-display font-bold mb-3">Tarif habitant &amp; justificatif</h2>
+        <h2 className="font-display font-bold mb-3">Tarif Nocéen &amp; justificatif</h2>
         <p className="text-sm text-slate-700">
-          Pour une réservation au <strong>tarif habitant</strong>, l'écran affiche un badge
-          « Tarif habitant — Neuilly-sur-Marne » et un lien <strong>« Voir le justificatif de
+          Pour une réservation au <strong>tarif Nocéen</strong>, l'écran affiche un badge
+          « Tarif Nocéen — Neuilly-sur-Marne » et un lien <strong>« Voir le justificatif de
           domicile »</strong>. En cas de contrôle, vous pouvez l'ouvrir. La mention
-          <em> « Justificatif non joint »</em> signale une réservation habitant sans pièce —
+          <em> « Justificatif non joint »</em> signale une réservation Nocéen·ne sans pièce —
           à signaler à un responsable si nécessaire.
         </p>
       </section>

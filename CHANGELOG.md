@@ -4,6 +4,32 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.3.5] — 2026-05-27
+
+### 🟢 Anti-pause Supabase — battement de cœur en écriture
+
+Correction du keep-alive : le projet recevait quand même le mail
+« bientôt mis en pause » alors que le job quotidien renvoyait HTTP 200
+depuis 10 jours. Cause : le timer d'inactivité 7 jours du Free tier se
+base sur l'**activité base de données** (écritures/requêtes réelles),
+pas sur les hits du gateway REST/Auth — une simple lecture (`select`)
+sur une vue ne réinitialise pas le compteur.
+
+- Nouvelle migration `20260527000000_keepalive.sql` : table
+  `keepalive_heartbeat` à ligne unique (bornée) + RPC `keepalive()`
+  `security definer` (`search_path` verrouillé) faisant un `UPSERT`
+  réel. RLS activée sans policy, aucun accès direct anon/authenticated ;
+  exécution de la fonction ouverte à `anon`/`authenticated`.
+- Workflow `supabase-keepalive.yml` : appelle désormais
+  `POST /rest/v1/rpc/keepalive` (vraie écriture) au lieu d'une lecture,
+  passe à **deux** déclenchements quotidiens (07:13 / 19:13 UTC) pour
+  absorber les jobs cron parfois ignorés par GitHub, et renvoie une
+  erreur explicite (404) tant que la migration n'est pas appliquée.
+
+> ⚠️ Action manuelle requise : exécuter
+> `supabase/migrations/20260527000000_keepalive.sql` dans le SQL Editor
+> Supabase, sinon la RPC reste introuvable (404) et le keep-alive échoue.
+
 ## [1.3.4] — 2026-05-20
 
 ### ✍️ Masculin générique partout

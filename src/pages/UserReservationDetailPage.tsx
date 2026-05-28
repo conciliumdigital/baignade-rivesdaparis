@@ -88,7 +88,7 @@ export function UserReservationDetailPage() {
           <ul className="space-y-2 text-sm">
             <li className="flex gap-2"><Calendar className="w-4 h-4 text-brand-600 mt-0.5" />{formatDate(reservation.slot.date)}</li>
             <li className="flex gap-2"><Clock className="w-4 h-4 text-brand-600 mt-0.5" />{formatTimeRange(reservation.slot.start_time, reservation.slot.end_time)}</li>
-            <li className="flex gap-2"><MapPin className="w-4 h-4 text-brand-600 mt-0.5" />Berge de la Marne, Neuilly-sur-Marne</li>
+            <li className="flex gap-2"><MapPin className="w-4 h-4 text-brand-600 mt-0.5" />Chemin de la Haute-Île, Neuilly-sur-Marne</li>
           </ul>
           <div className="mt-4 pt-4 border-t border-slate-100 text-sm space-y-1">
             <div className="flex justify-between"><span>{reservation.nb_adults} adulte(s)</span></div>

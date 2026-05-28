@@ -4,6 +4,44 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.4.1] — 2026-05-28
+
+### ♿ /staff — recherche par nom (3e voie d'accès accessible)
+
+Suite à l&apos;audit RGAA v1.4.0, troisième mode d&apos;entrée ajouté au
+scanner d&apos;accueil en complément du scan caméra et de la saisie
+clavier du code : **recherche par nom**.
+
+- Nouvel onglet « Nom » dans `/staff` (en plus de « Caméra » et
+  « Code ») — un agent non voyant équipé d&apos;un lecteur d&apos;écran
+  peut désormais valider une entrée en tapant simplement le nom de la
+  personne plutôt qu&apos;un long token alphanumérique. Bénéfice
+  collatéral : plus rapide aussi pour un agent voyant lorsque le QR
+  d&apos;un usager ne se scanne pas (téléphone déchargé, capture
+  d&apos;écran floue, etc.).
+- Nouvelle RPC **`staff_find_reservations(p_query text)`** SECURITY
+  DEFINER (`search_path` verrouillé) :
+  - exige authentification + rôle staff/admin/manager (fail-closed
+    sinon) ;
+  - filtre AUTORITAIREMENT sur la date du jour en Europe/Paris et les
+    statuts occupants — l&apos;agent ne voit jamais l&apos;historique
+    complet (minimisation PII, RGPD) ;
+  - exige une requête ≥ 2 caractères et limite à 20 résultats
+    (anti-énumération) ;
+  - LIKE insensible à la casse sur prénom, nom et référence.
+- Composant `NameSearch` (StaffScanner) avec recherche debounced
+  (250 ms), annonce du nombre de résultats via `role="status" + aria-live`
+  pour les lecteurs d&apos;écran, sélection au clavier dans une `listbox`
+  ARIA. Au clic, validation finalisée via le flux `scan-qr` existant
+  (mêmes contrôles d&apos;autorisation et même journalisation
+  `scan_log`).
+
+> ⚠️ Action manuelle requise : exécuter aussi
+> `supabase/migrations/20260528100000_staff_find_reservations.sql`
+> dans le SQL Editor (en complément de la migration `audit_fixes`
+> de la v1.4.0). Tant qu&apos;elle n&apos;est pas appliquée, le mode
+> « Nom » affichera « Aucune réservation correspondante ».
+
 ## [1.4.0] — 2026-05-28
 
 ### 🛡️ Corrections d'audit complet — six axes

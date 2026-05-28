@@ -1,13 +1,35 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Scanner, type IDetectedBarcode } from '@yudiel/react-qr-scanner';
-import { CheckCircle2, XCircle, AlertTriangle, RotateCcw, History, ScanLine, Loader2, Home, FileText, ShieldAlert, Keyboard, Send } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertTriangle, RotateCcw, History, ScanLine, Loader2, Home, FileText, ShieldAlert, Keyboard, Send, Search, UserSearch, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { isSupabaseConfigured, supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
 import { formatDate, formatTimeRange } from '../../lib/format';
-import { mapSupabaseError } from '../../lib/errors';
-import type { ScanResult, UsagerType } from '../../types/database';
+import { mapSupabaseError, formatReservationStatus } from '../../lib/errors';
+import type { ScanResult, UsagerType, ReservationStatus } from '../../types/database';
+
+// Trois modes d'entrée pour le scanner — le 1er = scan caméra par
+// défaut, les deux autres = alternatives accessibles (RGAA 7).
+type InputMode = 'camera' | 'token' | 'name';
+
+// Résultat d'une recherche par nom — colonnes renvoyées par la RPC
+// `staff_find_reservations` (security definer, créneaux du jour).
+interface NameMatch {
+  id: string;
+  reference: string;
+  qr_code_token: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  slot_date: string;
+  start_time: string;
+  end_time: string;
+  status: ReservationStatus;
+  nb_adults: number;
+  nb_children: number;
+  usager_type: UsagerType;
+  has_proof: boolean;
+}
 
 interface ValidationResult {
   result: ScanResult;
@@ -38,8 +60,10 @@ export function StaffScanner() {
   const [validating, setValidating] = useState(false);
   const [last, setLast] = useState<ValidationResult | null>(null);
   const [validCount, setValidCount] = useState(0);
-  // RGAA 7 — alternative équivalente au scan caméra : saisie manuelle.
-  const [manualOpen, setManualOpen] = useState(false);
+  // RGAA 7 — alternatives équivalentes au scan caméra :
+  //   - mode 'token' : saisie clavier du code QR
+  //   - mode 'name'  : recherche par nom (créneaux du jour)
+  const [inputMode, setInputMode] = useState<InputMode>('camera');
   const [manualToken, setManualToken] = useState('');
   const lastTokenRef = useRef<string | null>(null);
 
@@ -77,7 +101,6 @@ export function StaffScanner() {
     lastTokenRef.current = token;
     setScanning(false);
     setValidating(true);
-    setManualOpen(false);
 
     try {
       let r: ValidationResult;
@@ -162,41 +185,43 @@ export function StaffScanner() {
           />
         ) : (
           <div className="w-full max-w-md">
-            <div className="aspect-square rounded-3xl overflow-hidden border-4 border-brand-400 shadow-elevated relative">
-              {scanning && !manualOpen && (
-                <Scanner
-                  onScan={handleScan}
-                  onError={() => {}}
-                  styles={{ container: { width: '100%', height: '100%' } }}
-                  components={{ finder: false }}
-                />
-              )}
-              <div className="absolute inset-[12%] border-2 border-white/40 rounded-2xl pointer-events-none" aria-hidden="true" />
-            </div>
-            <p className="text-center text-slate-300 text-sm mt-4">Présentez le QR code au centre de l&apos;écran.</p>
-            <div className="mt-4 flex justify-center gap-4 text-xs text-slate-400 flex-wrap">
-              <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Accès</span>
-              <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> Déjà utilisé</span>
-              <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-red-500" /> Refusé</span>
+            {/* Onglets de mode d'entrée — RGAA 7 : trois voies équivalentes */}
+            <div role="tablist" aria-label="Mode de validation" className="mb-4 flex gap-1 bg-slate-800/60 p-1 rounded-xl">
+              <ModeTab active={inputMode === 'camera'} onClick={() => setInputMode('camera')} icon={Camera} label="Caméra" />
+              <ModeTab active={inputMode === 'token'} onClick={() => setInputMode('token')} icon={Keyboard} label="Code" />
+              <ModeTab active={inputMode === 'name'} onClick={() => setInputMode('name')} icon={UserSearch} label="Nom" />
             </div>
 
-            {/* RGAA 7 — alternative manuelle si caméra indisponible / inaccessible */}
-            <div className="mt-6 pt-5 border-t border-slate-800">
-              {!manualOpen ? (
-                <button
-                  type="button"
-                  onClick={() => setManualOpen(true)}
-                  className="w-full inline-flex items-center justify-center gap-2 text-sm text-slate-200 hover:text-white bg-slate-800/60 hover:bg-slate-800 rounded-xl px-4 py-3 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
-                >
-                  <Keyboard className="w-4 h-4" aria-hidden="true" /> Saisir le code de la réservation au clavier
-                </button>
-              ) : (
+            {inputMode === 'camera' && (
+              <div role="tabpanel" aria-label="Scan caméra">
+                <div className="aspect-square rounded-3xl overflow-hidden border-4 border-brand-400 shadow-elevated relative">
+                  {scanning && (
+                    <Scanner
+                      onScan={handleScan}
+                      onError={() => {}}
+                      styles={{ container: { width: '100%', height: '100%' } }}
+                      components={{ finder: false }}
+                    />
+                  )}
+                  <div className="absolute inset-[12%] border-2 border-white/40 rounded-2xl pointer-events-none" aria-hidden="true" />
+                </div>
+                <p className="text-center text-slate-300 text-sm mt-4">Présentez le QR code au centre de l&apos;écran.</p>
+                <div className="mt-4 flex justify-center gap-4 text-xs text-slate-400 flex-wrap">
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Accès</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> Déjà utilisé</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-red-500" /> Refusé</span>
+                </div>
+              </div>
+            )}
+
+            {inputMode === 'token' && (
+              <div role="tabpanel" aria-label="Saisie du code">
                 <form
                   onSubmit={(e) => { e.preventDefault(); processToken(manualToken.trim(), { manual: true }); setManualToken(''); }}
                   className="space-y-2"
                 >
                   <label htmlFor="qr-token" className="block text-sm text-slate-300">
-                    Code de la réservation (visible sous le QR code de l&apos;usager)
+                    Code de la réservation (sous le QR de l&apos;usager).
                   </label>
                   <div className="flex gap-2">
                     <input
@@ -219,10 +244,15 @@ export function StaffScanner() {
                       <Send className="w-4 h-4" aria-hidden="true" /> Valider
                     </button>
                   </div>
-                  <button type="button" onClick={() => { setManualOpen(false); setManualToken(''); }} className="text-xs text-slate-400 underline">Revenir au scan caméra</button>
                 </form>
-              )}
-            </div>
+              </div>
+            )}
+
+            {inputMode === 'name' && (
+              <div role="tabpanel" aria-label="Recherche par nom">
+                <NameSearch onPick={(qrToken) => processToken(qrToken, { manual: true })} />
+              </div>
+            )}
           </div>
         )}
       </main>
@@ -302,6 +332,156 @@ function ValidationCard({ result, onReset, onRetry, autoResume, retryable }: { r
           <p className="mt-3 text-xs text-white/85">Reprise automatique du scan…</p>
         )}
       </div>
+    </div>
+  );
+}
+
+// ============== Onglet de mode (caméra / code / nom) ==============
+function ModeTab({
+  active,
+  onClick,
+  icon: Icon,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: typeof Camera;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={active}
+      onClick={onClick}
+      className={`flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold rounded-lg px-3 py-2 min-h-[40px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 ${
+        active
+          ? 'bg-brand-500 text-white shadow'
+          : 'text-slate-300 hover:bg-slate-700/60'
+      }`}
+    >
+      <Icon className="w-4 h-4" aria-hidden="true" />
+      {label}
+    </button>
+  );
+}
+
+// ============== Recherche par nom (créneaux du jour) ==============
+function NameSearch({ onPick }: { onPick: (qrToken: string) => void }) {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<NameMatch[] | null>(null);
+  const [searching, setSearching] = useState(false);
+  const debounceRef = useRef<number | null>(null);
+
+  // Recherche debounced (250 ms) dès que l'usager tape ≥ 2 caractères
+  useEffect(() => {
+    if (debounceRef.current) { clearTimeout(debounceRef.current); }
+    const q = query.trim();
+    if (q.length < 2) {
+      setResults(null);
+      setSearching(false);
+      return;
+    }
+    debounceRef.current = window.setTimeout(async () => {
+      setSearching(true);
+      try {
+        if (!isSupabaseConfigured) {
+          // Mode démonstration : retourne 2 résultats fictifs
+          setResults(q.toLowerCase().includes('demo') ? [
+            { id: 'demo-1', reference: 'DEMO1234', qr_code_token: 'BAIGNADE-DEMO-1', first_name: 'Camille', last_name: 'Démo', slot_date: new Date().toISOString().slice(0,10), start_time: '14:00:00', end_time: '16:00:00', status: 'confirmed', nb_adults: 2, nb_children: 2, usager_type: 'habitant', has_proof: true },
+          ] : []);
+          return;
+        }
+        const { data, error } = await supabase.rpc('staff_find_reservations', { p_query: q });
+        if (error) throw error;
+        setResults((data ?? []) as NameMatch[]);
+      } catch (err) {
+        toast.error(mapSupabaseError(err));
+        setResults([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 250);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [query]);
+
+  return (
+    <div className="space-y-3">
+      <label htmlFor="name-search" className="block text-sm text-slate-300">
+        Nom, prénom ou référence (créneaux du jour uniquement).
+      </label>
+      <div className="relative">
+        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+        <input
+          id="name-search"
+          type="search"
+          autoFocus
+          autoComplete="off"
+          className="w-full rounded-lg bg-slate-800 border border-slate-700 text-white pl-9 pr-3 py-2.5 min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-400"
+          placeholder="Ex. Dupont, ABC123…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          aria-describedby="name-search-help"
+        />
+      </div>
+      <p id="name-search-help" className="text-xs text-slate-400">
+        2 caractères minimum. La liste se met à jour automatiquement.
+      </p>
+
+      <div role="status" aria-live="polite" className="sr-only">
+        {searching ? 'Recherche en cours.' : results == null ? '' : results.length === 0 ? 'Aucun résultat.' : `${results.length} résultat${results.length > 1 ? 's' : ''}.`}
+      </div>
+
+      {searching && (
+        <div className="text-center py-6">
+          <Loader2 className="w-6 h-6 animate-spin text-brand-400 mx-auto" aria-hidden="true" />
+        </div>
+      )}
+
+      {!searching && results != null && results.length === 0 && (
+        <div className="rounded-xl bg-slate-800/60 p-4 text-sm text-slate-300 text-center">
+          Aucune réservation correspondante n&apos;est attendue aujourd&apos;hui.
+        </div>
+      )}
+
+      {!searching && results != null && results.length > 0 && (
+        <ul role="listbox" aria-label="Réservations correspondantes" className="space-y-2 max-h-[55vh] overflow-y-auto">
+          {results.map((r) => {
+            const alreadyUsed = r.status === 'used';
+            const fullName = [r.first_name, r.last_name].filter(Boolean).join(' ') || 'Sans nom';
+            const persons = r.nb_adults + r.nb_children;
+            return (
+              <li key={r.id} role="option" aria-selected="false">
+                <button
+                  type="button"
+                  onClick={() => r.qr_code_token && onPick(r.qr_code_token)}
+                  disabled={!r.qr_code_token}
+                  className={`w-full text-left rounded-xl border px-4 py-3 min-h-[64px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 ${
+                    alreadyUsed
+                      ? 'bg-slate-800/40 border-slate-700 text-slate-400'
+                      : 'bg-slate-800 border-slate-700 hover:bg-slate-700 text-white'
+                  }`}
+                >
+                  <div className="flex items-baseline justify-between gap-3">
+                    <div className="font-semibold truncate">{fullName}</div>
+                    <div className="text-xs tabular-nums opacity-80">{r.start_time.slice(0,5)}–{r.end_time.slice(0,5)}</div>
+                  </div>
+                  <div className="mt-1 flex items-center gap-3 text-xs opacity-80 flex-wrap">
+                    <span className="font-mono">{r.reference}</span>
+                    <span>{persons} personne{persons > 1 ? 's' : ''}</span>
+                    {r.usager_type === 'habitant' && (
+                      <span className="inline-flex items-center gap-1"><Home className="w-3 h-3" aria-hidden="true" /> Nocéen</span>
+                    )}
+                    {alreadyUsed && (
+                      <span className="text-amber-300">déjà {formatReservationStatus(r.status)}</span>
+                    )}
+                  </div>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }

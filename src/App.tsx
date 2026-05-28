@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { PublicLayout } from './layouts/PublicLayout';
 import { RequireAuth } from './components/RequireAuth';
 
@@ -45,17 +45,25 @@ function NotFoundPage() {
   return (
     <div className="container-app py-20 text-center">
       <h1 className="text-5xl font-display font-extrabold text-brand-700 mb-2">404</h1>
-      <p className="text-slate-600 mb-6">Cette page n'existe pas.</p>
-      <a href="/" className="btn-primary">Retour à l'accueil</a>
+      <p className="text-slate-600 mb-6">Cette page est introuvable.</p>
+      <a href="/" className="btn-primary">Retour à l&apos;accueil</a>
     </div>
   );
 }
 
 function EmailSentPage() {
+  const location = useLocation();
+  const email = (location.state as { email?: string } | null)?.email;
   return (
     <div className="container-app py-24 text-center max-w-md">
-      <h1 className="text-2xl md:text-3xl font-display font-semibold mb-3">Vérifiez votre boîte mail</h1>
-      <p className="text-slate-600 text-sm leading-relaxed">Un lien de connexion sécurisé vient de vous être envoyé. Cliquez dessus pour finaliser votre réservation.</p>
+      <h1 className="text-2xl md:text-3xl font-display font-semibold mb-3">Vérifiez votre boîte de réception</h1>
+      <p className="text-slate-600 text-sm leading-relaxed" role="status" aria-live="polite">
+        Un lien de connexion sécurisé vient de vous être envoyé{email ? <> à <strong>{email}</strong></> : null}.
+        Cliquez dessus pour finaliser votre réservation.
+      </p>
+      <p className="text-xs text-slate-500 mt-4">
+        Pensez à consulter le dossier des courriers indésirables si le message n&apos;arrive pas dans la minute.
+      </p>
     </div>
   );
 }

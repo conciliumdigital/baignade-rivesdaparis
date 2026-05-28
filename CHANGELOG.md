@@ -4,6 +4,221 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.4.1] — 2026-05-28
+
+### ♿ /staff — recherche par nom (3e voie d'accès accessible)
+
+Suite à l&apos;audit RGAA v1.4.0, troisième mode d&apos;entrée ajouté au
+scanner d&apos;accueil en complément du scan caméra et de la saisie
+clavier du code : **recherche par nom**.
+
+- Nouvel onglet « Nom » dans `/staff` (en plus de « Caméra » et
+  « Code ») — un agent non voyant équipé d&apos;un lecteur d&apos;écran
+  peut désormais valider une entrée en tapant simplement le nom de la
+  personne plutôt qu&apos;un long token alphanumérique. Bénéfice
+  collatéral : plus rapide aussi pour un agent voyant lorsque le QR
+  d&apos;un usager ne se scanne pas (téléphone déchargé, capture
+  d&apos;écran floue, etc.).
+- Nouvelle RPC **`staff_find_reservations(p_query text)`** SECURITY
+  DEFINER (`search_path` verrouillé) :
+  - exige authentification + rôle staff/admin/manager (fail-closed
+    sinon) ;
+  - filtre AUTORITAIREMENT sur la date du jour en Europe/Paris et les
+    statuts occupants — l&apos;agent ne voit jamais l&apos;historique
+    complet (minimisation PII, RGPD) ;
+  - exige une requête ≥ 2 caractères et limite à 20 résultats
+    (anti-énumération) ;
+  - LIKE insensible à la casse sur prénom, nom et référence.
+- Composant `NameSearch` (StaffScanner) avec recherche debounced
+  (250 ms), annonce du nombre de résultats via `role="status" + aria-live`
+  pour les lecteurs d&apos;écran, sélection au clavier dans une `listbox`
+  ARIA. Au clic, validation finalisée via le flux `scan-qr` existant
+  (mêmes contrôles d&apos;autorisation et même journalisation
+  `scan_log`).
+
+> ⚠️ Action manuelle requise : exécuter aussi
+> `supabase/migrations/20260528100000_staff_find_reservations.sql`
+> dans le SQL Editor (en complément de la migration `audit_fixes`
+> de la v1.4.0). Tant qu&apos;elle n&apos;est pas appliquée, le mode
+> « Nom » affichera « Aucune réservation correspondante ».
+
+## [1.4.0] — 2026-05-28
+
+### 🛡️ Corrections d'audit complet — six axes
+
+Synthèse de six audits internes menés en parallèle (sécurité,
+parcours quotidien, back-office, UX/responsive, messages d&apos;erreur,
+conformité RGAA) ; aucune vulnérabilité critique trouvée, plusieurs
+non-conformités RGAA et bloquants fonctionnels corrigés avant
+l&apos;ouverture publique du 4 juillet.
+
+#### Sécurité (HIGH durcis)
+
+- **`set search_path = public, pg_temp`** appliqué à toutes les
+  fonctions `SECURITY DEFINER` héritées du schéma initial
+  (`handle_new_user`, `is_admin`, `is_staff_or_admin`,
+  `prevent_privilege_self_escalation`, `secure_reservation_insert`,
+  `secure_reservation_update`, `redeem_discount_after_insert`) —
+  parade contre le shadowing de schéma signalé par le linter Supabase.
+- **Content-Security-Policy stricte** ajoutée dans `netlify.toml`
+  (default-src 'self' + allowlist Supabase / Stripe ; `frame-ancestors
+  'none'` ; HSTS preload). X-Frame-Options passe à DENY.
+- **`create-checkout-session`** : ownership check obligatoire (le
+  caller doit être propriétaire de la réservation ou staff/admin),
+  vérification JWT, CORS restreint au domaine de production.
+- **`process-notifications`** : exige désormais un `Authorization:
+  Bearer <CRON_SECRET>` (ou la service role key) — l&apos;endpoint
+  n&apos;est plus appelable par anon, ce qui neutralise un vecteur
+  d&apos;épuisement de la quota Brevo et de déclenchement prématuré
+  des rappels.
+- **`keepalive()`** : court-circuit doux si dernier ping < 30 s
+  (anti-martelage anon).
+- **Export CSV admin** : échappement des cellules commençant par
+  `= + - @ \t \r` (anti-injection de formules à l&apos;ouverture
+  Excel).
+- **scan-qr** : le token n&apos;est plus logué brut (troncature à
+  64 caractères + filtre alphanumérique pour neutraliser la
+  log-injection).
+
+#### Parcours usager (4 bloquants levés)
+
+- **RPC `cancel_reservation()`** côté serveur (security definer,
+  search_path verrouillé) : vérifie auth, propriété, statut, et le
+  délai 24 h en `Europe/Paris`. Remplace l&apos;`update status` client
+  qui ne libérait pas la place et cassait en fuseau négatif.
+- **Magic-link en milieu de flux** : un usager au tarif Nocéen non
+  connecté est désormais redirigé vers `/connexion` avec préservation
+  du contexte (au lieu d&apos;envoyer un magic-link qui ferait perdre
+  le justificatif et la case sur l&apos;honneur au retour).
+- **Race condition créneau plein** : re-fetch du créneau juste avant
+  l&apos;insertion + mapping des erreurs serveur (`SLOT_FULL`,
+  `SLOT_CLOSED`, etc.) en messages utilisateur.
+- **Justificatif uploadé AVANT** insertion de la réservation, avec
+  rollback Storage si l&apos;insertion échoue (plus de réservation
+  orpheline sans justificatif).
+- Le mensonge visuel « Enfants × N (-50 %) » retiré du récapitulatif
+  (le tarif enfant est aujourd&apos;hui aligné sur l&apos;adulte).
+- `window.prompt()` de la liste d&apos;attente remplacé par un champ
+  React typé.
+- Page « courriel envoyé » : l&apos;adresse est restituée si fournie,
+  message annoncé via `role="status"`.
+
+#### Back-office (actions métier manquantes)
+
+- **Tableau Réservations** : drawer de détail par ligne, action
+  « Annuler la réservation » (via la RPC `cancel_reservation`) avec
+  motif facultatif et avertissement comptable explicite (le
+  remboursement Stripe reste à effectuer côté tableau de bord Stripe
+  tant que la passerelle n&apos;est pas branchée), action « Contacter
+  par courriel », warning si la troncature à 500 résas est atteinte,
+  recherche corrigée (les `null null` ne créent plus de faux
+  positifs).
+- **Édition créneau** : refuse une capacité inférieure au nombre de
+  personnes déjà réservées ; un changement de prix sur un créneau
+  ayant des résas exige une case de confirmation explicite (les
+  totaux des résas existantes restent figés côté trigger).
+- **Suppression créneau** : nouveau bouton, disponible uniquement
+  sur les créneaux vides (utilisation de « Fermer » pour les
+  créneaux ayant des résas).
+- **Génération en masse** : étape « Prévisualiser » obligatoire,
+  affiche le nombre de créneaux existants qui seraient écrasés
+  avant la validation.
+- **Fermeture météo** : affiche le nombre de réservations
+  (et de personnes) qui recevront une notification.
+- **Équipe** : l&apos;option « Administrateur » du menu de
+  promotion est masquée pour les gestionnaires (garde-fou UI
+  redondant avec la RLS).
+- **Codes de réduction** : suppression refusée si le code a déjà
+  été utilisé (proposition de désactiver à la place pour préserver
+  la traçabilité comptable) ; date de fin de validité dans le passé
+  rejetée à la création.
+- **Modèles d&apos;e-mails** : badges « déclencheur à brancher »
+  uniquement pour les modèles vraiment non câblés (les autres sont
+  fonctionnels) ; variables `{{xxx}}` cliquables (insertion au
+  curseur) ; protection contre l&apos;écrasement silencieux lors
+  d&apos;un changement d&apos;onglet avec saisie non sauvegardée ;
+  bouton « Enregistrer » désactivé tant que le formulaire n&apos;est
+  pas modifié.
+- **Communication** : les boutons « Test » et « Envoyer » annoncent
+  désormais clairement le mode démonstration au lieu de prétendre
+  envoyer.
+
+#### UX et responsive
+
+- **Récap réservation** : panneau collant en bas d&apos;écran mobile
+  (total + bouton Payer toujours visibles).
+- **Header mobile** : menu avec piège à focus, fermeture par
+  <kbd>Échap</kbd> et clic en dehors, restitution du focus sur le
+  bouton burger, `aria-controls`/`aria-expanded` corrects,
+  touch-targets ≥ 44 px partout.
+- **Calendrier** : navigation par chevrons en touch-targets ≥ 44 px,
+  grille mobile à une colonne (plus aucune empilation invisible
+  sous 640 px).
+- **Scanner /staff** : `z-50` sur la carte de validation (plus de
+  collision avec le header sticky), couleurs ajustées
+  (`emerald-700`/`red-700`) pour passer le contraste 4.5:1, cadre
+  de visée proportionnel `inset-[12%]`, bouton « Réessayer ce même
+  QR » sur les refus, action principale en touch-target ≥ 56 px.
+- **Vidéo hero** : `poster` ajouté (plus d&apos;écran noir 2 s),
+  source filtrée `media="(min-width: 768px)"`.
+- **Toasts** : repositionnés `top-center` avec offset 80 px (plus
+  cachés par le header sticky), `aria-live` correct selon le type
+  (succès = polite, erreur = assertive).
+
+#### Messages d&apos;erreur (couche centralisée)
+
+- Nouveau module **`src/lib/errors.ts`** : `mapSupabaseError()` qui
+  traduit les messages PostgREST anglais (`JWT expired`,
+  `duplicate key value`, `row-level security`, `Failed to fetch`,
+  etc.) et les codes métier SQL (`SLOT_FULL`, `AUTH_REQUIRED`,
+  `CANCELLATION_DEADLINE_PASSED`…) en formulations françaises
+  utilisateur. Appliqué à toutes les pages (~14 occurrences).
+- **scan-qr** : statuts (`cancelled`, `refunded`…) traduits, date
+  ISO formatée `JJ/MM/AAAA`, prénom inclus dans le message de
+  bienvenue.
+- Vocabulaire : « lien magique » → « lien de connexion »,
+  « email » → « courriel » / « adresse électronique » dans les
+  libellés public-facing.
+- Ponctuation des toasts uniformisée (point final partout).
+
+#### Conformité RGAA (loi 11 oct. 2019)
+
+- **Déclaration d&apos;accessibilité** entièrement réécrite selon
+  le modèle DINUM : état de conformité, résultats des tests,
+  contenus non accessibles, dérogations, voies de recours (Défenseur
+  des droits avec liens et adresse postale).
+- **Mention obligatoire** « Accessibilité : non conforme » ajoutée
+  au pied de page.
+- **`/staff` — alternative manuelle au scan caméra** : champ de
+  saisie clavier du code de réservation (RGAA 7, exclusion
+  non-voyants / pas de caméra levée).
+- **`CookieBanner`** : refonte accessible (`aria-modal`, piège à
+  focus, fermeture <kbd>Échap</kbd>, bouton fermer libellé,
+  restitution focus).
+- **`ReservationDetailPage`** : sélecteur de tarif refait en
+  groupe radio sémantique, composition encapsulée dans
+  `<fieldset>/<legend>`, messages d&apos;erreur reliés via
+  `aria-describedby` + `role="alert"` + `aria-invalid`, input
+  fichier avec `capture="environment"` pour la photo directe
+  mobile.
+- **Vidéo hero** : bouton Pause/Lecture visible (RGAA 4.1, animation
+  > 5 s).
+- **Modal accessible réutilisable** (`src/components/Modal.tsx`) :
+  piège à focus, Escape, `aria-modal`, restitution focus,
+  empêchement du scroll arrière-plan ; adopté par AdminSlots,
+  AdminStaff, AdminDiscounts, AdminReservations.
+- `<address>` ajouté autour des coordonnées du Footer.
+
+#### Action manuelle requise
+
+> Exécuter `supabase/migrations/20260528000000_audit_fixes.sql` dans
+> le SQL Editor Supabase. La migration verrouille `search_path`,
+> ajoute la RPC `cancel_reservation` et le rate-limit du `keepalive`.
+> Tant qu&apos;elle n&apos;est pas appliquée :
+> - l&apos;annulation côté usager et back-office échoue avec un
+>   message clair (« Réservation introuvable » / RPC absente) ;
+> - le keep-alive Supabase continue de tourner sans rate-limit.
+
 ## [1.3.5] — 2026-05-27
 
 ### 🟢 Anti-pause Supabase — battement de cœur en écriture

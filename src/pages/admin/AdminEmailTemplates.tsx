@@ -1,9 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Loader2, Save, RotateCcw, Mail, Eye, AlertTriangle } from 'lucide-react';
 import { isSupabaseConfigured, supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
 import { RichTextEditor } from '../../components/RichTextEditor';
+import { mapSupabaseError } from '../../lib/errors';
+
+// Modèles dont le déclencheur d'envoi est aujourd'hui câblé (côté SQL ou
+// Edge Functions). Les autres sont enregistrés mais pas encore envoyés.
+const WIRED = new Set(['confirmation', 'closure', 'waitlist_offered', 'reminder_j1', 'reminder_h1']);
 
 interface Template { key: string; name: string; subject: string; body_html: string }
 
@@ -56,6 +61,8 @@ export function AdminEmailTemplates() {
   const [loadError, setLoadError] = useState(false);
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
+  const [dirty, setDirty] = useState(false);
+  const bodyAreaRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -74,11 +81,15 @@ export function AdminEmailTemplates() {
   }, []);
 
   function selectTemplate(key: string) {
+    if (dirty && !confirm('Vous avez des modifications non enregistrées. Les abandonner ?')) {
+      return;
+    }
     const t = templates.find((x) => x.key === key);
     if (!t) return;
     setActiveKey(key);
     setSubject(t.subject);
     setBody(t.body_html);
+    setDirty(false);
   }
 
   function resetToDefault() {
@@ -87,19 +98,35 @@ export function AdminEmailTemplates() {
     if (!confirm('Réinitialiser ce modèle au texte par défaut ? (non enregistré tant que vous ne sauvegardez pas)')) return;
     setSubject(d.subject);
     setBody(d.body_html);
+    setDirty(true);
+  }
+
+  // Insertion d'une variable {{xxx}} à la fin de l'objet ou du corps,
+  // selon le dernier champ ayant le focus. Cliquable au lieu d'imposer
+  // une recopie manuelle.
+  function insertVariable(v: string) {
+    const token = `{{${v}}}`;
+    const active = document.activeElement as HTMLElement | null;
+    if (active && active.tagName === 'INPUT') {
+      setSubject((s) => s + token);
+    } else {
+      setBody((s) => s + token);
+    }
+    setDirty(true);
   }
 
   async function save() {
-    if (!subject.trim() || !body.trim()) { toast.error('Objet et corps requis.'); return; }
-    if (!isSupabaseConfigured) { toast.success('Mode démo : modèle non persisté'); return; }
+    if (!subject.trim() || !body.trim()) { toast.error('L\'objet et le corps sont requis.'); return; }
+    if (!isSupabaseConfigured) { toast.success('Mode démonstration : modèle non persisté.'); return; }
     setSaving(true);
     const { error } = await supabase
       .from('email_templates')
       .update({ subject, body_html: body, updated_by: profile?.id })
       .eq('key', activeKey);
     setSaving(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) { toast.error(mapSupabaseError(error)); return; }
     setTemplates((prev) => prev.map((t) => (t.key === activeKey ? { ...t, subject, body_html: body } : t)));
+    setDirty(false);
     toast.success('Modèle enregistré.');
   }
 
@@ -114,8 +141,8 @@ export function AdminEmailTemplates() {
   if (loadError) {
     return (
       <div className="card p-10 text-center max-w-lg">
-        <AlertTriangle className="w-9 h-9 text-amber-500 mx-auto mb-3" />
-        <h2 className="font-display font-bold mb-1">Modèles indisponibles</h2>
+        <AlertTriangle className="w-9 h-9 text-amber-500 mx-auto mb-3" aria-hidden="true" />
+        <h2 className="font-display font-bold mb-1">Modèles indisponibles.</h2>
         <p className="text-sm text-slate-500">Exécutez la migration <code>email_templates</code> dans Supabase, puis rechargez.</p>
       </div>
     );
@@ -125,25 +152,27 @@ export function AdminEmailTemplates() {
     <div>
       <header className="mb-6">
         <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <Mail className="w-6 h-6 text-brand-600" /> E-mails automatiques
+          <Mail className="w-6 h-6 text-brand-600" aria-hidden="true" /> Modèles d&apos;e-mails automatiques
         </h1>
         <p className="text-sm text-slate-600">
-          Modifiez l'objet et le contenu des e-mails. L'en-tête, le QR code et le pied de page
+          Modifiez l&apos;objet et le contenu des e-mails. L&apos;en-tête, le QR code et le pied de page
           sont gérés automatiquement (non modifiables) pour garantir un rendu fiable.
         </p>
       </header>
 
-      <div className="flex flex-wrap gap-2 mb-5">
+      <div className="flex flex-wrap gap-2 mb-5" role="tablist" aria-label="Liste des modèles d'e-mails">
         {templates.map((t) => (
           <button
             key={t.key}
+            role="tab"
+            aria-selected={activeKey === t.key}
             onClick={() => selectTemplate(t.key)}
-            className={`text-sm px-3 py-1.5 rounded-lg border ${
+            className={`text-sm px-3 py-1.5 rounded-lg border min-h-[36px] ${
               activeKey === t.key ? 'bg-brand-50 border-brand-200 text-brand-700 font-semibold' : 'border-slate-200 text-slate-600 hover:bg-slate-50'
             }`}
           >
             {t.name}
-            {t.key !== 'confirmation' && <span className="ml-1.5 text-[10px] text-slate-400">(à venir)</span>}
+            {!WIRED.has(t.key) && <span className="ml-1.5 text-[10px] text-amber-600">(déclencheur à brancher)</span>}
           </button>
         ))}
       </div>
@@ -151,25 +180,43 @@ export function AdminEmailTemplates() {
       <div className="grid lg:grid-cols-2 gap-5">
         <section className="space-y-3">
           <div className="card p-5">
-            <label className="label">Objet de l'e-mail — « {activeName} »</label>
-            <input className="input" value={subject} onChange={(e) => setSubject(e.target.value)} />
-            <label className="label mt-4">Corps de l'e-mail</label>
-            <RichTextEditor value={body} onChange={setBody} />
-            <p className="text-xs text-slate-500 mt-2">
-              Variables (cliquables non — à recopier) :{' '}
-              {VARS.map((v) => <code key={v} className="mr-1 bg-slate-100 px-1 rounded">{`{{${v}}}`}</code>)}
-            </p>
-            {activeKey !== 'confirmation' && (
+            <label className="label" htmlFor="tpl-subject">Objet de l&apos;e-mail — « {activeName} »</label>
+            <input
+              id="tpl-subject"
+              className="input"
+              value={subject}
+              onChange={(e) => { setSubject(e.target.value); setDirty(true); }}
+            />
+            <label className="label mt-4" htmlFor="tpl-body">Corps de l&apos;e-mail</label>
+            <div ref={bodyAreaRef}>
+              <RichTextEditor value={body} onChange={(v) => { setBody(v); setDirty(true); }} />
+            </div>
+            <div className="text-xs text-slate-500 mt-2">
+              <p className="mb-1">Variables (cliquez pour insérer à l&apos;endroit du dernier champ utilisé) :</p>
+              <div className="flex flex-wrap gap-1.5">
+                {VARS.map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => insertVariable(v)}
+                    className="bg-slate-100 hover:bg-slate-200 px-1.5 py-0.5 rounded font-mono text-xs min-h-[28px]"
+                  >
+                    {`{{${v}}}`}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {!WIRED.has(activeKey) && (
               <p className="text-xs text-amber-700 mt-2">
                 Ce modèle est enregistré mais pas encore envoyé automatiquement (déclencheur à brancher ultérieurement).
               </p>
             )}
             <div className="flex justify-between items-center gap-2 pt-4">
-              <button onClick={resetToDefault} className="btn-ghost text-sm"><RotateCcw className="w-4 h-4" /> Réinitialiser</button>
+              <button onClick={resetToDefault} className="btn-ghost text-sm"><RotateCcw className="w-4 h-4" aria-hidden="true" /> Réinitialiser</button>
               <div className="flex gap-2">
-                <button onClick={() => setShowPreview((s) => !s)} className="btn-ghost text-sm lg:hidden"><Eye className="w-4 h-4" /> Aperçu</button>
-                <button onClick={save} disabled={saving} className="btn-primary text-sm">
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Save className="w-4 h-4" /> Enregistrer</>}
+                <button onClick={() => setShowPreview((s) => !s)} className="btn-ghost text-sm lg:hidden"><Eye className="w-4 h-4" aria-hidden="true" /> Aperçu</button>
+                <button onClick={save} disabled={saving || !dirty} className="btn-primary text-sm">
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : <><Save className="w-4 h-4" aria-hidden="true" /> {dirty ? 'Enregistrer' : 'Enregistré'}</>}
                 </button>
               </div>
             </div>

@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { Trash2, Loader2, Save, ShieldAlert } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import { mapSupabaseError } from '../lib/errors';
 
 export function ProfilePage() {
   const { user, profile, refreshProfile, signOut } = useAuth();
@@ -31,7 +32,7 @@ export function ProfilePage() {
       })
       .eq('id', user.id);
     setSaving(false);
-    if (error) toast.error(error.message);
+    if (error) toast.error(mapSupabaseError(error));
     else {
       await refreshProfile();
       toast.success('Profil mis à jour.');
@@ -45,9 +46,9 @@ export function ProfilePage() {
     );
     if (!confirmed) return;
     const { error } = await supabase.from('profiles').delete().eq('id', user.id);
-    if (error) toast.error(error.message);
+    if (error) toast.error(mapSupabaseError(error));
     else {
-      toast.success('Compte supprimé. À bientôt !');
+      toast.success('Compte supprimé. À bientôt.');
       await signOut();
     }
   }
@@ -73,9 +74,9 @@ export function ProfilePage() {
             <input id="ln" className="input" value={lastName} onChange={(e) => setLastName(e.target.value)} />
           </div>
           <div className="sm:col-span-2">
-            <label className="label">Email</label>
-            <input className="input bg-slate-50" disabled value={profile?.email ?? user?.email ?? ''} />
-            <p className="text-xs text-slate-500 mt-1">L'email sert d'identifiant et ne peut pas être modifié ici.</p>
+            <label className="label" htmlFor="email-display">Adresse électronique</label>
+            <input id="email-display" className="input bg-slate-50" disabled value={profile?.email ?? user?.email ?? ''} />
+            <p className="text-xs text-slate-500 mt-1">L&apos;adresse électronique sert d&apos;identifiant et ne peut pas être modifiée ici.</p>
           </div>
           <div className="sm:col-span-2">
             <label htmlFor="ph" className="label">Téléphone</label>
@@ -87,7 +88,7 @@ export function ProfilePage() {
           <legend className="font-semibold text-sm mb-2">Notifications</legend>
           <label className="flex items-center gap-2 text-sm cursor-pointer">
             <input type="checkbox" checked={notifEmail} onChange={(e) => setNotifEmail(e.target.checked)} />
-            Recevoir les confirmations & rappels par email (recommandé)
+            Recevoir les confirmations et rappels par courriel (recommandé).
           </label>
           <label className="flex items-center gap-2 text-sm cursor-pointer">
             <input type="checkbox" checked={notifSms} onChange={(e) => setNotifSms(e.target.checked)} />
@@ -110,9 +111,9 @@ export function ProfilePage() {
         <div className="flex items-start gap-3">
           <ShieldAlert className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <h2 className="font-display font-bold text-base text-red-900 mb-1">Droit à l'oubli (RGPD)</h2>
+            <h2 className="font-display font-bold text-base text-red-900 mb-1">Droit à l&apos;oubli (RGPD)</h2>
             <p className="text-sm text-slate-700 mb-3">
-              Vous pouvez supprimer définitivement votre compte et l'ensemble de vos données personnelles à tout moment. Les réservations passées seront anonymisées pour les besoins comptables légaux.
+              Vous pouvez supprimer définitivement votre compte et l&apos;ensemble de vos données personnelles à tout moment. Les réservations passées seront anonymisées pour les besoins comptables légaux.
             </p>
             <button onClick={handleDelete} className="btn-danger text-sm">
               <Trash2 className="w-4 h-4" /> Supprimer mon compte

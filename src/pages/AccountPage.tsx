@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../lib/auth';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { formatDate, formatPrice, formatTimeRange } from '../lib/format';
+import { mapSupabaseError } from '../lib/errors';
 import type { ReservationWithSlot, ReservationStatus } from '../types/database';
 
 const STATUS_LABELS: Record<ReservationStatus, { label: string; cls: string }> = {
@@ -75,43 +76,34 @@ export function AccountPage() {
     if (!isSupabaseConfigured) return;
     if (!confirm('Retirer cette inscription de la liste d\'attente ?')) return;
     const { error } = await supabase.rpc('leave_waitlist', { p_slot_id: slot_id });
-    if (error) { toast.error(error.message); return; }
+    if (error) { toast.error(mapSupabaseError(error)); return; }
     toast.success('Inscription retirée.');
     setWaitlist((prev) => prev.filter((w) => w.slot_id !== slot_id));
   }
 
-  // Heure de début du créneau (pour la règle d'annulation 24h)
-  function slotStart(r: ReservationWithSlot) {
-    return new Date(`${r.slot.date}T${r.slot.start_time}`);
-  }
-
   async function cancelReservation(r: ReservationWithSlot) {
     const isPending = r.status === 'pending_payment';
-    // Réservation confirmée : annulation impossible à moins de 24h du créneau
-    if (!isPending) {
-      const msLeft = slotStart(r).getTime() - Date.now();
-      if (msLeft < 24 * 3600 * 1000) {
-        toast.error("L'annulation n'est plus possible à moins de 24h du créneau.");
-        return;
-      }
-    }
     const msg = isPending
       ? 'Abandonner cette demande de réservation non payée ?'
-      : "Confirmer l'annulation de cette réservation ?";
+      : 'Confirmer l\'annulation de cette réservation ? La place sera libérée immédiatement.';
     if (!confirm(msg)) return;
     if (!isSupabaseConfigured) return;
-    const { error } = await supabase
-      .from('reservations')
-      .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
-      .eq('id', r.id);
+    // Délégué à la RPC SECURITY DEFINER : elle vérifie l'authentification,
+    // la propriété, le statut, et le délai 24 h (en Europe/Paris). Côté
+    // client on ne refait plus le calcul de fuseau (cassait sous TZ
+    // négative et masquait le jour J). Trigger libère le créneau.
+    const { error } = await supabase.rpc('cancel_reservation', {
+      p_reservation_id: r.id,
+      p_reason: null,
+    });
     if (error) {
-      toast.error(error.message);
+      toast.error(mapSupabaseError(error));
       return;
     }
     toast.success(
       isPending
         ? 'Demande abandonnée.'
-        : "Demande d'annulation enregistrée. Le remboursement éventuel sera traité par la commune.",
+        : 'Annulation enregistrée. Le remboursement éventuel sera traité par la commune sous quelques jours.',
     );
     setReservations((prev) => prev.map((x) => (x.id === r.id ? { ...x, status: 'cancelled' } : x)));
   }
@@ -139,14 +131,14 @@ export function AccountPage() {
       ) : loadError ? (
         <div className="card p-10 text-center">
           <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto mb-3" />
-          <h2 className="font-display font-bold text-lg mb-1">Impossible de charger vos réservations</h2>
+          <h2 className="font-display font-bold text-lg mb-1">Impossible de charger vos réservations.</h2>
           <p className="text-sm text-slate-500 mb-5">Une erreur réseau est survenue. Vos réservations ne sont pas perdues.</p>
           <button onClick={() => setReloadTick((t) => t + 1)} className="btn-primary">Réessayer</button>
         </div>
       ) : reservations.length === 0 ? (
         <div className="card p-10 text-center">
           <Inbox className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-          <h2 className="font-display font-bold text-lg mb-1">Aucune réservation pour le moment</h2>
+          <h2 className="font-display font-bold text-lg mb-1">Aucune réservation pour le moment.</h2>
           <p className="text-sm text-slate-500 mb-5">Réservez votre prochain créneau de baignade en quelques clics.</p>
           <Link to="/reserver" className="btn-primary">Voir les créneaux</Link>
         </div>
@@ -154,7 +146,11 @@ export function AccountPage() {
         <div className="space-y-4">
           {reservations.map((r) => {
             const statusMeta = STATUS_LABELS[r.status];
-            const isUpcoming = r.status === 'confirmed' && new Date(r.slot.date) >= new Date(new Date().toDateString());
+            // Comparaison string yyyy-MM-dd pour rester insensible au fuseau
+            // (avec Date() en TZ négative, certains créneaux du jour étaient
+            // masqués). On compare strictement à la date locale du navigateur.
+            const todayStr = new Date().toLocaleDateString('fr-CA');
+            const isUpcoming = r.status === 'confirmed' && r.slot.date >= todayStr;
             return (
               <article key={r.id} className="card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
                 <div className="flex-1 min-w-0">
@@ -179,7 +175,7 @@ export function AccountPage() {
                   {r.status === 'pending_payment' && (
                     <>
                       <p className="text-xs text-amber-700 sm:text-right sm:max-w-[13rem]">
-                        Réservation non confirmée tant que le paiement n'est pas réglé.
+                        Réservation non confirmée tant que le paiement n&apos;est pas réglé.
                       </p>
                       <button onClick={() => cancelReservation(r)} className="btn-secondary text-sm justify-center">
                         Annuler la demande

@@ -13,6 +13,25 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Libellés français pour les statuts visibles par l'agent d'accueil
+const STATUS_FR: Record<string, string> = {
+  pending_payment: 'paiement en attente',
+  confirmed: 'confirmée',
+  cancelled: 'annulée',
+  refunded: 'remboursée',
+  used: 'utilisée',
+  no_show: 'non présentée',
+  expired: 'expirée',
+};
+function fmtStatus(s: string | null | undefined): string {
+  return s ? (STATUS_FR[s] ?? s) : 'inconnue';
+}
+function fmtDate(iso: string): string {
+  // 2026-07-15 → 15/07/2026
+  const [y, m, d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
@@ -57,29 +76,31 @@ serve(async (req: Request) => {
     .maybeSingle();
 
   if (!reservation) {
-    await supabase.from('scan_log').insert({ result: 'invalid', scanned_by: actorId, notes: `Token: ${qr_token}` });
-    return json({ result: 'invalid', message: 'QR code non reconnu' });
+    // Token loggé après troncature + filtrage pour neutraliser une éventuelle log-injection
+    const safeToken = String(qr_token).slice(0, 64).replace(/[^A-Za-z0-9_-]/g, '');
+    await supabase.from('scan_log').insert({ result: 'invalid', scanned_by: actorId, notes: `Token: ${safeToken}` });
+    return json({ result: 'invalid', message: 'QR code non reconnu.' });
   }
 
   if (reservation.status === 'used' || reservation.qr_used_at) {
     await supabase.from('scan_log').insert({ reservation_id: reservation.id, result: 'already_used', scanned_by: actorId });
     return json({
       result: 'already_used',
-      message: `Déjà scanné le ${new Date(reservation.qr_used_at).toLocaleString('fr-FR')}`,
+      message: `Déjà scanné le ${new Date(reservation.qr_used_at).toLocaleString('fr-FR')}.`,
       reservation: formatReservation(reservation, null),
     });
   }
 
   if (['cancelled', 'refunded', 'expired'].includes(reservation.status)) {
     await supabase.from('scan_log').insert({ reservation_id: reservation.id, result: 'invalid', scanned_by: actorId });
-    return json({ result: 'invalid', message: `Statut : ${reservation.status}` });
+    return json({ result: 'invalid', message: `Réservation non valable (statut : ${fmtStatus(reservation.status)}).` });
   }
 
   // Vérifie que c'est aujourd'hui
   const today = new Date().toISOString().slice(0, 10);
   if (reservation.slot.date !== today) {
     await supabase.from('scan_log').insert({ reservation_id: reservation.id, result: 'wrong_slot', scanned_by: actorId });
-    return json({ result: 'wrong_slot', message: `Créneau prévu le ${reservation.slot.date}`, reservation: formatReservation(reservation, null) });
+    return json({ result: 'wrong_slot', message: `Créneau prévu le ${fmtDate(reservation.slot.date)}.`, reservation: formatReservation(reservation, null) });
   }
 
   // Marquer comme utilisée
@@ -99,7 +120,10 @@ serve(async (req: Request) => {
     proofSignedUrl = signed?.signedUrl ?? null;
   }
 
-  return json({ result: 'valid', message: 'Bienvenue !', reservation: formatReservation(reservation, proofSignedUrl) });
+  const greeting = reservation.user?.first_name
+    ? `Bienvenue, ${String(reservation.user.first_name).slice(0, 40)}.`
+    : 'Bienvenue.';
+  return json({ result: 'valid', message: greeting, reservation: formatReservation(reservation, proofSignedUrl) });
 });
 
 function formatReservation(r: any, proofSignedUrl: string | null = null) {

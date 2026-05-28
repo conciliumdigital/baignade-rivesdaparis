@@ -40,7 +40,24 @@ function fmtTime(t: string): string {
 const BATCH_SIZE = 50;
 const MAX_DURATION_MS = 25_000; // marge sous le timeout 30s Edge Function
 
-serve(async () => {
+serve(async (req: Request) => {
+  // --- Authentification cron (durcissement v1.4.0) ---
+  // Endpoint anciennement public → vecteur DOS (vide la quota Brevo,
+  // déclenche les rappels avant l'heure). On exige soit :
+  //  - Authorization: Bearer <CRON_SECRET> (cron pg_cron / GitHub Actions)
+  //  - Authorization: Bearer <SUPABASE_SERVICE_ROLE_KEY> (admin / debug)
+  const CRON_SECRET = Deno.env.get('CRON_SECRET') ?? '';
+  const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+  const auth = (req.headers.get('Authorization') ?? '').replace(/^Bearer\s+/i, '').trim();
+  const authorized =
+    (CRON_SECRET && auth === CRON_SECRET) ||
+    (SERVICE_ROLE && auth === SERVICE_ROLE);
+  if (!authorized) {
+    return new Response(JSON.stringify({ error: 'unauthorized' }), {
+      status: 401, headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,

@@ -98,19 +98,110 @@ export function MentionsLegalesPage() {
 }
 
 export function AccessibilityPage() {
+  // Modèle de Déclaration d'accessibilité conforme au RGAA 4.1 et au
+  // décret n°2019-768 du 24 juillet 2019. Plan calé sur le modèle DINUM
+  // (numerique.gouv.fr/publications/rgaa-accessibilite/methode/declaration/).
   return (
     <LegalLayout title="Déclaration d'accessibilité">
       <p>
-        La Commune de Neuilly-sur-Marne s'engage à rendre ce service accessible conformément à l'article 47 de la loi n°2005-102 du 11 février 2005 et au Référentiel Général d'Amélioration de l'Accessibilité (RGAA 4.1).
+        La Commune de Neuilly-sur-Marne s&apos;engage à rendre ce service accessible
+        conformément à l&apos;article 47 de la loi n°&nbsp;2005-102 du 11&nbsp;février&nbsp;2005
+        et au décret n°&nbsp;2019-768 du 24&nbsp;juillet&nbsp;2019 relatif à l&apos;accessibilité
+        aux personnes handicapées des services de communication au public en ligne.
       </p>
+      <p>
+        Cette déclaration d&apos;accessibilité s&apos;applique au site
+        <strong> baignade.lesrivesdeparis.fr</strong>.
+      </p>
+
       <h2 className="font-display font-bold text-lg mt-6">État de conformité</h2>
       <p>
-        Le service vise un niveau de conformité <strong>partiellement conforme</strong> au RGAA 4.1 niveau AA. Un audit complet sera réalisé après mise en production.
+        Le service <strong>baignade.lesrivesdeparis.fr</strong> est
+        <strong> non conforme</strong> au RGAA 4.1 niveau AA. L&apos;audit initial
+        n&apos;a pas encore été réalisé ; les non-conformités identifiées par
+        l&apos;audit interne de mai&nbsp;2026 sont en cours de correction. Un audit
+        externe complet est planifié avant l&apos;ouverture publique du service
+        (4&nbsp;juillet&nbsp;2026).
       </p>
-      <h2 className="font-display font-bold text-lg mt-6">Retour utilisateur</h2>
+
+      <h2 className="font-display font-bold text-lg mt-6">Résultats des tests</h2>
       <p>
-        Si vous rencontrez un défaut d'accessibilité, contactez-nous à <a href="mailto:accessibilite@neuillysurmarne.fr">accessibilite@neuillysurmarne.fr</a>.
+        Aucun audit externe formel n&apos;a encore été conduit. Les contrôles
+        internes (audit&nbsp;2026-05) ont identifié des non-conformités sur
+        les critères suivants :
       </p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li>RGAA&nbsp;3 — Couleurs : vérification du contraste de la couleur d&apos;accent jaune en cours.</li>
+        <li>RGAA&nbsp;4 — Multimédia : la vidéo de présentation est décorative et muette (un bouton pause est disponible).</li>
+        <li>RGAA&nbsp;7 — Scripts : alternative manuelle au scan QR proposée pour les usagers sans caméra.</li>
+        <li>RGAA&nbsp;11 — Formulaires : regroupement sémantique et messages d&apos;erreur reliés en cours d&apos;amélioration.</li>
+        <li>RGAA&nbsp;12 — Navigation : plan du site à venir.</li>
+      </ul>
+
+      <h2 className="font-display font-bold text-lg mt-6">Contenus non accessibles</h2>
+      <h3 className="font-display font-bold text-base mt-4">Non-conformités</h3>
+      <ul className="list-disc pl-5 space-y-1">
+        <li>Certains formulaires ne disposent pas encore d&apos;un regroupement sémantique complet (<code>fieldset</code> / <code>legend</code>).</li>
+        <li>Le plan du site est en cours de réalisation.</li>
+      </ul>
+      <h3 className="font-display font-bold text-base mt-4">Dérogations pour charge disproportionnée</h3>
+      <p>Aucune dérogation invoquée à ce jour.</p>
+      <h3 className="font-display font-bold text-base mt-4">Contenus non soumis à l&apos;obligation d&apos;accessibilité</h3>
+      <p>
+        Le justificatif de domicile téléversé par l&apos;usager n&apos;est pas
+        retraité par la commune ; il est consulté uniquement par les agents
+        d&apos;accueil lors du contrôle d&apos;accès et n&apos;est jamais rediffusé en ligne.
+      </p>
+
+      <h2 className="font-display font-bold text-lg mt-6">Établissement de la déclaration</h2>
+      <p>
+        Cette déclaration a été établie le <strong>28&nbsp;mai&nbsp;2026</strong> sur
+        la base d&apos;une auto-évaluation interne (mai&nbsp;2026). Elle sera mise à
+        jour à l&apos;issue de l&apos;audit externe planifié avant l&apos;ouverture publique.
+      </p>
+      <p>
+        Technologies utilisées pour la réalisation du site : HTML5, CSS, JavaScript
+        (React, TypeScript, Tailwind&nbsp;CSS).
+      </p>
+      <p>
+        Outils d&apos;évaluation prévus : auto-évaluation manuelle (clavier,
+        lecteur d&apos;écran VoiceOver / NVDA), inspection des contrastes
+        (WCAG&nbsp;Color Contrast Checker), validation HTML&nbsp;(W3C).
+      </p>
+
+      <h2 className="font-display font-bold text-lg mt-6">Retour d&apos;information et contact</h2>
+      <p>
+        Si vous n&apos;arrivez pas à accéder à un contenu ou à un service de ce
+        site, vous pouvez nous contacter pour être orienté vers une alternative
+        accessible ou obtenir le contenu sous une autre forme.
+      </p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li>Courriel : <a href="mailto:accessibilite@neuillysurmarne.fr">accessibilite@neuillysurmarne.fr</a></li>
+        <li>Adresse postale : Mairie de Neuilly-sur-Marne, Place Ferdinand&nbsp;Buisson, 93330 Neuilly-sur-Marne.</li>
+      </ul>
+
+      <h2 className="font-display font-bold text-lg mt-6">Voies de recours</h2>
+      <p>
+        Cette procédure est à utiliser dans le cas suivant : vous avez signalé
+        au responsable du site internet un défaut d&apos;accessibilité qui vous
+        empêche d&apos;accéder à un contenu ou à un service, et vous n&apos;avez pas
+        obtenu de réponse satisfaisante.
+      </p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li>
+          Écrire un message au Défenseur des droits&nbsp;:{' '}
+          <a href="https://formulaire.defenseurdesdroits.fr/" rel="noopener noreferrer" target="_blank">
+            formulaire.defenseurdesdroits.fr
+          </a>
+        </li>
+        <li>
+          Contacter le délégué du Défenseur des droits dans votre région&nbsp;:{' '}
+          <a href="https://www.defenseurdesdroits.fr/saisir/delegues" rel="noopener noreferrer" target="_blank">
+            defenseurdesdroits.fr/saisir/delegues
+          </a>
+        </li>
+        <li>Envoyer un courrier (gratuit, sans timbre) au Défenseur des droits, 7&nbsp;rue Saint-Florentin, 75409 Paris&nbsp;Cedex&nbsp;08.</li>
+      </ul>
     </LegalLayout>
   );
 }

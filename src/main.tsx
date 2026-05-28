@@ -12,10 +12,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <AuthProvider>
         <App />
         <Toaster
-          position="top-right"
+          position="top-center"
+          containerStyle={{ top: 80 }}
           toastOptions={{
             duration: 4500,
             style: { fontSize: '0.9rem', borderRadius: '0.75rem' },
+            success: { ariaProps: { role: 'status', 'aria-live': 'polite' } },
+            error: { ariaProps: { role: 'alert', 'aria-live': 'assertive' } },
           }}
         />
       </AuthProvider>

@@ -61,40 +61,42 @@ export function ReservationPage() {
       </header>
 
       {/* Filtres */}
-      <div className="card p-4 mb-6 flex flex-wrap items-center gap-4">
-        <div className="flex items-center gap-2 text-sm text-slate-600 mr-2">
-          <Filter className="w-4 h-4" /> Filtres :
+      <div className="card p-4 mb-6 flex flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 text-sm text-slate-600 mr-1">
+            <Filter className="w-4 h-4" aria-hidden="true" /> Filtres :
+          </div>
+          <label className="flex items-center gap-2 text-sm">
+            <Users className="w-4 h-4 text-slate-500" aria-hidden="true" />
+            <span>Personnes :</span>
+            <select aria-label="Nombre de personnes" className="input py-1.5 text-sm w-20" value={persons} onChange={(e) => setPersons(Number(e.target.value))}>
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </label>
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" checked={showOnlyAvailable} onChange={(e) => setShowOnlyAvailable(e.target.checked)} className="rounded" />
+            Masquer les créneaux complets
+          </label>
         </div>
-        <label className="flex items-center gap-2 text-sm">
-          <Users className="w-4 h-4 text-slate-500" />
-          <span>Nombre de personnes :</span>
-          <select className="input py-1.5 text-sm w-20" value={persons} onChange={(e) => setPersons(Number(e.target.value))}>
-            {[1, 2, 3, 4, 5, 6].map((n) => (
-              <option key={n} value={n}>{n}</option>
-            ))}
-          </select>
-        </label>
-        <label className="flex items-center gap-2 text-sm cursor-pointer">
-          <input type="checkbox" checked={showOnlyAvailable} onChange={(e) => setShowOnlyAvailable(e.target.checked)} className="rounded" />
-          Masquer les créneaux complets
-        </label>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex items-center justify-between gap-2 border-t border-slate-100 pt-3 sm:border-0 sm:pt-0 sm:justify-end">
           <button
-            className="btn-ghost text-sm"
+            className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
             onClick={() => setWeekStart(addDays(weekStart, -7))}
             aria-label="Semaine précédente"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-5 h-5" aria-hidden="true" />
           </button>
-          <span className="text-sm font-medium px-2">
+          <span className="text-sm font-medium px-2 text-center min-w-0 truncate">
             {format(weekStart, 'd MMM', { locale: fr })} – {format(addDays(weekStart, 13), 'd MMM yyyy', { locale: fr })}
           </span>
           <button
-            className="btn-ghost text-sm"
+            className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
             onClick={() => setWeekStart(addDays(weekStart, 7))}
             aria-label="Semaine suivante"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -109,7 +111,7 @@ export function ReservationPage() {
       ) : slots.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {days.map((day) => {
             const dateKey = format(day, 'yyyy-MM-dd');
             const daySlots = slotsByDay[dateKey] ?? [];
@@ -168,12 +170,12 @@ function SlotButton({
       type="button"
       onClick={() => onSelect(slot)}
       disabled={disabled}
-      className={`w-full flex items-center justify-between rounded-xl border px-3.5 py-2.5 text-left transition group ${
+      className={`w-full flex items-center justify-between rounded-xl border px-3.5 py-3 min-h-[60px] text-left transition group focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
         disabled
           ? 'border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed'
           : 'border-brand-100 bg-white hover:border-brand-400 hover:bg-brand-50/50 hover:shadow-soft'
       }`}
-      aria-label={`Créneau ${formatTimeRange(slot.start_time, slot.end_time)}`}
+      aria-label={`Créneau ${formatTimeRange(slot.start_time, slot.end_time)} ${disabled ? '(indisponible)' : `(${slot.remaining} place${slot.remaining > 1 ? 's' : ''} restante${slot.remaining > 1 ? 's' : ''})`}`}
     >
       <div>
         <div className="font-semibold text-sm flex items-center gap-1.5">
@@ -200,10 +202,10 @@ function SlotButton({
 function EmptyState() {
   return (
     <div className="card p-10 text-center">
-      <AlertCircle className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-      <h2 className="font-display font-bold text-lg mb-1">Aucun créneau publié sur cette période</h2>
-      <p className="text-sm text-slate-500 mb-5">Les créneaux d'été sont publiés en juin. Revenez bientôt !</p>
-      <Link to="/" className="btn-secondary text-sm">Retour à l'accueil</Link>
+      <AlertCircle className="w-10 h-10 text-slate-300 mx-auto mb-3" aria-hidden="true" />
+      <h2 className="font-display font-bold text-lg mb-1">Aucun créneau publié sur cette période.</h2>
+      <p className="text-sm text-slate-500 mb-5">Les créneaux d&apos;été sont publiés en juin. Merci de revenir bientôt.</p>
+      <Link to="/" className="btn-secondary text-sm">Retour à l&apos;accueil</Link>
     </div>
   );
 }

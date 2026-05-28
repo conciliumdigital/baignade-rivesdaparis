@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { Calendar, ShieldCheck, QrCode, MapPin, Clock, Users, ArrowRight } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Calendar, ShieldCheck, QrCode, MapPin, Clock, Users, ArrowRight, Pause, Play } from 'lucide-react';
 import { Reveal } from '../components/Reveal';
 
 export function HomePage() {
   // Vidéo de fond : desktop uniquement et hors « réduire les animations »
   // (mobile / data-saver → fond sobre, ~6,5 Mo économisés, LCP préservé).
   const [showHeroVideo, setShowHeroVideo] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(true);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
     const wideEnough = window.matchMedia('(min-width: 768px)').matches;
@@ -14,23 +17,44 @@ export function HomePage() {
     setShowHeroVideo(wideEnough && !reducedMotion);
   }, []);
 
+  function toggleVideo() {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) { v.play(); setVideoPlaying(true); }
+    else { v.pause(); setVideoPlaying(false); }
+  }
+
   return (
     <>
       {/* ── Hero éditorial ───────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-brand-900 text-white">
         {showHeroVideo && (
           <video
+            ref={videoRef}
             className="absolute inset-0 w-full h-full object-cover"
             autoPlay
             muted
             loop
             playsInline
             preload="metadata"
+            poster="/hero-poster.webp"
             aria-hidden="true"
             tabIndex={-1}
           >
-            <source src="/hero-baignade.mp4" type="video/mp4" />
+            <source src="/hero-baignade.mp4" type="video/mp4" media="(min-width: 768px)" />
           </video>
+        )}
+        {showHeroVideo && (
+          /* RGAA 4.1 : tout contenu animé > 5 s doit pouvoir être mis en pause par l'usager. */
+          <button
+            type="button"
+            onClick={toggleVideo}
+            className="absolute bottom-4 right-4 z-20 inline-flex items-center gap-1.5 bg-black/40 hover:bg-black/60 text-white text-xs px-3 py-2 rounded-full backdrop-blur-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-white min-h-[36px]"
+            aria-label={videoPlaying ? 'Mettre la vidéo en pause' : 'Reprendre la vidéo'}
+          >
+            {videoPlaying ? <Pause className="w-4 h-4" aria-hidden="true" /> : <Play className="w-4 h-4" aria-hidden="true" />}
+            <span>{videoPlaying ? 'Pause' : 'Lecture'}</span>
+          </button>
         )}
         {/* Voile sobre (un seul ton) pour la lisibilité */}
         <div className="absolute inset-0 bg-brand-950/60" aria-hidden="true" />
@@ -144,7 +168,7 @@ export function HomePage() {
           <div className="rounded-2xl bg-brand-900 text-white px-8 py-14 md:px-16 md:py-20 text-center card-hover">
             <h2 className="text-3xl md:text-4xl font-display font-semibold mb-4" style={{ color: '#F5C111' }}>Prêt à plonger&nbsp;?</h2>
             <p className="text-white/80 max-w-xl mx-auto mb-8">
-              Les créneaux sont publiés tout l'été. Réservez le vôtre dès maintenant.
+              Les créneaux sont publiés tout l&apos;été. Réservez le vôtre dès maintenant.
             </p>
             <Link to="/reserver" className="btn-primary btn-lg bg-white text-brand-800 hover:bg-brand-50">
               Réserver mon créneau <ArrowRight className="w-5 h-5" />

@@ -4,6 +4,8 @@ import { Plus, Loader2, Trash2, Ticket, ToggleLeft, ToggleRight } from 'lucide-r
 import { isSupabaseConfigured, supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
 import { formatPrice } from '../../lib/format';
+import { mapSupabaseError } from '../../lib/errors';
+import { Modal } from '../../components/Modal';
 
 interface Code {
   code: string;
@@ -36,27 +38,39 @@ export function AdminDiscounts() {
 
   async function toggle(c: Code) {
     const { error } = await supabase.from('discount_codes').update({ active: !c.active }).eq('code', c.code);
-    if (error) toast.error(error.message);
-    else { toast.success(c.active ? 'Code désactivé' : 'Code activé'); load(); }
+    if (error) toast.error(mapSupabaseError(error));
+    else { toast.success(c.active ? 'Code désactivé.' : 'Code activé.'); load(); }
   }
 
-  async function remove(code: string) {
-    if (!confirm(`Supprimer définitivement le code ${code} ?`)) return;
-    const { error } = await supabase.from('discount_codes').delete().eq('code', code);
-    if (error) toast.error(error.message);
-    else { toast.success('Code supprimé'); load(); }
+  async function remove(c: Code) {
+    // Garde-fou comptable : refuser la suppression d'un code déjà utilisé,
+    // proposer la désactivation à la place (préserve la traçabilité des
+    // réservations passées qui référencent encore ce code).
+    if (c.used_count > 0) {
+      const desactiver = confirm(
+        `Le code ${c.code} a déjà été utilisé ${c.used_count} fois. La suppression effacerait la trace comptable des réservations associées et est donc refusée.\n\nVoulez-vous désactiver ce code à la place ? Il ne sera plus utilisable mais l'historique sera conservé.`,
+      );
+      if (desactiver && c.active) {
+        await toggle(c);
+      }
+      return;
+    }
+    if (!confirm(`Supprimer définitivement le code ${c.code} ?`)) return;
+    const { error } = await supabase.from('discount_codes').delete().eq('code', c.code);
+    if (error) toast.error(mapSupabaseError(error));
+    else { toast.success('Code supprimé.'); load(); }
   }
 
   return (
     <div>
-      <header className="flex items-center justify-between mb-6">
+      <header className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-            <Ticket className="w-6 h-6 text-brand-600" /> Codes de réduction
+            <Ticket className="w-6 h-6 text-brand-600" aria-hidden="true" /> Codes de réduction
           </h1>
           <p className="text-sm text-slate-600">La remise est validée et appliquée côté serveur (anti-fraude).</p>
         </div>
-        <button onClick={() => setShowCreate(true)} className="btn-primary text-sm"><Plus className="w-4 h-4" /> Nouveau code</button>
+        <button onClick={() => setShowCreate(true)} className="btn-primary text-sm"><Plus className="w-4 h-4" aria-hidden="true" /> Nouveau code</button>
       </header>
 
       {loading ? (
@@ -67,12 +81,12 @@ export function AdminDiscounts() {
         </div>
       ) : codes.length === 0 ? (
         <div className="card p-10 text-center">
-          <Ticket className="w-9 h-9 text-slate-300 mx-auto mb-3" />
+          <Ticket className="w-9 h-9 text-slate-300 mx-auto mb-3" aria-hidden="true" />
           <p className="text-sm text-slate-500 mb-4">Aucun code de réduction.</p>
           <button onClick={() => setShowCreate(true)} className="btn-primary">Créer un code</button>
         </div>
       ) : (
-        <div className="card overflow-hidden">
+        <div className="card overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-xs uppercase text-slate-500 border-b border-slate-100">
               <tr>
@@ -88,19 +102,21 @@ export function AdminDiscounts() {
               {codes.map((c) => (
                 <tr key={c.code}>
                   <td className="px-4 py-3 font-mono font-semibold">{c.code}{c.label && <span className="block text-xs font-sans font-normal text-slate-500">{c.label}</span>}</td>
-                  <td className="px-4 py-3">{c.kind === 'percent' ? `−${c.value}%` : `−${formatPrice(c.value)}`}</td>
+                  <td className="px-4 py-3">{c.kind === 'percent' ? `−${c.value} %` : `−${formatPrice(c.value)}`}</td>
                   <td className="px-4 py-3">{c.used_count}{c.max_uses != null ? ` / ${c.max_uses}` : ''}</td>
                   <td className="px-4 py-3 text-xs text-slate-500">
-                    {c.valid_from ? `dès ${c.valid_from.slice(0, 10)}` : '—'}{c.valid_until ? ` → ${c.valid_until.slice(0, 10)}` : ''}
+                    {c.valid_from ? `dès le ${c.valid_from.slice(0, 10)}` : '—'}{c.valid_until ? ` → ${c.valid_until.slice(0, 10)}` : ''}
                   </td>
                   <td className="px-4 py-3">
                     {c.active ? <span className="badge-success">Actif</span> : <span className="badge-muted">Inactif</span>}
                   </td>
                   <td className="px-4 py-3 text-right space-x-1">
-                    <button onClick={() => toggle(c)} className="btn-ghost text-xs" title={c.active ? 'Désactiver' : 'Activer'}>
-                      {c.active ? <ToggleRight className="w-4 h-4 text-emerald-600" /> : <ToggleLeft className="w-4 h-4" />}
+                    <button onClick={() => toggle(c)} className="btn-ghost text-xs min-h-[36px]" aria-label={c.active ? `Désactiver le code ${c.code}` : `Activer le code ${c.code}`} title={c.active ? 'Désactiver' : 'Activer'}>
+                      {c.active ? <ToggleRight className="w-4 h-4 text-emerald-600" aria-hidden="true" /> : <ToggleLeft className="w-4 h-4" aria-hidden="true" />}
                     </button>
-                    <button onClick={() => remove(c.code)} className="btn-ghost text-xs" title="Supprimer"><Trash2 className="w-4 h-4 text-red-500" /></button>
+                    <button onClick={() => remove(c)} className="btn-ghost text-xs min-h-[36px]" aria-label={`Supprimer le code ${c.code}`} title={c.used_count > 0 ? 'Suppression refusée (code déjà utilisé)' : 'Supprimer'}>
+                      <Trash2 className={`w-4 h-4 ${c.used_count > 0 ? 'text-slate-300' : 'text-red-500'}`} aria-hidden="true" />
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -127,9 +143,17 @@ function CreateCodeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
   async function save(e: React.FormEvent) {
     e.preventDefault();
     const c = code.trim().toUpperCase();
-    if (!c) { toast.error('Code requis'); return; }
-    if (kind === 'percent' && (value <= 0 || value > 100)) { toast.error('Pourcentage entre 1 et 100'); return; }
-    if (!isSupabaseConfigured) { toast.success('Mode démo : code non persisté'); onClose(); return; }
+    if (!c) { toast.error('Le code est requis.'); return; }
+    if (kind === 'percent' && (value <= 0 || value > 100)) { toast.error('Le pourcentage doit être compris entre 1 et 100.'); return; }
+    if (kind === 'fixed' && value <= 0) { toast.error('Le montant fixe doit être supérieur à zéro.'); return; }
+    if (until) {
+      const untilDate = new Date(until + 'T23:59:59');
+      if (untilDate < new Date()) {
+        toast.error('La date de fin de validité est dans le passé : ce code serait mort-né.');
+        return;
+      }
+    }
+    if (!isSupabaseConfigured) { toast.success('Mode démonstration : code non persisté.'); onClose(); return; }
     setSaving(true);
     const { error } = await supabase.from('discount_codes').insert({
       code: c,
@@ -137,47 +161,48 @@ function CreateCodeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
       kind,
       value: kind === 'percent' ? Math.round(value) : Math.round(value * 100),
       max_uses: maxUses.trim() ? Number(maxUses) : null,
-      valid_until: until ? new Date(until).toISOString() : null,
+      valid_until: until ? new Date(until + 'T23:59:59').toISOString() : null,
       active: true,
       created_by: profile?.id,
     });
     setSaving(false);
-    if (error) { toast.error(error.code === '23505' ? 'Ce code existe déjà.' : error.message); return; }
-    toast.success('Code créé');
+    if (error) {
+      const code = (error as { code?: string }).code;
+      toast.error(code === '23505' ? 'Ce code existe déjà.' : mapSupabaseError(error));
+      return;
+    }
+    toast.success('Code créé.');
     onSaved();
     onClose();
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/40 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="card p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-        <h2 className="font-display font-bold text-lg mb-4">Nouveau code de réduction</h2>
-        <form onSubmit={save} className="space-y-3">
-          <div><label className="label">Code (ex : ETE2026)</label><input className="input uppercase" required value={code} onChange={(e) => setCode(e.target.value)} /></div>
-          <div><label className="label">Libellé interne (facultatif)</label><input className="input" value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Opération été, partenaire…" /></div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="label">Type</label>
-              <select className="input" value={kind} onChange={(e) => setKind(e.target.value as 'percent' | 'fixed')}>
-                <option value="percent">Pourcentage (%)</option>
-                <option value="fixed">Montant fixe (€)</option>
-              </select>
-            </div>
-            <div>
-              <label className="label">{kind === 'percent' ? 'Réduction (%)' : 'Réduction (€)'}</label>
-              <input type="number" min={0} step={kind === 'percent' ? 1 : 0.5} className="input" value={value} onChange={(e) => setValue(Number(e.target.value))} />
-            </div>
+    <Modal open onClose={onClose} title="Nouveau code de réduction" locked={saving} size="md">
+      <form onSubmit={save} className="space-y-3">
+        <div><label className="label" htmlFor="dc-code">Code (ex. ETE2026)</label><input id="dc-code" className="input uppercase" required value={code} onChange={(e) => setCode(e.target.value)} /></div>
+        <div><label className="label" htmlFor="dc-label">Libellé interne (facultatif)</label><input id="dc-label" className="input" value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Opération été, partenaire…" /></div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="label" htmlFor="dc-kind">Type</label>
+            <select id="dc-kind" className="input" value={kind} onChange={(e) => setKind(e.target.value as 'percent' | 'fixed')}>
+              <option value="percent">Pourcentage (%)</option>
+              <option value="fixed">Montant fixe (€)</option>
+            </select>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div><label className="label">Usages max (vide = illimité)</label><input type="number" min={1} className="input" value={maxUses} onChange={(e) => setMaxUses(e.target.value)} /></div>
-            <div><label className="label">Valable jusqu'au (facultatif)</label><input type="date" className="input" value={until} onChange={(e) => setUntil(e.target.value)} /></div>
+          <div>
+            <label className="label" htmlFor="dc-value">{kind === 'percent' ? 'Réduction (%)' : 'Réduction (€)'}</label>
+            <input id="dc-value" type="number" min={0} step={kind === 'percent' ? 1 : 0.5} className="input" value={value} onChange={(e) => setValue(Number(e.target.value))} />
           </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={onClose} className="btn-ghost">Annuler</button>
-            <button type="submit" disabled={saving} className="btn-primary">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Créer'}</button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className="label" htmlFor="dc-uses">Usages maximaux (vide = illimité)</label><input id="dc-uses" type="number" min={1} className="input" value={maxUses} onChange={(e) => setMaxUses(e.target.value)} /></div>
+          <div><label className="label" htmlFor="dc-until">Valable jusqu&apos;au (facultatif)</label><input id="dc-until" type="date" className="input" value={until} onChange={(e) => setUntil(e.target.value)} /></div>
+        </div>
+        <div className="flex justify-end gap-2 pt-2">
+          <button type="button" onClick={onClose} className="btn-ghost" disabled={saving}>Annuler</button>
+          <button type="submit" disabled={saving} className="btn-primary">{saving ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : 'Créer'}</button>
+        </div>
+      </form>
+    </Modal>
   );
 }

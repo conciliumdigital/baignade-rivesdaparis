@@ -16,13 +16,15 @@ export function AdminCommunication() {
   const [previewMode, setPreviewMode] = useState(false);
 
   function handleTest() {
-    toast.success('Email de test envoyé à votre adresse admin.');
+    // Mode démonstration tant que l'API d'envoi n'est pas branchée :
+    // pas de vrai envoi pour éviter de gâcher la quota Brevo en QA.
+    toast('Mode démonstration : aucun courriel n\'a été envoyé.', { icon: 'ℹ️' });
   }
 
   function handleSend() {
-    if (!subject || !body) { toast.error('Sujet et message requis'); return; }
+    if (!subject.trim() || !body.trim()) { toast.error('Le sujet et le message sont requis.'); return; }
     if (!confirm('Confirmer l\'envoi de cette campagne ?')) return;
-    toast.success('Campagne en cours d\'envoi…');
+    toast('Mode démonstration : aucun envoi réel. La campagne sera mise en file dès l\'activation du connecteur.', { icon: 'ℹ️', duration: 6000 });
   }
 
   return (

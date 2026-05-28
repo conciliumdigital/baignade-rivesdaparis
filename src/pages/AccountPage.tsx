@@ -103,7 +103,7 @@ export function AccountPage() {
     toast.success(
       isPending
         ? 'Demande abandonnée.'
-        : 'Annulation enregistrée. Le remboursement éventuel sera traité par la commune sous quelques jours.',
+        : 'Annulation enregistrée. La place est libérée pour la liste d\'attente. Aucun remboursement n\'est effectué (voir les conditions générales).',
     );
     setReservations((prev) => prev.map((x) => (x.id === r.id ? { ...x, status: 'cancelled' } : x)));
   }
@@ -161,7 +161,7 @@ export function AccountPage() {
                   <h3 className="font-display font-bold text-lg">{formatDate(r.slot.date)}</h3>
                   <ul className="mt-1.5 text-sm text-slate-600 flex flex-wrap gap-x-4 gap-y-1">
                     <li className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {formatTimeRange(r.slot.start_time, r.slot.end_time)}</li>
-                    <li className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Berge de la Marne</li>
+                    <li className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Chemin de la Haute-Île</li>
                     <li>{r.nb_adults} adulte{r.nb_adults > 1 ? 's' : ''}{r.nb_children > 0 && ` · ${r.nb_children} enfant${r.nb_children > 1 ? 's' : ''}`}</li>
                     <li className="font-semibold text-slate-700">{formatPrice(r.total_amount_cents)}</li>
                   </ul>

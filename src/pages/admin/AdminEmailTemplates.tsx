@@ -19,7 +19,7 @@ const SAMPLE: Record<string, string> = {
   prenom: 'Camille', nom: 'Dubois', reference: 'ABC12345',
   date: 'samedi 4 juillet 2026', horaire: '12:00 – 14:00',
   nb_personnes: '2 adulte(s) + 1 enfant(s)', total: '12,00 €',
-  lieu: 'Berge de la Marne, Neuilly-sur-Marne', lien_compte: '#',
+  lieu: 'Chemin de la Haute-Île, Neuilly-sur-Marne', lien_compte: '#',
 };
 
 // Valeurs par défaut (miroir de la migration) pour « Réinitialiser ».
@@ -27,19 +27,19 @@ const DEFAULTS: Record<string, { subject: string; body_html: string }> = {
   confirmation: {
     subject: 'Votre réservation est confirmée — {{date}}',
     body_html:
-      '<p>Bonjour {{prenom}},</p><p>Votre réservation est confirmée. Présentez le QR code ci-dessous à l\'accueil le jour de votre visite.</p><p><strong>Date :</strong> {{date}}<br><strong>Horaire :</strong> {{horaire}}<br><strong>Personnes :</strong> {{nb_personnes}}<br><strong>Total payé :</strong> {{total}}</p><p><strong>Lieu :</strong> {{lieu}}</p><p>À apporter : maillot de bain, serviette, crème solaire. Casiers gratuits sur place.</p><p><a href="{{lien_compte}}">Voir ma réservation</a></p>',
+      '<p>Bonjour {{prenom}},</p><p>Votre réservation est confirmée. Présentez le QR code ci-dessous à l\'accueil le jour de votre visite.</p><p><strong>Date :</strong> {{date}}<br><strong>Horaire :</strong> {{horaire}}<br><strong>Personnes :</strong> {{nb_personnes}}<br><strong>Total payé :</strong> {{total}}</p><p><strong>Lieu :</strong> {{lieu}}</p><p><strong>À apporter :</strong> maillot de bain, serviette, crème solaire, bouteille d\'eau.</p><p><strong>Vigilance :</strong> aucun casier n\'est mis à disposition. Chaque usager est responsable de ses affaires. Il est fortement déconseillé d\'apporter des objets de valeur.</p><p><a href="{{lien_compte}}">Voir ma réservation</a></p>',
   },
   reminder_j1: {
     subject: 'Demain : votre baignade à Neuilly-sur-Marne',
-    body_html: '<p>Bonjour {{prenom}},</p><p>Petit rappel : votre créneau de baignade est prévu <strong>demain {{date}}</strong>, de {{horaire}}. Pensez à votre QR code (réf. {{reference}}).</p><p>À demain !</p>',
+    body_html: '<p>Bonjour {{prenom}},</p><p>Petit rappel : votre créneau de baignade est prévu <strong>demain {{date}}</strong>, de {{horaire}}. Pensez à votre QR code (réf. {{reference}}).</p><p>À demain.</p>',
   },
   reminder_h1: {
     subject: 'Votre créneau commence dans 1 heure',
     body_html: '<p>Bonjour {{prenom}},</p><p>Votre créneau de baignade ({{horaire}}) commence bientôt. Présentez votre QR code à l\'accueil. Réf. {{reference}}.</p>',
   },
   closure: {
-    subject: 'Information importante — créneau du {{date}} modifié',
-    body_html: '<p>Bonjour {{prenom}},</p><p>En raison des conditions météo, votre créneau du <strong>{{date}}</strong> ({{horaire}}) est impacté. Vous serez recontacté pour un report ou un remboursement.</p><p>Merci de votre compréhension.</p>',
+    subject: 'Information importante — créneau du {{date}} reporté',
+    body_html: '<p>Bonjour {{prenom}},</p><p>En raison des conditions météo, votre créneau du <strong>{{date}}</strong> ({{horaire}}) ne pourra pas se tenir. Conformément aux conditions d\'utilisation, aucun remboursement n\'est effectué ; un <strong>report</strong> sur un autre créneau de la saison vous sera proposé par courriel dans les prochains jours.</p><p>Merci de votre compréhension.</p>',
   },
   satisfaction: {
     subject: 'Votre avis sur votre baignade du {{date}}',

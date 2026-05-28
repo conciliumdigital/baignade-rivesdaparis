@@ -335,7 +335,7 @@ export function ReservationDetailPage() {
             <ul className="space-y-3 text-sm border-b border-slate-100 pb-4 mb-4">
               <li className="flex gap-2"><Calendar className="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5" aria-hidden="true" /><span>{formatDate(slot.date)}</span></li>
               <li className="flex gap-2"><Clock className="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5" aria-hidden="true" /><span>{formatTimeRange(slot.start_time, slot.end_time)}</span></li>
-              <li className="flex gap-2"><MapPin className="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5" aria-hidden="true" /><span>Berge de la Marne, Neuilly-sur-Marne</span></li>
+              <li className="flex gap-2"><MapPin className="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5" aria-hidden="true" /><span>Chemin de la Haute-Île, Neuilly-sur-Marne</span></li>
               <li className="flex gap-2"><Users className="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5" aria-hidden="true" /><span>{totalPersons} personne{totalPersons > 1 ? 's' : ''}</span></li>
             </ul>
             <div className="space-y-1.5 text-sm">

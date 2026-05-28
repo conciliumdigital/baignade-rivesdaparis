@@ -4,6 +4,66 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.4.2] — 2026-05-28
+
+### 🏛️ Mise à jour de contenu opérationnel (cahier des charges mairie)
+
+Synchronisation du site sur les informations transmises par la mairie :
+
+- **Adresse de la mairie** corrigée partout : « Place Ferdinand Buisson »
+  → **« 1 place François Mitterrand »** (Footer, Mentions légales,
+  Politique de confidentialité, Déclaration d&apos;accessibilité,
+  migration `site_settings.mairie_address`).
+- **Localisation du site de baignade** : « Berge de la Marne » →
+  **« Chemin de la Haute-Île, 93330 Neuilly-sur-Marne »** + mention
+  « À environ 20 minutes à pied du RER A » (Hero, InfosPage, récap
+  réservation, confirmations, page utilisateur, e-mails de confirmation
+  et de rappel, nouvelles clés `site_settings.location_address` /
+  `location_transport`).
+- **Tarifs été 2026** mis à jour dans la grille InfosPage et les
+  défauts AdminSlots / BulkGenerate : Nocéen 2 € · extérieur 5 € ·
+  groupe 3 € / personne (≥ 10 personnes). Suppression du libellé
+  « Enfant -4 ans gratuit / -12 ans à 2,50 € » (pas de tarif enfant
+  spécifique cette saison).
+- **Politique d&apos;annulation et de remboursement entièrement
+  refondue** :
+  - Plus aucun remboursement n&apos;est effectué, quelle que soit la
+    date d&apos;annulation. L&apos;usager peut tout de même annuler
+    pour libérer la place pour la liste d&apos;attente.
+  - En cas de fermeture pour raisons météo ou sanitaires, **report
+    uniquement** sur un autre créneau (plus de mention de
+    « remboursement intégral »).
+  - Mise à jour des CGU §3, du pied de page e-mail de confirmation,
+    du modèle e-mail `closure` (sujet « créneau reporté »), du toast
+    de confirmation d&apos;annulation `/compte`, des engagements du
+    Hero (HomePage), de la carte « Conditions météo » d&apos;InfosPage.
+- **Accessibilité reformulée** : « Service accessible aux personnes
+  en situation de handicap » → **« Mise à l&apos;eau adaptée pour les
+  personnes à mobilité réduite »** (HomePage, InfosPage).
+- **Affaires personnelles — vigilance** : suppression de la mention
+  « casiers gratuits sur place » (qui n&apos;existent pas) et ajout
+  d&apos;un encart de vigilance : « Aucun casier n&apos;est mis à
+  disposition. Chaque usager est responsable de ses affaires. Il est
+  fortement déconseillé d&apos;apporter des objets de valeur. »
+  (InfosPage + corps des e-mails de confirmation, codé et en base).
+- **Poste de secours** explicité dans les engagements du Hero et la
+  carte Sécurité d&apos;InfosPage.
+- **Bannière d&apos;inauguration** (`InaugurationBanner`, intégrée
+  dans `PublicLayout`) : annonce de la cérémonie du 4 juillet de 14 h
+  à 16 h et du premier créneau réservable à 16 h. Disparition
+  automatique à 16 h pile (heure de Paris).
+
+> ⚠️ Action manuelle requise : appliquer la migration
+> `supabase/migrations/20260528200000_content_update.sql` dans le SQL
+> Editor pour aligner `site_settings` et les modèles `email_templates`
+> en base. Sans cela, les e-mails sortant continueront de mentionner
+> les casiers et la promesse de remboursement obsolètes.
+>
+> Côté planning du 4 juillet : générer manuellement via
+> `/admin/creneaux` les créneaux de 16 h et 18 h (à 0 € si lancement
+> gratuit) et ne PAS créer ceux de 10 h, 12 h ni 14 h (inauguration
+> en cours).
+
 ## [1.4.1] — 2026-05-28
 
 ### ♿ /staff — recherche par nom (3e voie d'accès accessible)

@@ -322,9 +322,10 @@ function CreateSlotModal({
   const [end, setEnd] = useState(slot ? slot.end_time.slice(0, 5) : '12:00');
   const [capacity, setCapacity] = useState(slot ? slot.capacity : 50);
   // Tarifs saisis en EUROS (convertis en centimes à l'enregistrement).
+  // Défauts été 2026 : extérieur 5 €, Nocéen 2 €, groupe 3 € (≥ 10 personnes).
   const [price, setPrice] = useState(slot ? slot.price_cents / 100 : 5);
-  const [priceResident, setPriceResident] = useState(slot ? (slot.price_resident_cents ?? 0) / 100 : 3);
-  const [priceChild, setPriceChild] = useState(slot ? (slot.price_child_cents ?? 0) / 100 : 2.5);
+  const [priceResident, setPriceResident] = useState(slot ? (slot.price_resident_cents ?? 0) / 100 : 2);
+  const [priceChild, setPriceChild] = useState(slot ? (slot.price_child_cents ?? 0) / 100 : 3);
   const [saving, setSaving] = useState(false);
   const [confirmPriceChange, setConfirmPriceChange] = useState(false);
 
@@ -394,7 +395,7 @@ function CreateSlotModal({
         <div className="grid grid-cols-3 gap-3">
           <div><label className="label" htmlFor="price-ext">Tarif extérieur (€)</label><input id="price-ext" type="number" min={0} step={0.5} className="input" value={price} onChange={e => setPrice(Number(e.target.value))} /></div>
           <div><label className="label" htmlFor="price-noc">Tarif Nocéen (€)</label><input id="price-noc" type="number" min={0} step={0.5} className="input" value={priceResident} onChange={e => setPriceResident(Number(e.target.value))} /></div>
-          <div><label className="label" htmlFor="price-child">Tarif enfant (€)</label><input id="price-child" type="number" min={0} step={0.5} className="input" value={priceChild} onChange={e => setPriceChild(Number(e.target.value))} /></div>
+          <div><label className="label" htmlFor="price-grp">Tarif groupe (€ / pers.)</label><input id="price-grp" type="number" min={0} step={0.5} className="input" value={priceChild} onChange={e => setPriceChild(Number(e.target.value))} /></div>
         </div>
         <p className="text-xs text-slate-500">Si tarif Nocéen ≥ tarif extérieur, l&apos;option « Nocéen » est masquée côté usager (pas de réduction).</p>
 
@@ -425,9 +426,10 @@ function BulkGenerateModal({ onClose, onSaved }: { onClose: () => void; onSaved:
   const [to, setTo] = useState('2026-08-30');
   const [capacity, setCapacity] = useState(50);
   // Tarifs saisis en EUROS (convertis en centimes à l'enregistrement).
+  // Défauts été 2026 : extérieur 5 €, Nocéen 2 €, groupe 3 € (≥ 10 personnes).
   const [price, setPrice] = useState(5);
-  const [priceResident, setPriceResident] = useState(3);
-  const [priceChild, setPriceChild] = useState(2.5);
+  const [priceResident, setPriceResident] = useState(2);
+  const [priceChild, setPriceChild] = useState(3);
   const [saving, setSaving] = useState(false);
   const [previewing, setPreviewing] = useState(false);
   const [preview, setPreview] = useState<{ total: number; existing: number } | null>(null);
@@ -488,7 +490,7 @@ function BulkGenerateModal({ onClose, onSaved }: { onClose: () => void; onSaved:
         <div className="grid grid-cols-3 gap-3">
           <div><label className="label" htmlFor="bulk-pr-ext">Tarif extérieur (€)</label><input id="bulk-pr-ext" type="number" min={0} step={0.5} className="input" value={price} onChange={e => setPrice(Number(e.target.value))} /></div>
           <div><label className="label" htmlFor="bulk-pr-noc">Tarif Nocéen (€)</label><input id="bulk-pr-noc" type="number" min={0} step={0.5} className="input" value={priceResident} onChange={e => setPriceResident(Number(e.target.value))} /></div>
-          <div><label className="label" htmlFor="bulk-pr-child">Tarif enfant (€)</label><input id="bulk-pr-child" type="number" min={0} step={0.5} className="input" value={priceChild} onChange={e => setPriceChild(Number(e.target.value))} /></div>
+          <div><label className="label" htmlFor="bulk-pr-grp">Tarif groupe (€ / pers.)</label><input id="bulk-pr-grp" type="number" min={0} step={0.5} className="input" value={priceChild} onChange={e => setPriceChild(Number(e.target.value))} /></div>
         </div>
         <p className="text-xs text-slate-500">
           5 créneaux/jour seront créés (10 h, 12 h, 14 h, 16 h, 18 h). Si tarif Nocéen ≥ extérieur, l&apos;option « Nocéen » est masquée côté usager.

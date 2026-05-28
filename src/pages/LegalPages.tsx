@@ -26,7 +26,10 @@ export function CguPage() {
       </p>
       <h2 className="font-display font-bold text-lg mt-6">3. Annulation et remboursement</h2>
       <p>
-        L'annulation est possible jusqu'à 24 heures avant le créneau réservé, depuis l'espace personnel de l'utilisateur. Au-delà, aucun remboursement ne pourra être accordé sauf cas de force majeure (fermeture météo, problème sanitaire) où le remboursement est automatique.
+        <strong>Aucun remboursement n&apos;est effectué en cas d&apos;annulation, quelle qu&apos;en soit la raison.</strong> L&apos;usager peut toutefois annuler sa réservation depuis son espace personnel afin de libérer la place pour les personnes en liste d&apos;attente.
+      </p>
+      <p>
+        En cas de fermeture pour raisons météo ou sanitaires décidée par la commune, un <strong>report</strong> sur un autre créneau de la saison est proposé par courriel. Aucun remboursement n&apos;est versé dans ce cas non plus.
       </p>
       <h2 className="font-display font-bold text-lg mt-6">4. Comportement et règlement intérieur</h2>
       <p>
@@ -47,7 +50,7 @@ export function PrivacyPage() {
         La Commune de Neuilly-sur-Marne s'engage à protéger la vie privée des utilisateurs du service baignade.lesrivesdeparis.fr conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés.
       </p>
       <h2 className="font-display font-bold text-lg mt-6">Responsable de traitement</h2>
-      <p>Mairie de Neuilly-sur-Marne — Place Ferdinand Buisson, 93330 Neuilly-sur-Marne.</p>
+      <p>Mairie de Neuilly-sur-Marne — 1 place François Mitterrand, 93330 Neuilly-sur-Marne.</p>
       <h2 className="font-display font-bold text-lg mt-6">Données collectées</h2>
       <ul className="list-disc pl-5 space-y-1">
         <li>Identité : nom, prénom</li>
@@ -81,7 +84,7 @@ export function MentionsLegalesPage() {
   return (
     <LegalLayout title="Mentions légales">
       <h2 className="font-display font-bold text-lg mt-6">Éditeur</h2>
-      <p>Mairie de Neuilly-sur-Marne — Place Ferdinand Buisson, 93330 Neuilly-sur-Marne.</p>
+      <p>Mairie de Neuilly-sur-Marne — 1 place François Mitterrand, 93330 Neuilly-sur-Marne.</p>
       <h2 className="font-display font-bold text-lg mt-6">Directeur de la publication</h2>
       <p>Le Maire de Neuilly-sur-Marne.</p>
       <h2 className="font-display font-bold text-lg mt-6">Conception & développement</h2>
@@ -177,7 +180,7 @@ export function AccessibilityPage() {
       </p>
       <ul className="list-disc pl-5 space-y-1">
         <li>Courriel : <a href="mailto:accessibilite@neuillysurmarne.fr">accessibilite@neuillysurmarne.fr</a></li>
-        <li>Adresse postale : Mairie de Neuilly-sur-Marne, Place Ferdinand&nbsp;Buisson, 93330 Neuilly-sur-Marne.</li>
+        <li>Adresse postale : Mairie de Neuilly-sur-Marne, 1&nbsp;place François&nbsp;Mitterrand, 93330 Neuilly-sur-Marne.</li>
       </ul>
 
       <h2 className="font-display font-bold text-lg mt-6">Voies de recours</h2>

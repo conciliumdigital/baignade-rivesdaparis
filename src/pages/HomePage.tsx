@@ -92,7 +92,7 @@ export function HomePage() {
             className="mt-14 flex flex-wrap gap-x-10 gap-y-3 text-sm text-white/80 border-t border-white/15 pt-6 animate-fade-up"
             style={{ animationDelay: '240ms' }}
           >
-            <span className="inline-flex items-center gap-2"><MapPin className="w-4 h-4 text-brand-200" /> Berge de la Marne</span>
+            <span className="inline-flex items-center gap-2"><MapPin className="w-4 h-4 text-brand-200" aria-hidden="true" /> Chemin de la Haute-Île · 20 min à pied du RER A</span>
             <span className="inline-flex items-center gap-2"><Clock className="w-4 h-4 text-brand-200" /> Du 4 juillet au 30 août</span>
             <span className="inline-flex items-center gap-2"><Users className="w-4 h-4 text-brand-200" /> Encadré par des maîtres-nageurs</span>
           </div>
@@ -147,10 +147,10 @@ export function HomePage() {
             <ul className="divide-y divide-slate-100 border-y border-slate-100">
               {[
                 'Tarif préférentiel pour les Nocéens (habitants de Neuilly-sur-Marne)',
-                'Créneaux dédiés aux groupes et aux écoles en semaine',
-                "Annulation gratuite jusqu'à 24 heures avant le créneau",
-                'Notification automatique en cas de fermeture météo',
-                'Service accessible aux personnes en situation de handicap',
+                'Tarif groupe dès 10 personnes',
+                'Notification automatique et report en cas de fermeture météo',
+                'Mise à l\'eau adaptée pour les personnes à mobilité réduite',
+                'Poste de secours sur place pendant toute la durée d\'ouverture',
               ].map((b) => (
                 <li key={b} className="flex items-start gap-3 py-3.5">
                   <ArrowRight className="w-4 h-4 text-brand-600 mt-0.5 flex-shrink-0" />

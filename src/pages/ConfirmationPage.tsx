@@ -141,7 +141,7 @@ export function ConfirmationPage() {
           <ul className="space-y-3 text-sm">
             <li className="flex gap-2"><Calendar className="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5" /><span>{formatDate(reservation.slot.date)}</span></li>
             <li className="flex gap-2"><Clock className="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5" /><span>{formatTimeRange(reservation.slot.start_time, reservation.slot.end_time)}</span></li>
-            <li className="flex gap-2"><MapPin className="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5" /><span>Berge de la Marne, Neuilly-sur-Marne</span></li>
+            <li className="flex gap-2"><MapPin className="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5" /><span>Chemin de la Haute-Île, Neuilly-sur-Marne</span></li>
           </ul>
 
           <div className="mt-5 pt-5 border-t border-slate-100">

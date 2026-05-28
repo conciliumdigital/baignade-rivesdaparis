@@ -23,7 +23,8 @@ const DEFAULT_BODY =
   '<p>Votre réservation est confirmée. Présentez le QR code ci-dessous à l\'accueil le jour de votre visite.</p>' +
   '<p><strong>Date :</strong> {{date}}<br><strong>Horaire :</strong> {{horaire}}<br><strong>Personnes :</strong> {{nb_personnes}}<br><strong>Total payé :</strong> {{total}}</p>' +
   '<p><strong>Lieu :</strong> {{lieu}}</p>' +
-  '<p>À apporter : maillot de bain, serviette, crème solaire. Casiers gratuits sur place.</p>' +
+  '<p><strong>À apporter :</strong> maillot de bain, serviette, crème solaire, bouteille d\'eau.</p>' +
+  '<p><strong>Vigilance :</strong> aucun casier n\'est mis à disposition. Chaque usager est responsable de ses affaires. Il est fortement déconseillé d\'apporter des objets de valeur.</p>' +
   '<p><a href="{{lien_compte}}">Voir ma réservation</a></p>';
 
 serve(async (req: Request) => {
@@ -60,7 +61,7 @@ serve(async (req: Request) => {
     horaire: esc(`${r.slot.start_time.slice(0, 5)} – ${r.slot.end_time.slice(0, 5)}`),
     nb_personnes: esc(`${r.nb_adults} adulte(s)${r.nb_children > 0 ? ` + ${r.nb_children} enfant(s)` : ''}`),
     total: esc(`${(r.total_amount_cents / 100).toFixed(2)} €`),
-    lieu: 'Berge de la Marne, Neuilly-sur-Marne',
+    lieu: 'Chemin de la Haute-Île, 93330 Neuilly-sur-Marne (à 20 min à pied du RER A)',
     lien_compte: `${appUrl}/compte`,
   };
   const subst = (s: string) => s.replace(/\{\{\s*(\w+)\s*\}\}/g, (_m, k) => vars[k] ?? '');
@@ -87,7 +88,7 @@ serve(async (req: Request) => {
       </div>
     </div>
     <div style="background:#f8fafc;padding:18px 32px;font-size:12px;color:#64748b;text-align:center">
-      Annulation gratuite jusqu'à 24h avant le créneau · Commune de Neuilly-sur-Marne
+      Aucun remboursement en cas d'annulation · Report possible en cas de fermeture météo · Commune de Neuilly-sur-Marne
     </div>
   </div>
 </body>

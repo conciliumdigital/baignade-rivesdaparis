@@ -36,7 +36,7 @@ export function Footer() {
           <address className="not-italic">
             <ul className="space-y-2 text-sm text-slate-400">
               <li>Mairie de Neuilly-sur-Marne</li>
-              <li>Place Ferdinand Buisson</li>
+              <li>1 place François Mitterrand</li>
               <li>93330 Neuilly-sur-Marne</li>
               <li><a href="mailto:baignade@neuillysurmarne.fr" className="hover:text-white transition">baignade@neuillysurmarne.fr</a></li>
             </ul>

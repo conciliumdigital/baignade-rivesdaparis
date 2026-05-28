@@ -152,7 +152,7 @@ serve(async (req: Request) => {
           ? `${reservation.nb_adults} adulte(s)${reservation.nb_children > 0 ? ` + ${reservation.nb_children} enfant(s)` : ''}`
           : '',
         total: reservation ? `${(reservation.total_amount_cents / 100).toFixed(2)} €` : '',
-        lieu: 'Berge de la Marne, Neuilly-sur-Marne',
+        lieu: 'Chemin de la Haute-Île, 93330 Neuilly-sur-Marne (à 20 min à pied du RER A)',
         lien_compte: `${appUrl}/compte`,
       };
       const subst = (s: string) => s.replace(/\{\{\s*(\w+)\s*\}\}/g, (_m, k) => vars[k] ?? '');

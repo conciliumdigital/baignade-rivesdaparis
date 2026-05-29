@@ -4,6 +4,55 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.4.3] (2026-05-29)
+
+### 🗓️ Horaires confirmés et génération de la saison
+
+Horaires définitifs transmis par la mairie le 2026-05-29 :
+
+- Période : 4 juillet au 30 août 2026.
+- Semaine (lundi au vendredi) : public de 11 h à 18 h. Le bassin reste
+  réservé aux enfants de la ville de 10 h à 11 h (créneau privé).
+- Samedi, dimanche et jours fériés : public de 10 h à 20 h.
+- Créneau de 11 h à 12 h en semaine : 1 € pour tous (nocéens compris).
+- Inauguration du 4 juillet : cérémonie de 14 h à 16 h, puis baignade
+  gratuite de 16 h à 20 h (créneaux de 16 h et 18 h à 0 €). Aucun
+  créneau avant 16 h ce jour-là.
+
+#### Front
+
+- `InfosPage` : carte « Horaires et saison » publie désormais les
+  horaires détaillés (remplace « seront publiés prochainement »). Carte
+  « Inauguration » : mention de la gratuité de 16 h à 20 h. Grille
+  tarifaire : ajout du créneau 11 h à 12 h en semaine à 1 € pour tous.
+- `InaugurationBanner` : message mis à jour (gratuité de 16 h à 20 h).
+
+#### Base de données
+
+- `supabase/season_2026.sql` réécrit : génération complète et idempotente
+  de la saison.
+  - Jours fériés (14 juillet, 15 août) traités comme le week-end (public
+    de 10 h à 20 h, sans le créneau privé enfants).
+  - 4 juillet : uniquement deux créneaux à 0 €, de 16 h à 20 h.
+  - Étape de nettoyage sûre : suppression des créneaux `SAISON2026` sans
+    réservation avant régénération (les créneaux déjà réservés ne sont
+    jamais touchés). Requêtes de contrôle ajoutées.
+
+#### Correctif
+
+- `package-lock.json` : trois champs `version` de dépendances
+  (loose-envify, merge2, natural-compare) avaient été écrasés à `1.4.2`
+  par un `replace_all` trop large lors d'un bump précédent. Remis à leur
+  version réelle (1.4.0, 1.4.1, 1.4.0), conforme au tarball `resolved`.
+
+> ⚠️ Action manuelle requise : exécuter `supabase/season_2026.sql` dans
+> le SQL Editor Supabase pour générer les créneaux de la saison. Le
+> script est idempotent et ne touche aucun créneau déjà réservé.
+>
+> Rappel : le tarif groupe (3 € par personne, à partir de 10 personnes)
+> n'est pas un prix par créneau ; il se gère hors créneau (code de
+> réduction ou logique de réservation).
+
 ## [1.4.2] — 2026-05-28
 
 ### 🏛️ Mise à jour de contenu opérationnel (cahier des charges mairie)

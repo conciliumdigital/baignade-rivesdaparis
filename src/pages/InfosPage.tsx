@@ -14,7 +14,7 @@ export function InfosPage() {
           Chemin de la Haute-Île, 93330 Neuilly-sur-Marne. À environ 20 minutes à pied du RER A.
         </InfoCard>
         <InfoCard icon={Clock} title="Horaires et saison">
-          Ouvert du 4 juillet au 30 août. Créneaux fixes de 2 heures. Les horaires détaillés (semaine, week-end, jours fériés) seront publiés prochainement.
+          Ouverte du 4 juillet au 30 août. En semaine (lundi au vendredi) de 11 h à 18 h ; samedi, dimanche et jours fériés de 10 h à 20 h. Créneaux de 2 heures (et un créneau d&apos;une heure à 11 h en semaine). En semaine, le bassin est réservé aux enfants de la ville de 10 h à 11 h.
         </InfoCard>
         <InfoCard icon={ShieldAlert} title="Sécurité et encadrement">
           Poste de secours sur place pendant toute la durée d&apos;ouverture. La baignade est surveillée par des maîtres-nageurs sauveteurs habilités.
@@ -31,8 +31,8 @@ export function InfosPage() {
         <InfoCard icon={Heart} title="Accessibilité">
           Mise à l&apos;eau adaptée pour les personnes à mobilité réduite. Pour toute demande particulière, contactez la mairie.
         </InfoCard>
-        <InfoCard icon={Users} title="Inauguration — 4 juillet">
-          Cérémonie d&apos;inauguration de 14 h à 16 h. La baignade ouvre officiellement après ; le premier créneau réservable est celui de <strong>16 h</strong>.
+        <InfoCard icon={Users} title="Inauguration le 4 juillet">
+          Cérémonie d&apos;inauguration de 14 h à 16 h. La baignade ouvre ensuite <strong>gratuitement de 16 h à 20 h</strong> : les créneaux de 16 h et de 18 h sont offerts pour le lancement.
         </InfoCard>
       </div>
 
@@ -47,9 +47,13 @@ export function InfosPage() {
             <span>Extérieur</span>
             <strong>5 €</strong>
           </li>
-          <li className="flex justify-between">
+          <li className="flex justify-between border-b border-slate-100 pb-2">
             <span>Groupe (à partir de 10 personnes)</span>
             <strong>3 € par personne</strong>
+          </li>
+          <li className="flex justify-between">
+            <span>Créneau de 11 h à 12 h en semaine</span>
+            <strong>1 € pour tous</strong>
           </li>
         </ul>
         <p className="text-xs text-slate-500 mt-3">

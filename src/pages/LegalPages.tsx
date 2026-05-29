@@ -50,7 +50,7 @@ export function PrivacyPage() {
         La Commune de Neuilly-sur-Marne s'engage à protéger la vie privée des utilisateurs du service baignade.lesrivesdeparis.fr conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés.
       </p>
       <h2 className="font-display font-bold text-lg mt-6">Responsable de traitement</h2>
-      <p>Mairie de Neuilly-sur-Marne — 1 place François Mitterrand, 93330 Neuilly-sur-Marne.</p>
+      <p>Mairie de Neuilly-sur-Marne, 1 place François Mitterrand, 93330 Neuilly-sur-Marne.</p>
       <h2 className="font-display font-bold text-lg mt-6">Données collectées</h2>
       <ul className="list-disc pl-5 space-y-1">
         <li>Identité : nom, prénom</li>
@@ -66,7 +66,7 @@ export function PrivacyPage() {
       </ul>
       <h2 className="font-display font-bold text-lg mt-6">Hébergement</h2>
       <p>
-        Les données sont hébergées en Union européenne (Supabase — région Europe). Aucun transfert hors UE.
+        Les données sont hébergées en Union européenne (Supabase, région Europe). Aucun transfert hors UE.
       </p>
       <h2 className="font-display font-bold text-lg mt-6">Durée de conservation</h2>
       <p>
@@ -84,11 +84,11 @@ export function MentionsLegalesPage() {
   return (
     <LegalLayout title="Mentions légales">
       <h2 className="font-display font-bold text-lg mt-6">Éditeur</h2>
-      <p>Mairie de Neuilly-sur-Marne — 1 place François Mitterrand, 93330 Neuilly-sur-Marne.</p>
+      <p>Mairie de Neuilly-sur-Marne, 1 place François Mitterrand, 93330 Neuilly-sur-Marne.</p>
       <h2 className="font-display font-bold text-lg mt-6">Directeur de la publication</h2>
       <p>Le Maire de Neuilly-sur-Marne.</p>
       <h2 className="font-display font-bold text-lg mt-6">Conception & développement</h2>
-      <p>CONCILIUM — solution numérique de réservation.</p>
+      <p>CONCILIUM, solution numérique de réservation.</p>
       <h2 className="font-display font-bold text-lg mt-6">Hébergement</h2>
       <p>
         Données hébergées dans l'Union européenne. Les paiements par carte
@@ -134,11 +134,11 @@ export function AccessibilityPage() {
         les critères suivants :
       </p>
       <ul className="list-disc pl-5 space-y-1">
-        <li>RGAA&nbsp;3 — Couleurs : vérification du contraste de la couleur d&apos;accent jaune en cours.</li>
-        <li>RGAA&nbsp;4 — Multimédia : la vidéo de présentation est décorative et muette (un bouton pause est disponible).</li>
-        <li>RGAA&nbsp;7 — Scripts : alternative manuelle au scan QR proposée pour les usagers sans caméra.</li>
-        <li>RGAA&nbsp;11 — Formulaires : regroupement sémantique et messages d&apos;erreur reliés en cours d&apos;amélioration.</li>
-        <li>RGAA&nbsp;12 — Navigation : plan du site à venir.</li>
+        <li>RGAA&nbsp;3, Couleurs : vérification du contraste de la couleur d&apos;accent jaune en cours.</li>
+        <li>RGAA&nbsp;4, Multimédia : la vidéo de présentation est décorative et muette (un bouton pause est disponible).</li>
+        <li>RGAA&nbsp;7, Scripts : alternative manuelle au scan QR proposée pour les usagers sans caméra.</li>
+        <li>RGAA&nbsp;11, Formulaires : regroupement sémantique et messages d&apos;erreur reliés en cours d&apos;amélioration.</li>
+        <li>RGAA&nbsp;12, Navigation : plan du site à venir.</li>
       </ul>
 
       <h2 className="font-display font-bold text-lg mt-6">Contenus non accessibles</h2>

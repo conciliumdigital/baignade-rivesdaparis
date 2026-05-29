@@ -17,7 +17,7 @@ function esc(v: unknown): string {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-const DEFAULT_SUBJECT = 'Votre réservation est confirmée — {{date}}';
+const DEFAULT_SUBJECT = 'Votre réservation est confirmée : {{date}}';
 const DEFAULT_BODY =
   '<p>Bonjour {{prenom}},</p>' +
   '<p>Votre réservation est confirmée. Présentez le QR code ci-dessous à l\'accueil le jour de votre visite.</p>' +
@@ -58,7 +58,7 @@ serve(async (req: Request) => {
     nom: esc(r.user?.last_name),
     reference: esc(r.reference),
     date: esc(r.slot.date),
-    horaire: esc(`${r.slot.start_time.slice(0, 5)} – ${r.slot.end_time.slice(0, 5)}`),
+    horaire: esc(`${r.slot.start_time.slice(0, 5)} à ${r.slot.end_time.slice(0, 5)}`),
     nb_personnes: esc(`${r.nb_adults} adulte(s)${r.nb_children > 0 ? ` + ${r.nb_children} enfant(s)` : ''}`),
     total: esc(`${(r.total_amount_cents / 100).toFixed(2)} €`),
     lieu: 'Chemin de la Haute-Île, 93330 Neuilly-sur-Marne (à 20 min à pied du RER A)',
@@ -77,7 +77,7 @@ serve(async (req: Request) => {
   <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(2,132,199,.1)">
     <div style="background:linear-gradient(135deg,#0284c7,#0c4a6e);color:#fff;padding:28px 32px">
       <h1 style="margin:0;font-size:22px">Réservation confirmée</h1>
-      <p style="margin:6px 0 0;opacity:.9;font-size:14px">Baignade Rives d'Paris — Neuilly-sur-Marne</p>
+      <p style="margin:6px 0 0;opacity:.9;font-size:14px">Baignade Rives d'Paris · Neuilly-sur-Marne</p>
     </div>
     <div style="padding:28px 32px;font-size:14px;line-height:1.55">
       ${bodyContent}

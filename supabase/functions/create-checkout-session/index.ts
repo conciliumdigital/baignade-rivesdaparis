@@ -96,8 +96,8 @@ serve(async (req: Request) => {
             currency: 'eur',
             unit_amount: reservation.total_amount_cents,
             product_data: {
-              name: `Baignade Rives d'Paris — ${reservation.slot.date}`,
-              description: `Créneau ${reservation.slot.start_time.slice(0, 5)} – ${reservation.slot.end_time.slice(0, 5)} · ${reservation.nb_adults} adulte(s)${reservation.nb_children > 0 ? ` + ${reservation.nb_children} enfant(s)` : ''}`,
+              name: `Baignade Rives d'Paris · ${reservation.slot.date}`,
+              description: `Créneau ${reservation.slot.start_time.slice(0, 5)} à ${reservation.slot.end_time.slice(0, 5)} · ${reservation.nb_adults} adulte(s)${reservation.nb_children > 0 ? ` + ${reservation.nb_children} enfant(s)` : ''}`,
             },
           },
           quantity: 1,

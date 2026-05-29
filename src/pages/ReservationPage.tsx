@@ -89,7 +89,7 @@ export function ReservationPage() {
             <ChevronLeft className="w-5 h-5" aria-hidden="true" />
           </button>
           <span className="text-sm font-medium px-2 text-center min-w-0 truncate">
-            {format(weekStart, 'd MMM', { locale: fr })} – {format(addDays(weekStart, 13), 'd MMM yyyy', { locale: fr })}
+            {format(weekStart, 'd MMM', { locale: fr })} au {format(addDays(weekStart, 13), 'd MMM yyyy', { locale: fr })}
           </span>
           <button
             className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"

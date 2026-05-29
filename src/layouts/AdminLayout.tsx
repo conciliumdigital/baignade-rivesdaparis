@@ -32,7 +32,7 @@ export function AdminLayout() {
             <NavLink to="/admin/satisfaction" className={itemClass}><Star className="w-4 h-4" /> Satisfaction</NavLink>
             <NavLink to="/admin/staff" className={itemClass}><Users2 className="w-4 h-4" /> Équipe</NavLink>
             <NavLink to="/admin/parametres" className={itemClass}><Settings className="w-4 h-4" /> Paramètres</NavLink>
-            <NavLink to="/admin/aide" className={itemClass}><HelpCircle className="w-4 h-4" /> Aide — Scan QR</NavLink>
+            <NavLink to="/admin/aide" className={itemClass}><HelpCircle className="w-4 h-4" /> Aide : Scan QR</NavLink>
           </nav>
         </aside>
 

@@ -147,7 +147,7 @@ serve(async (req: Request) => {
         nom: esc(user.last_name),
         reference: esc(reservation?.reference ?? ''),
         date: slot ? fmtDate(slot.date) : '',
-        horaire: slot ? `${fmtTime(slot.start_time)} – ${fmtTime(slot.end_time)}` : '',
+        horaire: slot ? `${fmtTime(slot.start_time)} à ${fmtTime(slot.end_time)}` : '',
         nb_personnes: reservation
           ? `${reservation.nb_adults} adulte(s)${reservation.nb_children > 0 ? ` + ${reservation.nb_children} enfant(s)` : ''}`
           : '',

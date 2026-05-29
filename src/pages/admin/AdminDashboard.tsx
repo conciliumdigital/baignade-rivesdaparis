@@ -73,7 +73,7 @@ export function AdminDashboard() {
     <div>
       <header className="mb-6">
         <h1 className="text-2xl font-display font-bold mb-1">Tableau de bord</h1>
-        <p className="text-sm text-slate-600">Pilotage de la zone de baignade — saison 2026.</p>
+        <p className="text-sm text-slate-600">Pilotage de la zone de baignade, saison 2026.</p>
       </header>
 
       {loadError && (

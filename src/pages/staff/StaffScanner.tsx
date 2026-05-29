@@ -9,11 +9,11 @@ import { formatDate, formatTimeRange } from '../../lib/format';
 import { mapSupabaseError, formatReservationStatus } from '../../lib/errors';
 import type { ScanResult, UsagerType, ReservationStatus } from '../../types/database';
 
-// Trois modes d'entrée pour le scanner — le 1er = scan caméra par
+// Trois modes d'entrée pour le scanner : le 1er = scan caméra par
 // défaut, les deux autres = alternatives accessibles (RGAA 7).
 type InputMode = 'camera' | 'token' | 'name';
 
-// Résultat d'une recherche par nom — colonnes renvoyées par la RPC
+// Résultat d'une recherche par nom : colonnes renvoyées par la RPC
 // `staff_find_reservations` (security definer, créneaux du jour).
 interface NameMatch {
   id: string;
@@ -60,7 +60,7 @@ export function StaffScanner() {
   const [validating, setValidating] = useState(false);
   const [last, setLast] = useState<ValidationResult | null>(null);
   const [validCount, setValidCount] = useState(0);
-  // RGAA 7 — alternatives équivalentes au scan caméra :
+  // RGAA 7 : alternatives équivalentes au scan caméra :
   //   - mode 'token' : saisie clavier du code QR
   //   - mode 'name'  : recherche par nom (créneaux du jour)
   const [inputMode, setInputMode] = useState<InputMode>('camera');
@@ -108,7 +108,7 @@ export function StaffScanner() {
         r = token.startsWith('BAIGNADE-DEMO')
           ? {
               result: 'valid',
-              message: 'Accès autorisé — mode démonstration.',
+              message: 'Accès autorisé : mode démonstration.',
               reservation: {
                 reference: 'DEMO1234', nb_persons: 4, nb_adults: 2, nb_children: 2,
                 date: new Date().toISOString().slice(0, 10), start_time: '14:00:00', end_time: '16:00:00',
@@ -185,7 +185,7 @@ export function StaffScanner() {
           />
         ) : (
           <div className="w-full max-w-md">
-            {/* Onglets de mode d'entrée — RGAA 7 : trois voies équivalentes */}
+            {/* Onglets de mode d'entrée, RGAA 7 : trois voies équivalentes */}
             <div role="tablist" aria-label="Mode de validation" className="mb-4 flex gap-1 bg-slate-800/60 p-1 rounded-xl">
               <ModeTab active={inputMode === 'camera'} onClick={() => setInputMode('camera')} icon={Camera} label="Caméra" />
               <ModeTab active={inputMode === 'token'} onClick={() => setInputMode('token')} icon={Keyboard} label="Code" />
@@ -296,7 +296,7 @@ function ValidationCard({ result, onReset, onRetry, autoResume, retryable }: { r
             {result.reservation.usager_type === 'habitant' && (
               <div className="mt-2 pt-2 border-t border-white/20 space-y-1.5">
                 <div className="inline-flex items-center gap-1.5 bg-white/25 rounded-md px-2 py-1 text-xs font-semibold">
-                  <Home className="w-3.5 h-3.5" aria-hidden="true" /> Tarif Nocéen — Neuilly-sur-Marne
+                  <Home className="w-3.5 h-3.5" aria-hidden="true" /> Tarif Nocéen · Neuilly-sur-Marne
                 </div>
                 {result.reservation.proof_url ? (
                   <a href={result.reservation.proof_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs underline hover:opacity-90">
@@ -464,7 +464,7 @@ function NameSearch({ onPick }: { onPick: (qrToken: string) => void }) {
                 >
                   <div className="flex items-baseline justify-between gap-3">
                     <div className="font-semibold truncate">{fullName}</div>
-                    <div className="text-xs tabular-nums opacity-80">{r.start_time.slice(0,5)}–{r.end_time.slice(0,5)}</div>
+                    <div className="text-xs tabular-nums opacity-80">{r.start_time.slice(0,5)} à {r.end_time.slice(0,5)}</div>
                   </div>
                   <div className="mt-1 flex items-center gap-3 text-xs opacity-80 flex-wrap">
                     <span className="font-mono">{r.reference}</span>

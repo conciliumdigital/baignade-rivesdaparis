@@ -54,7 +54,7 @@ serve(async (req: Request) => {
 
   const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
 
-  // Le scanner DOIT être staff/admin/manager — vérifié sur l'identité du JWT,
+  // Le scanner DOIT être staff/admin/manager : vérifié sur l'identité du JWT,
   // pas sur une valeur fournie par l'appelant.
   const { data: scanner } = await supabase
     .from('profiles')

@@ -112,7 +112,7 @@ export function HomePage() {
           {[
             { n: '01', icon: Calendar, title: 'Choisissez votre créneau', desc: "Le calendrier affiche en temps réel les places restantes pour chaque créneau de deux heures." },
             { n: '02', icon: ShieldCheck, title: 'Payez en toute sécurité', desc: 'Paiement en ligne par carte bancaire. La commune ne conserve aucune coordonnée bancaire.' },
-            { n: '03', icon: QrCode, title: 'Présentez votre QR code', desc: "Reçu instantanément par e-mail, scanné à l'entrée — validation en moins d'une seconde." },
+            { n: '03', icon: QrCode, title: 'Présentez votre QR code', desc: "Reçu instantanément par e-mail, scanné à l'entrée : validation en moins d'une seconde." },
           ].map((s, i) => (
             <Reveal key={s.n} delay={i * 90}>
               <div className="border-t-2 border-slate-900 pt-5">

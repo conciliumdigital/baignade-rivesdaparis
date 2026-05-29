@@ -1,5 +1,5 @@
 -- =====================================================================
--- TEST — Harnais de validation QR + scan (Stripe NON requis)
+-- TEST : Harnais de validation QR + scan (Stripe NON requis)
 -- =====================================================================
 -- À coller dans le SQL Editor Supabase :
 --   https://supabase.com/dashboard/project/nunglkeqekxzpmushxty/sql/new
@@ -26,7 +26,7 @@
 
 begin;
 
--- 1) Utilisateur de test — NON connectable (le trigger crée le profil)
+-- 1) Utilisateur de test : NON connectable (le trigger crée le profil)
 insert into auth.users (
   instance_id, id, aud, role, email, banned_until,
   email_confirmed_at, created_at, updated_at,

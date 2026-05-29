@@ -1,5 +1,5 @@
 -- =====================================================================
--- DEMO — Partie A : créneaux (SÛR, à exécuter en premier)
+-- DEMO, Partie A : créneaux (SÛR, à exécuter en premier)
 -- =====================================================================
 -- À coller dans le SQL Editor Supabase :
 --   https://supabase.com/dashboard/project/nunglkeqekxzpmushxty/sql/new
@@ -8,7 +8,7 @@
 -- le calendrier public et le tunnel de réservation soient pleinement
 -- démontrables sur https://baignade.lesrivesdeparis.fr.
 --
--- 100 % idempotent (on conflict do nothing) — rejouable sans risque.
+-- 100 % idempotent (on conflict do nothing), rejouable sans risque.
 -- Toutes les lignes sont taguées notes='DEMO' → nettoyage facile
 -- (voir 99_cleanup_demo.sql).
 -- =====================================================================
@@ -43,7 +43,7 @@ on conflict (date, start_time) do nothing;
 -- Motif de fermeture sur le créneau "météo" (pour démontrer la gestion
 -- des fermetures / notification usagers)
 update public.slots
-set closure_reason = 'Alerte météo — orages annoncés, baignade suspendue'
+set closure_reason = 'Alerte météo : orages annoncés, baignade suspendue'
 where date = date '2026-07-09' and start_time = time '10:00' and notes = 'DEMO';
 
 -- Contrôle rapide

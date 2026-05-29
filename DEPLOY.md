@@ -1,4 +1,4 @@
-# 🚀 Mise en ligne — baignade.lesrivesdeparis.fr
+# 🚀 Mise en ligne : baignade.lesrivesdeparis.fr
 
 > **Stack budget zéro** : 0 €/mois fixes pour héberger le service. Tu ne payes que les commissions Stripe sur les réservations effectives.
 
@@ -12,25 +12,25 @@
 | **Supabase** Free (Frankfurt) | Free | 0 € | 500 MB DB, 50 000 utilisateurs/mois, 500 k Edge Functions |
 | **Brevo** 🇫🇷 (emails) | Free | 0 € | 300 emails/jour |
 | **Stripe** | Standard | 0 € | Commission 1,4 % + 0,25 €/transaction |
-| **Domaine** `lesrivesdeparis.fr` | déjà acquis | 0 € | — |
+| **Domaine** `lesrivesdeparis.fr` | déjà acquis | 0 € | · |
 | **Total fixe** | | **0 €/mois** | |
 
-⚠️ **À savoir** : Supabase Free met le projet en pause après 7 jours sans activité. Hors saison de baignade, il suffit de cliquer sur "Restore" pour le réveiller. Pour passer en illimité, le plan Pro est à 25 $/mois — mais inutile pour démarrer.
+⚠️ **À savoir** : Supabase Free met le projet en pause après 7 jours sans activité. Hors saison de baignade, il suffit de cliquer sur "Restore" pour le réveiller. Pour passer en illimité, le plan Pro est à 25 $/mois, mais inutile pour démarrer.
 
 📈 **Quand passer en payant ?** Si la commune approche 50 000 réservations/mois (peu probable) ou veut un projet jamais mis en pause hors saison, basculer Supabase en Pro. Le reste reste gratuit.
 
 ---
 
-## ⚡ TL;DR — ordre de bataille (1 h 30 chrono)
+## ⚡ TL;DR : ordre de bataille (1 h 30 chrono)
 
-1. **Supabase** : créer le projet UE → appliquer le schéma → récupérer URL + anon key — *15 min*
-2. **Brevo** : compte → vérifier le domaine `lesrivesdeparis.fr` → API key — *15 min*
-3. **Stripe** : compte → clés → webhook — *15 min*
-4. **GitHub** : push du code — *5 min*
-5. **Netlify** : New site from Git → repo → `netlify.toml` auto + 2 env vars Supabase — *10 min*
-6. **Edge Functions Supabase** : `supabase functions deploy` ×4 — *10 min*
-7. **DNS** : ajouter le domaine dans Netlify puis CNAME `baignade` chez OVH — *5 min*
-8. **Test bout-en-bout** : réserver → payer (carte test) → recevoir le QR → scanner — *15 min*
+1. **Supabase** : créer le projet UE → appliquer le schéma → récupérer URL + anon key · *15 min*
+2. **Brevo** : compte → vérifier le domaine `lesrivesdeparis.fr` → API key · *15 min*
+3. **Stripe** : compte → clés → webhook · *15 min*
+4. **GitHub** : push du code · *5 min*
+5. **Netlify** : New site from Git → repo → `netlify.toml` auto + 2 env vars Supabase · *10 min*
+6. **Edge Functions Supabase** : `supabase functions deploy` ×4 · *10 min*
+7. **DNS** : ajouter le domaine dans Netlify puis CNAME `baignade` chez OVH · *5 min*
+8. **Test bout-en-bout** : réserver → payer (carte test) → recevoir le QR → scanner · *15 min*
 
 ---
 
@@ -57,7 +57,7 @@ supabase db push
 ### c) Activer le Magic Link
 Authentication → Providers → Email :
 - ✅ Enable Email provider
-- ❌ Confirm email (décocher — Magic Link suffit)
+- ❌ Confirm email (décocher, Magic Link suffit)
 - ✅ Magic link
 
 Authentication → Email Templates → "Magic Link" : personnaliser en FR. Exemple :
@@ -83,9 +83,9 @@ Settings → API :
 
 ---
 
-## 2. Brevo — emails transactionnels (15 min)
+## 2. Brevo : emails transactionnels (15 min)
 
-[Brevo (ex-Sendinblue)](https://www.brevo.com/fr/) est une entreprise française basée à Paris, RGPD natif, 300 emails/jour gratuits — largement suffisant.
+[Brevo (ex-Sendinblue)](https://www.brevo.com/fr/) est une entreprise française basée à Paris, RGPD natif, 300 emails/jour gratuits, largement suffisant.
 
 1. https://www.brevo.com/fr/ → Inscription gratuite
 2. Senders & IPs → Domains → Ajouter `lesrivesdeparis.fr`
@@ -101,7 +101,7 @@ Tu peux aussi configurer l'email d'expédition par défaut : `baignade@lesrivesd
 ### a) Compte business commune
 1. https://dashboard.stripe.com/register → "Business account"
 2. Renseigner les infos commune (SIRET, RIB, justificatifs)
-3. **Mode test** d'abord — l'activation live prend 1-3 jours côté Stripe
+3. **Mode test** d'abord : l'activation live prend 1-3 jours côté Stripe
 
 ### b) Moyens de paiement
 Settings → Payment methods → activer : **Card**, **Apple Pay**, **Google Pay**, **Link** (optionnel).
@@ -150,7 +150,7 @@ gh repo create baignade-rivesdaparis --public --source=. --push
    - Publish directory : `dist`
    - Node : 20
    - SPA fallback + headers : déjà configurés dans `netlify.toml`
-4. **Environment variables** (Site configuration → Environment variables) — les 2 seules lues par le code :
+4. **Environment variables** (Site configuration → Environment variables), les 2 seules lues par le code :
    - `VITE_SUPABASE_URL` = `https://xxx.supabase.co`
    - `VITE_SUPABASE_ANON_KEY` = `sb_publishable_...`
    - *(plus tard, quand Stripe est prêt : `VITE_STRIPE_PUBLISHABLE_KEY` = `pk_live_xxx`)*
@@ -184,7 +184,7 @@ supabase functions deploy send-confirmation-email --no-verify-jwt
 
 ---
 
-## 7. DNS — pointer le domaine (5 min)
+## 7. DNS : pointer le domaine (5 min)
 
 Dans Netlify :
 - Site configuration → **Domain management** → **Add custom domain** → `baignade.lesrivesdeparis.fr`
@@ -201,7 +201,7 @@ Propagation DNS : 5 min à 24 h selon les FAI. Netlify émet et renouvelle le ce
 
 ## 8. Test bout-en-bout (15 min)
 
-1. Aller sur `https://baignade.lesrivesdeparis.fr/` — la landing doit s'afficher
+1. Aller sur `https://baignade.lesrivesdeparis.fr/` : la landing doit s'afficher
 2. **Admin** : se connecter avec l'email admin → Magic Link reçu (Brevo) → admin
 3. **Créer un créneau** : Admin → Créneaux → Génération en masse pour aujourd'hui
 4. **Réserver côté public** : aller sur `/reserver` → sélectionner → payer avec carte test `4242 4242 4242 4242` (CVC 123, date future)

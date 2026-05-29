@@ -3,7 +3,7 @@
 -- =====================================================================
 -- Les seeds initiaux contenaient « recontacté·e », « inscrit·e ». Comme
 -- les inserts d'origine utilisent ON CONFLICT DO NOTHING, rejouer la
--- migration ne corrige pas les valeurs déjà présentes — d'où ce UPDATE
+-- migration ne corrige pas les valeurs déjà présentes, d'où ce UPDATE
 -- explicite. Idempotent (les remplacements de chaînes ne s'appliquent
 -- que si la forme inclusive est encore présente).
 -- =====================================================================

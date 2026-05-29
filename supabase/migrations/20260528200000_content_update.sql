@@ -1,5 +1,5 @@
 -- =====================================================================
--- Mise à jour de contenu — politique 2026, lieu, casiers, inauguration
+-- Mise à jour de contenu : politique 2026, lieu, casiers, inauguration
 -- =====================================================================
 -- Aligne le contenu en base sur le cahier des charges du 2026-05-28
 -- (CONCILIUM / Mairie de Neuilly-sur-Marne) :
@@ -66,7 +66,7 @@ update public.email_templates
 -- `closure` : la fermeture météo donne lieu à un REPORT uniquement
 -- (politique sans remboursement). Reformulation conforme.
 update public.email_templates
-   set subject = 'Information importante — créneau du {{date}} reporté',
+   set subject = 'Information importante : créneau du {{date}} reporté',
        body_html =
          '<p>Bonjour {{prenom}},</p>'
          '<p>En raison des conditions météo, votre créneau du <strong>{{date}}</strong> ({{horaire}}) ne pourra pas se tenir.</p>'

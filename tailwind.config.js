@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Charte Neuilly-sur-Marne — bleu institutionnel + accent estival
+        // Charte Neuilly-sur-Marne : bleu institutionnel + accent estival
         brand: {
           50: '#f0f9ff',
           100: '#e0f2fe',
@@ -28,7 +28,7 @@ export default {
       },
       fontFamily: {
         // Corps : Inter (neutre, lisible). Titres : Fraunces (serif
-        // éditorial, identité civique — moins « template SaaS/IA »).
+        // éditorial, identité civique, moins « template SaaS/IA »).
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
         display: ['Fraunces', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
       },

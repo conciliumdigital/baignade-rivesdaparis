@@ -30,13 +30,13 @@ create trigger trg_email_templates_updated
   before update on public.email_templates
   for each row execute function public.touch_updated_at();
 
--- Modèles par défaut (insérés seulement s'ils n'existent pas — l'édition
+-- Modèles par défaut (insérés seulement s'ils n'existent pas, l'édition
 -- back-office ne sera pas écrasée à un rejeu de la migration).
 insert into public.email_templates (key, name, subject, body_html) values
 (
   'confirmation',
   'Confirmation de réservation',
-  'Votre réservation est confirmée — {{date}}',
+  'Votre réservation est confirmée : {{date}}',
   '<p>Bonjour {{prenom}},</p>'
   '<p>Votre réservation est confirmée. Présentez le QR code ci-dessous à l''accueil le jour de votre visite.</p>'
   '<p><strong>Date :</strong> {{date}}<br><strong>Horaire :</strong> {{horaire}}<br><strong>Personnes :</strong> {{nb_personnes}}<br><strong>Total payé :</strong> {{total}}</p>'
@@ -59,14 +59,14 @@ insert into public.email_templates (key, name, subject, body_html) values
 (
   'closure',
   'Fermeture météo',
-  'Information importante — créneau du {{date}} modifié',
+  'Information importante : créneau du {{date}} modifié',
   '<p>Bonjour {{prenom}},</p><p>En raison des conditions météo, votre créneau du <strong>{{date}}</strong> ({{horaire}}) est impacté. Vous serez recontacté pour un report ou un remboursement.</p><p>Merci de votre compréhension.</p>'
 ),
 (
   'satisfaction',
   'Enquête de satisfaction',
   'Votre avis sur votre baignade du {{date}}',
-  '<p>Bonjour {{prenom}},</p><p>Vous avez profité de la zone de baignade le {{date}}. Votre avis nous aide à améliorer le service — merci de prendre quelques instants depuis votre espace : <a href="{{lien_compte}}">donner mon avis</a>.</p>'
+  '<p>Bonjour {{prenom}},</p><p>Vous avez profité de la zone de baignade le {{date}}. Votre avis nous aide à améliorer le service, merci de prendre quelques instants depuis votre espace : <a href="{{lien_compte}}">donner mon avis</a>.</p>'
 )
 on conflict (key) do nothing;
 

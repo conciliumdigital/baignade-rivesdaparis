@@ -21,7 +21,7 @@
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
     # Content-Security-Policy stricte. Sources autorisées :
     #  - script-src : self + Stripe SDK
-    #  - style-src  : self + Google Fonts (CSS) — 'unsafe-inline' requis par Tailwind/runtime
+    #  - style-src  : self + Google Fonts (CSS), 'unsafe-inline' requis par Tailwind/runtime
     #  - img-src    : self + data:/blob: (QR codes, previews) + Supabase Storage
     #  - connect-src: Supabase REST/Auth/Realtime + Stripe API
     #  - frame-src  : Stripe Checkout/Elements uniquement

@@ -1,5 +1,5 @@
 -- =====================================================================
--- ANTI-PAUSE SUPABASE — battement de cœur (heartbeat) en écriture
+-- ANTI-PAUSE SUPABASE : battement de cœur (heartbeat) en écriture
 -- =====================================================================
 -- Le timer d'inactivité 7 jours du Free tier se base sur l'ACTIVITÉ
 -- BASE DE DONNÉES (requêtes/écritures réelles), PAS sur les hits du

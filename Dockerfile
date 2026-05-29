@@ -1,5 +1,5 @@
 # =====================================================================
-# Baignade Rives d'Paris — Dockerfile multi-stage pour Scaleway / OVH / Clever Cloud
+# Baignade Rives d'Paris : Dockerfile multi-stage pour Scaleway / OVH / Clever Cloud
 # =====================================================================
 
 # ---- Build stage ----

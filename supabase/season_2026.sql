@@ -1,5 +1,5 @@
 -- =====================================================================
--- SAISON 2026 — Génération des créneaux réels (PRODUCTION)
+-- SAISON 2026 : Génération des créneaux réels (PRODUCTION)
 -- =====================================================================
 -- Modèle opérationnel confirmé par la mairie (Delphine) le 2026-05-29.
 -- À coller dans le SQL Editor Supabase :
@@ -83,7 +83,7 @@ where (extract(dow from d) in (0, 6) or d::date in (date '2026-07-14', date '202
 on conflict (date, start_time) do nothing;
 
 -- ---------------------------------------------------------------------
--- 3. Inauguration — samedi 4 juillet : gratuit de 16h à 20h, rien avant
+-- 3. Inauguration, samedi 4 juillet : gratuit de 16h à 20h, rien avant
 -- ---------------------------------------------------------------------
 insert into public.slots
   (date, start_time, end_time, capacity, capacity_residents, capacity_groups,

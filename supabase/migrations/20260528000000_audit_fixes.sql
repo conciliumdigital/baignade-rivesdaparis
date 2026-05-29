@@ -1,11 +1,11 @@
 -- =====================================================================
--- CORRECTIONS D'AUDIT — sécurité, intégrité fonctionnelle, anti-pause
+-- CORRECTIONS D'AUDIT : sécurité, intégrité fonctionnelle, anti-pause
 -- (audit interne v1.3.5 → corrections v1.4.0)
 -- =====================================================================
 --
--- 1. SÉCURITÉ — `set search_path = public, pg_temp` sur TOUTES les
+-- 1. SÉCURITÉ : `set search_path = public, pg_temp` sur TOUTES les
 --    fonctions SECURITY DEFINER existantes (parade contre l'escalade
---    par shadowing de schéma — déjà signalé par le linter Supabase).
+--    par shadowing de schéma, déjà signalé par le linter Supabase).
 --
 -- 2. RPC `cancel_reservation()` : annulation côté serveur, comparaison
 --    deadline en Europe/Paris, libération du créneau via le trigger
@@ -17,7 +17,7 @@
 --    < 30 s, pour neutraliser un éventuel martelage anon (la table est
 --    déjà bornée à une ligne, mais on évite le bruit WAL).
 --
--- Idempotent — peut être réappliqué sans effet de bord.
+-- Idempotent : peut être réappliqué sans effet de bord.
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
@@ -43,7 +43,7 @@ alter function public.check_slot_capacity()                   set search_path = 
 alter function public.touch_updated_at()                      set search_path = public, pg_temp;
 
 -- ---------------------------------------------------------------------
--- 2. RPC cancel_reservation() — annulation serveur
+-- 2. RPC cancel_reservation() : annulation serveur
 -- ---------------------------------------------------------------------
 -- Règles :
 --   - auth requise (anon refusé)
@@ -52,7 +52,7 @@ alter function public.touch_updated_at()                      set search_path = 
 --   - créneau strictement futur (toute annulation d'un créneau passé
 --     refusée côté usager ; staff/admin peuvent forcer)
 --   - délai > `cancellation_deadline_hours` (lu depuis site_settings,
---     défaut 24h) — calcul en Europe/Paris pour cohérence (le créneau
+--     défaut 24h), calcul en Europe/Paris pour cohérence (le créneau
 --     est exprimé en heure locale)
 --   - update status='cancelled' déclenche le trigger
 --     `notify_on_reservation_freed` qui notifie la liste d'attente
@@ -132,7 +132,7 @@ grant execute on function public.cancel_reservation(uuid, text) to authenticated
 -- ---------------------------------------------------------------------
 -- Si quelqu'un martèle la RPC, on absorbe sans écrire (last_ping est
 -- retourné sans UPSERT). Le job GitHub Actions tourne 2×/jour donc
--- jamais dans la fenêtre de 30 s — aucune régression keep-alive.
+-- jamais dans la fenêtre de 30 s, aucune régression keep-alive.
 -- ---------------------------------------------------------------------
 
 create or replace function public.keepalive()

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Sparkles } from 'lucide-react';
 
-// Cérémonie d'inauguration : 4 juillet 2026, 14 h – 16 h (heure de Paris).
-// Le 1er créneau réservable est celui de 16 h. La bannière s'affiche
-// jusqu'à 16 h ce jour-là, puis disparaît automatiquement.
+// Cérémonie d'inauguration : 4 juillet 2026, 14 h à 16 h (heure de Paris),
+// puis baignade gratuite de 16 h à 20 h (créneaux de 16 h et 18 h offerts).
+// La bannière s'affiche jusqu'à 16 h ce jour-là (fin de la cérémonie),
+// puis disparaît automatiquement.
 //
 // Heure d'été Paris (CEST = UTC+2) → 16:00 Paris = 14:00 UTC.
 const INAUGURATION_END_UTC = new Date('2026-07-04T14:00:00Z');
@@ -30,7 +31,7 @@ export function InaugurationBanner() {
         <Sparkles className="w-4 h-4 shrink-0" style={{ color: '#F5C111' }} aria-hidden="true" />
         <p>
           <strong>Inauguration le 4 juillet de 14 h à 16 h.</strong>{' '}
-          <span className="opacity-90">La baignade ouvre officiellement après la cérémonie. Premier créneau réservable&nbsp;: <strong>16 h</strong>.</span>
+          <span className="opacity-90">La baignade ouvre ensuite <strong>gratuitement de 16 h à 20 h</strong> : créneaux de 16 h et 18 h offerts.</span>
         </p>
       </div>
     </div>

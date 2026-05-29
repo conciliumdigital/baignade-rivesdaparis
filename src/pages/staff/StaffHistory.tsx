@@ -52,7 +52,7 @@ export function StaffHistory() {
             <article key={r.id} className="card p-4 flex items-center gap-3">
               <Icon className={`w-6 h-6 ${cls} flex-shrink-0`} />
               <div className="flex-1 min-w-0">
-                <div className="font-mono text-xs text-slate-500">{r.reservation?.reference ?? '—'}</div>
+                <div className="font-mono text-xs text-slate-500">{r.reservation?.reference ?? '·'}</div>
                 <div className="text-sm">{formatDate(r.scanned_at, 'EEE d MMM yyyy · HH:mm')}</div>
               </div>
               <div className="text-xs text-slate-500 text-right">

@@ -53,7 +53,7 @@ export function Header() {
     <header className="sticky top-0 z-40 bg-white/85 backdrop-blur border-b border-slate-100" role="banner">
       {/* Skip-link déjà fourni par PublicLayout */}
       <div className="w-full px-6 lg:px-10 flex items-center justify-between h-16">
-        <Link to="/" className="flex items-center gap-2.5 group min-w-0" aria-label="Accueil — Baignade Rives d'Paris">
+        <Link to="/" className="flex items-center gap-2.5 group min-w-0" aria-label="Accueil : Baignade Rives d'Paris">
           <div className="w-9 h-9 rounded-lg bg-brand-800 flex items-center justify-center transition-transform group-hover:-translate-y-0.5 flex-shrink-0">
             <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor" aria-hidden="true">
               <path d="M2 17c2 0 2-1 4-1s2 1 4 1 2-1 4-1 2 1 4 1 2-1 4-1v3c-2 0-2-1-4-1s-2 1-4 1-2-1-4-1-2 1-4 1-2-1-4-1v-2zM2 12c2 0 2-1 4-1s2 1 4 1 2-1 4-1 2 1 4 1 2-1 4-1v3c-2 0-2-1-4-1s-2 1-4 1-2-1-4-1-2 1-4 1-2-1-4-1v-2z" />

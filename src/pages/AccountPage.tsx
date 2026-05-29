@@ -113,7 +113,7 @@ export function AccountPage() {
       <header className="mb-8">
         <h1 className="text-3xl md:text-4xl font-display font-semibold mb-1">Mon espace</h1>
         <p className="text-slate-600">
-          Bonjour {profile?.first_name || 'à vous'} — voici vos réservations et vos informations personnelles.
+          Bonjour {profile?.first_name || 'à vous'}, voici vos réservations et vos informations personnelles.
         </p>
       </header>
 
@@ -208,7 +208,7 @@ export function AccountPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       {offered && !expired ? (
-                        <span className="badge-success">Place disponible — réservez sous 24h</span>
+                        <span className="badge-success">Place disponible, réservez sous 24h</span>
                       ) : expired ? (
                         <span className="badge-muted">Délai dépassé</span>
                       ) : (
@@ -241,7 +241,7 @@ export function AccountPage() {
         <div className="mt-6 card p-4 border-amber-200 bg-amber-50/60 flex gap-3 items-start text-sm">
           <AlertTriangle className="w-5 h-5 text-amber-700 flex-shrink-0 mt-0.5" />
           <div>
-            <strong>Mode démo</strong> — Configurez Supabase dans <code>.env.local</code> pour activer la persistance des données.
+            <strong>Mode démo</strong> : configurez Supabase dans <code>.env.local</code> pour activer la persistance des données.
           </div>
         </div>
       )}

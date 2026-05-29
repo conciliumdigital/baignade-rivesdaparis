@@ -17,7 +17,7 @@ const VARS = ['prenom', 'nom', 'reference', 'date', 'horaire', 'nb_personnes', '
 // Échantillon pour l'aperçu (les vraies valeurs sont injectées à l'envoi)
 const SAMPLE: Record<string, string> = {
   prenom: 'Camille', nom: 'Dubois', reference: 'ABC12345',
-  date: 'samedi 4 juillet 2026', horaire: '12:00 – 14:00',
+  date: 'samedi 4 juillet 2026', horaire: '12:00 à 14:00',
   nb_personnes: '2 adulte(s) + 1 enfant(s)', total: '12,00 €',
   lieu: 'Chemin de la Haute-Île, Neuilly-sur-Marne', lien_compte: '#',
 };
@@ -25,7 +25,7 @@ const SAMPLE: Record<string, string> = {
 // Valeurs par défaut (miroir de la migration) pour « Réinitialiser ».
 const DEFAULTS: Record<string, { subject: string; body_html: string }> = {
   confirmation: {
-    subject: 'Votre réservation est confirmée — {{date}}',
+    subject: 'Votre réservation est confirmée : {{date}}',
     body_html:
       '<p>Bonjour {{prenom}},</p><p>Votre réservation est confirmée. Présentez le QR code ci-dessous à l\'accueil le jour de votre visite.</p><p><strong>Date :</strong> {{date}}<br><strong>Horaire :</strong> {{horaire}}<br><strong>Personnes :</strong> {{nb_personnes}}<br><strong>Total payé :</strong> {{total}}</p><p><strong>Lieu :</strong> {{lieu}}</p><p><strong>À apporter :</strong> maillot de bain, serviette, crème solaire, bouteille d\'eau.</p><p><strong>Vigilance :</strong> aucun casier n\'est mis à disposition. Chaque usager est responsable de ses affaires. Il est fortement déconseillé d\'apporter des objets de valeur.</p><p><a href="{{lien_compte}}">Voir ma réservation</a></p>',
   },
@@ -38,7 +38,7 @@ const DEFAULTS: Record<string, { subject: string; body_html: string }> = {
     body_html: '<p>Bonjour {{prenom}},</p><p>Votre créneau de baignade ({{horaire}}) commence bientôt. Présentez votre QR code à l\'accueil. Réf. {{reference}}.</p>',
   },
   closure: {
-    subject: 'Information importante — créneau du {{date}} reporté',
+    subject: 'Information importante : créneau du {{date}} reporté',
     body_html: '<p>Bonjour {{prenom}},</p><p>En raison des conditions météo, votre créneau du <strong>{{date}}</strong> ({{horaire}}) ne pourra pas se tenir. Conformément aux conditions d\'utilisation, aucun remboursement n\'est effectué ; un <strong>report</strong> sur un autre créneau de la saison vous sera proposé par courriel dans les prochains jours.</p><p>Merci de votre compréhension.</p>',
   },
   satisfaction: {
@@ -180,7 +180,7 @@ export function AdminEmailTemplates() {
       <div className="grid lg:grid-cols-2 gap-5">
         <section className="space-y-3">
           <div className="card p-5">
-            <label className="label" htmlFor="tpl-subject">Objet de l&apos;e-mail — « {activeName} »</label>
+            <label className="label" htmlFor="tpl-subject">Objet de l&apos;e-mail : « {activeName} »</label>
             <input
               id="tpl-subject"
               className="input"
@@ -230,12 +230,12 @@ export function AdminEmailTemplates() {
               <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
                 <div style={{ background: 'linear-gradient(135deg,#0284c7,#0c4a6e)', color: '#fff', padding: '20px 24px' }}>
                   <div className="font-bold text-lg">Réservation confirmée</div>
-                  <div className="text-xs opacity-90">Baignade Rives d'Paris — Neuilly-sur-Marne</div>
+                  <div className="text-xs opacity-90">Baignade Rives d'Paris · Neuilly-sur-Marne</div>
                 </div>
                 <div className="bg-white p-5 text-sm">
                   <div className="text-xs text-slate-500 mb-1">Objet : <strong>{subst(subject)}</strong></div>
                   <hr className="my-2 border-slate-100" />
-                  {/* Aperçu de contenu rédigé par l'admin (lui-même) — usage légitime de dangerouslySetInnerHTML */}
+                  {/* Aperçu de contenu rédigé par l'admin (lui-même), usage légitime de dangerouslySetInnerHTML */}
                   <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: subst(body) }} />
                   {activeKey === 'confirmation' && (
                     <div className="text-center my-4">

@@ -65,8 +65,8 @@ export function ReservationDetailPage() {
 
   const isResident = usagerType === 'habitant';
   // Le tarif habitant n'est proposé que s'il constitue une vraie réduction
-  // (résident < extérieur). Sur les créneaux à tarif unique — ex. créneau
-  // 1 € pour tous — l'option « habitant » et le justificatif sont masqués.
+  // (résident < extérieur). Sur les créneaux à tarif unique (ex. créneau
+  // 1 € pour tous), l'option « habitant » et le justificatif sont masqués.
   const hasResidentPrice =
     slot?.price_resident_cents != null &&
     slot.price_resident_cents > 0 &&
@@ -78,7 +78,7 @@ export function ReservationDetailPage() {
   }, [slot, isResident, hasResidentPrice]);
 
   // Tarif enfant : identique à l'adulte pour l'instant (la commune n'a pas
-  // défini de tarif enfant / groupe — à reprendre ultérieurement).
+  // défini de tarif enfant / groupe, à reprendre ultérieurement).
   const childPriceCents = adultPriceCents;
 
   const totalCents = useMemo(() => {
@@ -374,7 +374,7 @@ export function ReservationDetailPage() {
               {promo && (
                 promo.valid ? (
                   <p className="text-xs text-emerald-700 mt-1.5" role="status">
-                    ✓ Réduction appliquée{promo.label ? ` — ${promo.label}` : ''} : −{formatPrice(promo.discount_cents)}
+                    ✓ Réduction appliquée{promo.label ? ` (${promo.label})` : ''} : −{formatPrice(promo.discount_cents)}
                   </p>
                 ) : (
                   <p className="text-xs text-red-600 mt-1.5" role="alert">Code non valable : {promo.reason}.</p>
@@ -438,7 +438,7 @@ export function ReservationDetailPage() {
                     Justificatif de domicile <span className="text-red-600" aria-hidden="true">*</span>
                   </label>
                   <p id="proof-help" className="text-xs text-slate-500 mb-2">
-                    Facture (eau, électricité, internet) de moins de 3 mois, avis d&apos;imposition ou quittance de loyer. JPG, PNG, WEBP ou PDF — 5 Mo maximum.
+                    Facture (eau, électricité, internet) de moins de 3 mois, avis d&apos;imposition ou quittance de loyer. JPG, PNG, WEBP ou PDF, 5 Mo maximum.
                   </p>
                   {proofFile ? (
                     <div className="flex items-center justify-between gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-sm">
@@ -619,7 +619,7 @@ export function ReservationDetailPage() {
   );
 }
 
-// Carte d'inscription en liste d'attente — affichée quand le créneau est
+// Carte d'inscription en liste d'attente : affichée quand le créneau est
 // complet (status='open' & remaining=0). Le serveur revérifie ces deux
 // conditions (RPC join_waitlist SECURITY DEFINER) ; le client ne fait
 // que présenter le formulaire.

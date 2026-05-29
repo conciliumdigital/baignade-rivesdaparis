@@ -19,6 +19,6 @@ export const supabase = isSupabaseConfigured
 if (!isSupabaseConfigured && typeof window !== 'undefined') {
   // eslint-disable-next-line no-console
   console.warn(
-    '[baignade] Supabase non configuré — mode démo activé. Renseignez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY dans .env.local',
+    '[baignade] Supabase non configuré : mode démo activé. Renseignez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY dans .env.local',
   );
 }

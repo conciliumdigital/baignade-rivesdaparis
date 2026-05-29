@@ -128,7 +128,7 @@ export function AdminReservations() {
       <header className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-display font-bold">Réservations</h1>
-          <p className="text-sm text-slate-600">{filtered.length} résultat{filtered.length > 1 ? 's' : ''}{truncated ? ` (sur les ${PAGE_SIZE} plus récentes — affinez les filtres pour voir le reste)` : ''}.</p>
+          <p className="text-sm text-slate-600">{filtered.length} résultat{filtered.length > 1 ? 's' : ''}{truncated ? ` (sur les ${PAGE_SIZE} plus récentes, affinez les filtres pour voir le reste)` : ''}.</p>
         </div>
         <button onClick={exportCsv} className="btn-secondary text-sm"><Download className="w-4 h-4" /> Exporter CSV</button>
       </header>
@@ -183,7 +183,7 @@ export function AdminReservations() {
                 <tr key={r.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-mono text-xs">{r.reference}</td>
                   <td className="px-4 py-3">
-                    <div className="font-medium">{[r.user?.first_name, r.user?.last_name].filter(Boolean).join(' ') || '—'}</div>
+                    <div className="font-medium">{[r.user?.first_name, r.user?.last_name].filter(Boolean).join(' ') || '·'}</div>
                     <div className="text-xs text-slate-500">{r.user?.email}</div>
                   </td>
                   <td className="px-4 py-3">
@@ -192,7 +192,7 @@ export function AdminReservations() {
                         <div>{formatDate(r.slot.date, 'EEE d MMM')}</div>
                         <div className="text-xs text-slate-500">{formatTimeRange(r.slot.start_time, r.slot.end_time)}</div>
                       </>
-                    ) : '—'}
+                    ) : '·'}
                   </td>
                   <td className="px-4 py-3">{r.nb_adults}A {r.nb_children > 0 && `· ${r.nb_children}E`}</td>
                   <td className="px-4 py-3"><UsagerBadge type={r.usager_type} /></td>
@@ -207,7 +207,7 @@ export function AdminReservations() {
                     ) : r.usager_type === 'habitant' ? (
                       <span className="text-xs text-amber-600">manquant</span>
                     ) : (
-                      <span className="text-xs text-slate-400">—</span>
+                      <span className="text-xs text-slate-400">·</span>
                     )}
                   </td>
                   <td className="px-4 py-3">{formatPrice(r.total_amount_cents)}</td>
@@ -307,21 +307,21 @@ function DetailDrawer({ reservation, onClose, onChanged }: {
       open={!!reservation}
       onClose={onClose}
       title={`Réservation ${reservation.reference}`}
-      description={reservation.slot ? `Créneau du ${reservation.slot.date} · ${reservation.slot.start_time}–${reservation.slot.end_time}` : undefined}
+      description={reservation.slot ? `Créneau du ${reservation.slot.date} · ${reservation.slot.start_time} à ${reservation.slot.end_time}` : undefined}
       size="lg"
       locked={busy}
     >
       <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
         <Field label="Statut"><StatusBadge status={reservation.status} /></Field>
         <Field label="Type"><UsagerBadge type={reservation.usager_type} /></Field>
-        <Field label="Usager">{[reservation.user?.first_name, reservation.user?.last_name].filter(Boolean).join(' ') || '—'}</Field>
-        <Field label="Courriel">{reservation.user?.email ?? '—'}</Field>
+        <Field label="Usager">{[reservation.user?.first_name, reservation.user?.last_name].filter(Boolean).join(' ') || '·'}</Field>
+        <Field label="Courriel">{reservation.user?.email ?? '·'}</Field>
         {reservation.user?.phone && <Field label="Téléphone">{reservation.user.phone}</Field>}
         <Field label="Adultes / Enfants">{reservation.nb_adults} / {reservation.nb_children}</Field>
         <Field label="Montant total">{formatPrice(reservation.total_amount_cents)}</Field>
-        <Field label="Justificatif">{reservation.resident_proof_url ? 'Présent' : (reservation.usager_type === 'habitant' ? 'Manquant' : '—')}</Field>
+        <Field label="Justificatif">{reservation.resident_proof_url ? 'Présent' : (reservation.usager_type === 'habitant' ? 'Manquant' : '·')}</Field>
         {reservation.cancelled_at && (
-          <Field label="Annulée le" wide>{new Date(reservation.cancelled_at).toLocaleString('fr-FR')}{reservation.cancellation_reason ? ` — « ${reservation.cancellation_reason} »` : ''}</Field>
+          <Field label="Annulée le" wide>{new Date(reservation.cancelled_at).toLocaleString('fr-FR')}{reservation.cancellation_reason ? ` : « ${reservation.cancellation_reason} »` : ''}</Field>
         )}
         {reservation.stripe_session_id && (
           <Field label="Paiement Stripe" wide>
@@ -355,7 +355,7 @@ function DetailDrawer({ reservation, onClose, onChanged }: {
             <div className="flex items-start gap-2 text-red-900">
               <AlertTriangle className="w-5 h-5 shrink-0" aria-hidden="true" />
               <p className="text-sm">
-                <strong>Annulation administrative</strong> — la place sera libérée immédiatement et la première personne en liste d&apos;attente recevra automatiquement une offre. Cette action est définitive (sauf re-création manuelle).
+                <strong>Annulation administrative</strong> : la place sera libérée immédiatement et la première personne en liste d&apos;attente recevra automatiquement une offre. Cette action est définitive (sauf re-création manuelle).
               </p>
             </div>
             <label className="block text-xs font-medium text-red-900">

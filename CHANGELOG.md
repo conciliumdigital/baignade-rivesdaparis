@@ -4,6 +4,55 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.4.4] (2026-05-29)
+
+### ✍️ Typographie : suppression de tous les tirets cadratin et demi-cadratin
+
+Application stricte de la consigne de rédaction (jamais de « — » ni de
+« – », ni comme séparateur, ni dans un titre ou un objet). Tous les
+occurrences ont été remplacées par un signe adapté au contexte (deux-points,
+virgule, parenthèses, point médian « · », ou « à » pour les plages horaires).
+
+#### Front (`src/`)
+
+- `lib/format.ts` : `formatTimeRange` affiche désormais « 14h00 à 16h00 »
+  (au lieu d'un demi-cadratin). Corrige l'affichage des horaires sur les
+  pages Réservation, Confirmation, Compte et back-office.
+- `ReservationPage` : l'en-tête de plage de dates utilise « au ».
+- Pages et composants nettoyés : `Footer`, `Header`, `Modal`,
+  `AdminLayout`, `index.css`, `lib/supabase.ts`, `LegalPages`,
+  `AccountPage`, `HomePage`, `ReservationDetailPage`, `AdminDashboard`,
+  `AdminDiscounts`, `AdminEmailTemplates`, `AdminHelp`, `AdminReservations`,
+  `AdminStaff`, `StaffScanner`, `StaffHistory`.
+- Les cases vides des tableaux d'administration affichent « · » (et non
+  plus un cadratin).
+
+#### E-mails et fonctions Edge (`supabase/functions/`)
+
+- `send-confirmation-email` : objet par défaut, plage horaire et pied de
+  page corrigés.
+- `process-notifications` : plage horaire des rappels et reports corrigée.
+- `create-checkout-session` : libellé et description du produit Stripe.
+- `scan-qr`, `send-reminders` : commentaires nettoyés.
+
+> ⚠️ Action manuelle requise après déploiement : redéployer les fonctions
+> `send-confirmation-email` et `process-notifications` (les modifications
+> ne prennent effet qu'après redéploiement). Les modèles d'e-mails stockés
+> en base (`email_templates`) gardent les anciens textes tant qu'ils n'ont
+> pas été réenregistrés : vérifier l'objet de la confirmation côté
+> back-office si besoin.
+
+#### Outillage
+
+- Ajout de `eslint.config.js` (flat config ESLint 9) : `npm run lint`
+  fonctionne désormais. Couvre `src/` (TypeScript + React, hooks et
+  react-refresh). Dépendances de dev ajoutées : `@eslint/js`,
+  `typescript-eslint`, `eslint-plugin-react-hooks`,
+  `eslint-plugin-react-refresh`, `globals`.
+- Le lint passe sans erreur (10 avertissements résiduels non bloquants :
+  `any` de typage Supabase et directives `eslint-disable` obsolètes, à
+  resserrer ultérieurement).
+
 ## [1.4.3] (2026-05-29)
 
 ### 🗓️ Horaires confirmés et génération de la saison

@@ -105,7 +105,7 @@ export function AdminDiscounts() {
                   <td className="px-4 py-3">{c.kind === 'percent' ? `−${c.value} %` : `−${formatPrice(c.value)}`}</td>
                   <td className="px-4 py-3">{c.used_count}{c.max_uses != null ? ` / ${c.max_uses}` : ''}</td>
                   <td className="px-4 py-3 text-xs text-slate-500">
-                    {c.valid_from ? `dès le ${c.valid_from.slice(0, 10)}` : '—'}{c.valid_until ? ` → ${c.valid_until.slice(0, 10)}` : ''}
+                    {c.valid_from ? `dès le ${c.valid_from.slice(0, 10)}` : '·'}{c.valid_until ? ` → ${c.valid_until.slice(0, 10)}` : ''}
                   </td>
                   <td className="px-4 py-3">
                     {c.active ? <span className="badge-success">Actif</span> : <span className="badge-muted">Inactif</span>}

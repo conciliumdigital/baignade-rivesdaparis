@@ -46,7 +46,7 @@ export function Footer() {
 
       <div className="border-t border-slate-800">
         <div className="container-app py-5 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-          <span>© {new Date().getFullYear()} Commune de Neuilly-sur-Marne — Tous droits réservés.</span>
+          <span>© {new Date().getFullYear()} Commune de Neuilly-sur-Marne. Tous droits réservés.</span>
           <span>Réalisé par CONCILIUM · v{APP_VERSION}</span>
         </div>
       </div>

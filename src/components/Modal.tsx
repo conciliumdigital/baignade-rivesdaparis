@@ -1,7 +1,7 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 
 // =====================================================================
-// Modal accessible — focus trap, Escape, aria-modal, restauration focus
+// Modal accessible : focus trap, Escape, aria-modal, restauration focus
 // Conforme RGAA 7.1 / WCAG 2.1.2 + 2.4.3.
 // =====================================================================
 

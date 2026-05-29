@@ -1,11 +1,11 @@
 // Edge Function: send-reminders
-// Cron quotidien (J-1) + horaire (H-1) — scanne les réservations
+// Cron quotidien (J-1) + horaire (H-1) : scanne les réservations
 // CONFIRMÉES dont le créneau démarre dans la fenêtre cible et insère
 // une ligne dans `notification_log` (template reminder_j1 ou reminder_h1)
 // si pas déjà envoyée. L'envoi effectif est fait par process-notifications.
 //
 // Idempotence : on filtre les réservations qui ont déjà une notif
-// `sent` du même template — un rejeu ne double pas les e-mails.
+// `sent` du même template : un rejeu ne double pas les e-mails.
 //
 // Fenêtres (UTC) :
 //   J-1 : créneau ∈ [now+23h, now+25h]   → planifier 1×/jour à 18h CET

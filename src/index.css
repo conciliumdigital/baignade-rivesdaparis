@@ -21,7 +21,7 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Titres éditoriaux (serif Fraunces) — identité civique */
+  /* Titres éditoriaux (serif Fraunces), identité civique */
   h1, h2, h3 {
     @apply font-display tracking-tight text-slate-900;
     font-optical-sizing: auto;

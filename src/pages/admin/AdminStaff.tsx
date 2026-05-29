@@ -92,7 +92,7 @@ function InviteModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =>
     const target = email.trim().toLowerCase();
     if (!target) return;
     if (role === 'admin' && !isAdmin) {
-      // Garde-fou UI redondant avec la RLS — les gestionnaires ne doivent
+      // Garde-fou UI redondant avec la RLS : les gestionnaires ne doivent
       // pas pouvoir promouvoir admin via l'interface.
       toast.error('Seul un administrateur peut attribuer le rôle d\'administrateur.');
       return;

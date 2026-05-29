@@ -1,5 +1,5 @@
 -- =====================================================================
--- Baignade Rives d'Paris — Schéma initial
+-- Baignade Rives d'Paris : Schéma initial
 -- Commune de Neuilly-sur-Marne x CONCILIUM
 -- =====================================================================
 

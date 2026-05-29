@@ -1,5 +1,5 @@
 -- =====================================================================
--- DEMO — Partie B : back-office (OPTIONNEL / AVANCÉ)
+-- DEMO, Partie B : back-office (OPTIONNEL / AVANCÉ)
 -- =====================================================================
 -- À exécuter APRÈS 01_seed_slots.sql, dans le SQL Editor Supabase.
 --
@@ -7,7 +7,7 @@
 -- alimenter le TABLEAU DE BORD admin (réservations, recettes, no-show,
 -- note moyenne), la liste des réservations et la page satisfaction.
 --
--- 🔒 SÉCURITÉ — Les comptes de démo sont VOLONTAIREMENT NON CONNECTABLES :
+-- 🔒 SÉCURITÉ · Les comptes de démo sont VOLONTAIREMENT NON CONNECTABLES :
 --    aucun mot de passe (pas de `encrypted_password`) ET `banned_until`
 --    fixé en 2999 → GoTrue refuse toute connexion (mot de passe ET magic
 --    link). Ils servent uniquement de propriétaires FK pour les données
@@ -30,7 +30,7 @@
 begin;
 
 -- ---------------------------------------------------------------------
--- 1) Usagers de démo (auth.users) — le trigger crée les profils
+-- 1) Usagers de démo (auth.users) : le trigger crée les profils
 -- ---------------------------------------------------------------------
 insert into auth.users (
   instance_id, id, aud, role, email, banned_until,
@@ -105,18 +105,18 @@ insert into public.satisfaction_responses
   (reservation_id, user_id, rating_overall, rating_cleanliness, rating_staff, comment, nps)
 select r.id, r.user_id, v.ro, v.rc, v.rs, v.cmt, v.nps
 from (values
-  ('DEMO-0001', 5,5,5,'DEMO — Super après-midi, eau impeccable et personnel adorable !',10),
-  ('DEMO-0002', 4,4,5,'DEMO — Très bien organisé, le QR code à l''entrée est pratique.',9),
-  ('DEMO-0006', 5,4,5,'DEMO — Tarif habitant très appréciable, on reviendra en famille.',10),
-  ('DEMO-0011', 3,3,4,'DEMO — Bien mais un peu de monde sur le créneau de 10h.',7),
-  ('DEMO-0003', 5,5,4,'DEMO — Réservation en 2 minutes, parfait pour les parents.',9),
-  ('DEMO-0009', 4,5,4,'DEMO — Site agréable, vestiaires propres.',8),
-  ('DEMO-0013', 2,3,3,'DEMO — Créneau écourté pour cause de météo, remboursement reçu rapidement.',6),
-  ('DEMO-0016', 5,5,5,'DEMO — Rien à redire, expérience au top.',10)
+  ('DEMO-0001', 5,5,5,'DEMO · Super après-midi, eau impeccable et personnel adorable !',10),
+  ('DEMO-0002', 4,4,5,'DEMO · Très bien organisé, le QR code à l''entrée est pratique.',9),
+  ('DEMO-0006', 5,4,5,'DEMO · Tarif habitant très appréciable, on reviendra en famille.',10),
+  ('DEMO-0011', 3,3,4,'DEMO · Bien mais un peu de monde sur le créneau de 10h.',7),
+  ('DEMO-0003', 5,5,4,'DEMO · Réservation en 2 minutes, parfait pour les parents.',9),
+  ('DEMO-0009', 4,5,4,'DEMO · Site agréable, vestiaires propres.',8),
+  ('DEMO-0013', 2,3,3,'DEMO · Créneau écourté pour cause de météo, remboursement reçu rapidement.',6),
+  ('DEMO-0016', 5,5,5,'DEMO · Rien à redire, expérience au top.',10)
 ) as v(reference,ro,rc,rs,cmt,nps)
 join public.reservations r on r.reference = v.reference
 where not exists (
-  select 1 from public.satisfaction_responses where comment like 'DEMO —%'
+  select 1 from public.satisfaction_responses where comment like 'DEMO ·%'
 );
 
 commit;
@@ -127,4 +127,4 @@ select
   (select coalesce(sum(total_amount_cents),0) from public.reservations
      where reference like 'DEMO-%' and status in ('confirmed','used')) as recettes_cts,
   (select count(*) from public.reservations where reference like 'DEMO-%' and status='no_show') as no_show,
-  (select round(avg(rating_overall),2) from public.satisfaction_responses where comment like 'DEMO —%') as note_moy;
+  (select round(avg(rating_overall),2) from public.satisfaction_responses where comment like 'DEMO ·%') as note_moy;

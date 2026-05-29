@@ -1,4 +1,4 @@
-# 🏊‍♀️ HANDOFF — Baignade Rives d'Paris
+# 🏊‍♀️ HANDOFF : Baignade Rives d'Paris
 
 > Document de reprise du projet. Tout ce qu'il faut savoir pour continuer depuis une nouvelle machine, un nouveau collaborateur, ou après une pause.
 
@@ -12,7 +12,7 @@
 
 ---
 
-## 1. État actuel — Quick-look
+## 1. État actuel : Quick-look
 
 | Composant | Statut | URL / Référence |
 |---|---|---|
@@ -28,11 +28,11 @@
 | **Emails transactionnels** | ⏳ Prêt, non actif | Code OK ; nécessite Stripe (déclencheur) + domaine Brevo vérifié |
 | **Vérification domaine Brevo** | ⏳ À finaliser | DNS TXT (SPF + DKIM + Brevo code) à ajouter chez le registrar |
 | **Paiement Stripe** | ⏳ En attente | Client doit créer son compte commune |
-| **Coût mensuel actuel** | **0 €/mois** | — |
+| **Coût mensuel actuel** | **0 €/mois** | · |
 
 ---
 
-## 1bis. 🔖 Reprise — état au 2026-05-19 (fin de session)
+## 1bis. 🔖 Reprise : état au 2026-05-19 (fin de session)
 
 > Lire **en premier** en reprenant le projet. Beaucoup de choses ont été
 > livrées ; voici l'état exact et la **seule action en attente**.
@@ -69,7 +69,7 @@ Exécuter dans le **SQL Editor** Supabase :
 pas). Sans ça : page `/admin/reductions` affiche « migration à exécuter »
 et les codes promo ne fonctionnent pas. Rien à redéployer côté Edge.
 
-### 🧾 Migrations SQL — état d'application
+### 🧾 Migrations SQL : état d'application
 | Migration | Appliquée en prod ? |
 |---|---|
 | `20260505000000_initial_schema` | ✅ |
@@ -78,7 +78,7 @@ et les codes promo ne fonctionnent pas. Rien à redéployer côté Edge.
 | `20260519100000_email_templates` | ✅ |
 | `20260519200000_discount_codes` | ⏳ **À EXÉCUTER** |
 
-### 🔌 Edge Functions — état de déploiement
+### 🔌 Edge Functions : état de déploiement
 `scan-qr` ✅ redéployée (version sécurisée) · `send-confirmation-email`
 ✅ redéployée (templates) · `create-checkout-session` / `stripe-webhook`
 inchangées (attendent Stripe).
@@ -91,7 +91,7 @@ inchangées (attendent Stripe).
 
 ### 🚧 Bloquants restants (hors code, côté mairie / décision)
 - **Stripe** : compte commune à créer (paiement réel + remboursements).
-  Tant qu'absent : aucune réservation confirmée, aucun e-mail (normal —
+  Tant qu'absent : aucune réservation confirmée, aucun e-mail (normal,
   pas de confirmation sans paiement).
 - **Brevo** : domaine `lesrivesdeparis.fr` à vérifier (SPF/DKIM chez OVH).
 - **Capacité réelle** par créneau (200 provisoire) à confirmer après
@@ -100,7 +100,7 @@ inchangées (attendent Stripe).
   bug d'affichage « -50 % » volontairement laissé, exclu par Thomas).
 - **Validation juridique DPO** (CGU / mentions / RGPD).
 - **Phase 2** : module d'inscription en ligne aux **cours de natation**
-  (groupes 6-9 / 10-14, cohortes de 6, 3×/sem alternance 2 sem) — spec
+  (groupes 6-9 / 10-14, cohortes de 6, 3×/sem alternance 2 sem), spec
   capturée, chantier dédié à cadrer.
 
 ---
@@ -113,25 +113,25 @@ inchangées (attendent Stripe).
 |---|---|---|
 | **Supabase** | `baignade-rivesdaparis@tk7.fr` | https://supabase.com/dashboard/project/nunglkeqekxzpmushxty |
 | **GitHub** | `conciliumdigital` | https://github.com/conciliumdigital/baignade-rivesdaparis |
-| **Netlify** | (à compléter) | https://app.netlify.com — site `exquisite-sable-8f9d45` |
+| **Netlify** | (à compléter) | https://app.netlify.com (site `exquisite-sable-8f9d45`) |
 | **Brevo** | `baignade-rivesdaparis@tk7.fr` | https://app.brevo.com |
 | **Stripe** | ⏳ à créer par le client (Mairie) | https://dashboard.stripe.com |
-| **DNS `lesrivesdeparis.fr`** | OVH | Zone DNS 100 % chez OVH — CNAME `baignade` → `exquisite-sable-8f9d45.netlify.app` |
+| **DNS `lesrivesdeparis.fr`** | OVH | Zone DNS 100 % chez OVH : CNAME `baignade` → `exquisite-sable-8f9d45.netlify.app` |
 
-### 2.2 Secrets sensibles (à stocker dans Bitwarden / 1Password — NE JAMAIS commiter)
+### 2.2 Secrets sensibles (à stocker dans Bitwarden / 1Password, NE JAMAIS commiter)
 
 Voir le message de chat du 11/05/2026 ou ton gestionnaire de mots de passe.
 
 À sauvegarder :
-- Supabase **access token** (`sbp_...`) — pour la CLI/déploiement
-- Supabase **service_role key** — pour les opérations admin
-- Supabase **DB password** — généré à la création du projet
+- Supabase **access token** (`sbp_...`) : pour la CLI/déploiement
+- Supabase **service_role key** : pour les opérations admin
+- Supabase **DB password** : généré à la création du projet
 - **Brevo API key** (`xkeysib-...`)
 - (À venir) Stripe **secret key**, **webhook secret**
 
 ### 2.3 Clés publiques (peuvent être versionnées dans la doc)
 
-Ces clés sont par design exposables au public (côté front) — pas un secret :
+Ces clés sont par design exposables au public (côté front), pas un secret :
 
 ```
 SUPABASE_URL          = https://nunglkeqekxzpmushxty.supabase.co
@@ -251,27 +251,27 @@ baignade-rivesdaparis/
 └── nginx.conf
 ```
 
-### 4.3 Schéma SQL — tables principales
+### 4.3 Schéma SQL : tables principales
 
-- `profiles` — utilisateurs étendus (rôle, RGPD, notifs)
-- `slots` — créneaux 2h, capacité, prix, statut
-- `slot_availability` (view) — places restantes en temps réel
-- `reservations` — résa avec QR token, statut, Stripe IDs
-- `scan_log` — historique scans QR par le staff
-- `waitlist` — liste d'attente
-- `satisfaction_responses` — avis post-visite
-- `email_campaigns` — communication ciblée
-- `notification_log` — historique des emails envoyés
-- `site_settings` — config dynamique de la commune
-- `email_templates` — modèles d'e-mails auto éditables (back-office)
-- `discount_codes` — codes de réduction (% ou fixe, usages, validité)
+- `profiles` : utilisateurs étendus (rôle, RGPD, notifs)
+- `slots` : créneaux 2h, capacité, prix, statut
+- `slot_availability` (view) : places restantes en temps réel
+- `reservations` : résa avec QR token, statut, Stripe IDs
+- `scan_log` : historique scans QR par le staff
+- `waitlist` : liste d'attente
+- `satisfaction_responses` : avis post-visite
+- `email_campaigns` : communication ciblée
+- `notification_log` : historique des emails envoyés
+- `site_settings` : config dynamique de la commune
+- `email_templates` : modèles d'e-mails auto éditables (back-office)
+- `discount_codes` : codes de réduction (% ou fixe, usages, validité)
 
 RLS active sur toutes les tables. Helpers `is_admin()` / `is_staff_or_admin()`.
 **Triggers de sécurité** (migration `20260519000000_harden_rls`) :
 `prevent_privilege_self_escalation` (profiles), `secure_reservation_insert`
 (recalcul du total serveur + remise), `secure_reservation_update`
 (usager limité à l'annulation). `reservations.total_amount_cents` n'est
-**jamais** fiable depuis le client — recalculé par le trigger.
+**jamais** fiable depuis le client, recalculé par le trigger.
 
 ### 4.4 Edge Functions
 
@@ -293,7 +293,7 @@ RLS active sur toutes les tables. Helpers `is_admin()` / `is_staff_or_admin()`.
 
 ### 5.1 ⏳ À faire (par toi)
 
-- [x] ✅ **Domaine `baignade.lesrivesdeparis.fr` en ligne** — FAIT
+- [x] ✅ **Domaine `baignade.lesrivesdeparis.fr` en ligne** : FAIT
   - Hébergement Netlify, domaine ajouté dans Netlify → Domain management
   - Zone DNS 100 % chez **OVH** : un seul `CNAME` `baignade` → `exquisite-sable-8f9d45.netlify.app`
   - SSL Let's Encrypt provisionné automatiquement par Netlify (actif et valide)
@@ -317,7 +317,7 @@ RLS active sur toutes les tables. Helpers `is_admin()` / `is_staff_or_admin()`.
     ```
   - (Tu dois d'abord t'être connecté une fois via Magic Link pour que le profil soit auto-créé par le trigger)
 
-- [x] ✅ **Créneaux de la saison générés** — modèle réel confirmé par la
+- [x] ✅ **Créneaux de la saison générés** : modèle réel confirmé par la
   commune (semaine vs week-end, créneau 1 €, 10-11 privé). Script de
   référence versionné : **`supabase/season_2026.sql`** (idempotent, tag
   `notes='SAISON2026'`). Pour régénérer/étendre : ré-exécuter ce script,
@@ -325,7 +325,7 @@ RLS active sur toutes les tables. Helpers `is_admin()` / `is_staff_or_admin()`.
 
 - [ ] **⏳ Exécuter la migration codes de réduction**
   `supabase/migrations/20260519200000_discount_codes.sql` dans le SQL
-  Editor (seule migration en attente — voir §1bis).
+  Editor (seule migration en attente, voir §1bis).
 
 ### 5.2 ⏳ En attente du client (Mairie de Neuilly-sur-Marne)
 
@@ -388,8 +388,8 @@ export SUPABASE_ACCESS_TOKEN=sbp_xxx
 touch supabase/migrations/$(date +%Y%m%d%H%M%S)_description.sql
 
 # L'écrire, puis l'appliquer :
-# Option A — copier-coller dans SQL Editor du dashboard Supabase
-# Option B — via la CLI (nécessite db push + DB password)
+# Option A : copier-coller dans SQL Editor du dashboard Supabase
+# Option B : via la CLI (nécessite db push + DB password)
 ~/.local/bin/supabase db push --project-ref nunglkeqekxzpmushxty
 ```
 
@@ -410,7 +410,7 @@ touch supabase/migrations/$(date +%Y%m%d%H%M%S)_description.sql
 ### 7.2 Test admin
 
 1. Se connecter via Magic Link (email reçu via SMTP Supabase)
-2. Aller sur `/admin` — accessible si rôle `admin` ou `manager`
+2. Aller sur `/admin` : accessible si rôle `admin` ou `manager`
 3. Onglets : Tableau de bord, Créneaux, Réservations, Communication, Satisfaction, Équipe, Paramètres
 
 ### 7.3 Test staff scanner

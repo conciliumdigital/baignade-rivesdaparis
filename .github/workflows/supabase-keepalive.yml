@@ -4,7 +4,7 @@ name: Supabase Keep-Alive
 # après 7 jours SANS ACTIVITÉ BASE DE DONNÉES).
 #
 # ⚠️ Le timer d'inactivité se base sur l'activité BASE, pas sur les hits
-# du gateway REST/Auth. Une simple lecture (`select`) ne suffit PAS — le
+# du gateway REST/Auth. Une simple lecture (`select`) ne suffit PAS : le
 # job a renvoyé HTTP 200 dix jours d'affilée et le mail de pause est
 # quand même arrivé. On déclenche donc une vraie ÉCRITURE via la RPC
 # `keepalive()` (UPSERT d'une ligne unique). Voir la migration
@@ -39,7 +39,7 @@ jobs:
       SUPABASE_URL: "https://nunglkeqekxzpmushxty.supabase.co"
       SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY || 'sb_publishable_XHasVadnhVZMoispGMq3aA_GdZEs8xy' }}
     steps:
-      - name: Heartbeat — ecriture reelle via RPC keepalive()
+      - name: Heartbeat, ecriture reelle via RPC keepalive()
         run: |
           set -euo pipefail
           code=$(curl -s -o /tmp/rpc.json -w "%{http_code}" \
@@ -57,7 +57,7 @@ jobs:
             exit 1
           fi
           if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
-            echo "::error::RPC keepalive() a repondu $code (attendu 2xx) — la base est peut-etre en pause."
+            echo "::error::RPC keepalive() a repondu $code (attendu 2xx), la base est peut-etre en pause."
             exit 1
           fi
 
@@ -75,4 +75,4 @@ jobs:
           fi
 
       - name: Resume
-        run: echo "Ecriture heartbeat OK — timer d'inactivite reinitialise ($(date -u +'%Y-%m-%dT%H:%M:%SZ'))."
+        run: echo "Ecriture heartbeat OK : timer d'inactivite reinitialise ($(date -u +'%Y-%m-%dT%H:%M:%SZ'))."

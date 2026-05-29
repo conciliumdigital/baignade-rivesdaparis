@@ -1,5 +1,5 @@
 -- =====================================================================
--- DURCISSEMENT SÉCURITÉ — RLS / triggers (audit 2026-05-19)
+-- DURCISSEMENT SÉCURITÉ : RLS / triggers (audit 2026-05-19)
 -- =====================================================================
 -- Corrige 3 failles confirmées par l'audit :
 --  - Vuln 1 (CRITIQUE) : escalade de privilège. La policy
@@ -19,7 +19,7 @@
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
--- Vuln 1 — profiles : interdire l'auto-modification de role / is_resident
+-- Vuln 1, profiles : interdire l'auto-modification de role / is_resident
 -- ---------------------------------------------------------------------
 create or replace function public.prevent_privilege_self_escalation()
 returns trigger as $$
@@ -51,7 +51,7 @@ create policy profiles_update_own on public.profiles for update
   with check (auth.uid() = id or public.is_admin());
 
 -- ---------------------------------------------------------------------
--- Vuln 2 — reservations : recalcul serveur du montant à l'INSERT usager
+-- Vuln 2, reservations : recalcul serveur du montant à l'INSERT usager
 -- ---------------------------------------------------------------------
 create or replace function public.secure_reservation_insert()
 returns trigger as $$
@@ -105,7 +105,7 @@ create trigger trg_reservations_secure_insert
   for each row execute function public.secure_reservation_insert();
 
 -- ---------------------------------------------------------------------
--- Vuln 3 — reservations : un usager ne peut qu'ANNULER sa résa
+-- Vuln 3, reservations : un usager ne peut qu'ANNULER sa résa
 -- ---------------------------------------------------------------------
 create or replace function public.secure_reservation_update()
 returns trigger as $$

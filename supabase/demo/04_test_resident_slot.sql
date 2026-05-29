@@ -1,5 +1,5 @@
 -- =====================================================================
--- TEST — Créneau « tarif habitant » pour valider le formulaire usager
+-- TEST : Créneau « tarif habitant » pour valider le formulaire usager
 -- =====================================================================
 -- À coller dans le SQL Editor Supabase :
 --   https://supabase.com/dashboard/project/nunglkeqekxzpmushxty/sql/new
@@ -28,7 +28,7 @@ where notes = 'TEST' and date = current_date + 7;
 
 -- ► COMMENT TESTER LE FORMULAIRE TARIF HABITANT
 --   1. Ouvrez https://baignade.lesrivesdeparis.fr/reserver
---   2. Choisissez le créneau daté dans 7 jours, 14h–16h.
+--   2. Choisissez le créneau daté dans 7 jours, 14h à 16h.
 --   3. Dans le formulaire, cliquez la carte « Tarif habitant »
 --      (par défaut « Tarif extérieur » est sélectionné).
 --      → Apparaissent : l'upload du justificatif (JPG/PNG/WEBP/PDF, 5 Mo)

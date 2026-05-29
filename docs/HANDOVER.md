@@ -1,4 +1,4 @@
-# Note technique de reprise — Baignade Rives d'Paris
+# Note technique de reprise : Baignade Rives d'Paris
 
 > Snapshot technique à jour, destiné à la continuité du développement chez CONCILIUM.
 > Pour l'historique détaillé et le runbook de déploiement, voir `HANDOFF.md`, `DEPLOY.md` et `CHANGELOG.md` à la racine du dépôt.
@@ -141,7 +141,7 @@ Les migrations sont appliquées manuellement par Thomas dans le SQL Editor Supab
 
 - Communication en français, registre soutenu et professionnel.
 - Écriture inclusive interdite (pas de point médian ni de doublets) : masculin générique.
-- Tirets cadratin et demi-cadratin interdits (« — » et « – »). Utiliser deux-points, parenthèses, virgules ou puces. Le trait d'union « - » reste réservé aux mots composés (Neuilly-sur-Marne).
+- Tirets cadratin et demi-cadratin interdits, ni comme séparateur ni dans un titre. Utiliser deux-points, parenthèses, virgules ou puces. Le trait d'union « - » reste réservé aux mots composés (Neuilly-sur-Marne).
 
 ---
 

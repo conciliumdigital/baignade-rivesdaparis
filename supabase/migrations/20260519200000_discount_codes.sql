@@ -1,9 +1,9 @@
 -- =====================================================================
--- Codes de réduction — sécurisé côté serveur
+-- Codes de réduction : sécurisé côté serveur
 -- =====================================================================
 -- La remise est appliquée AUTORITAIREMENT par le trigger d'insertion
 -- (cohérent avec le durcissement anti-fraude tarifaire). Le formulaire
--- ne fait qu'un APERÇU via la fonction compute_discount() — même source
+-- ne fait qu'un APERÇU via la fonction compute_discount(), même source
 -- de vérité que le trigger. Idempotent.
 -- =====================================================================
 

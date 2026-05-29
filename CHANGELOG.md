@@ -4,14 +4,55 @@ Toutes les modifications notables apportées à ce projet sont documentées ici.
 Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 versioning [SemVer](https://semver.org/lang/fr/).
 
+## [1.4.5] (2026-05-29)
+
+### ✍️ Typographie : tirets cadratin et demi-cadratin purgés du dépôt entier
+
+Extension de la consigne de rédaction (aucun tiret cadratin « — » ni
+demi-cadratin « – », ni comme séparateur, ni dans un titre) à l'ensemble
+du dépôt. La version 1.4.4 avait nettoyé le code applicatif (`src/`) et
+les fonctions Edge ; cette version traite tout le reste afin qu'un
+contrôle `grep` sur la totalité du dépôt ne remonte plus aucune
+occurrence.
+
+#### Documentation et configuration
+
+- `README.md`, `DEPLOY.md`, `docs/HANDOVER.md`, `HANDOFF.md`,
+  `supabase/demo/README.md` : titres, listes et tableaux nettoyés
+  (deux-points, virgules, parenthèses ou point médian « · » selon le
+  contexte).
+- `CHANGELOG.md` : en-têtes de version (« · » entre numéro et date),
+  plages horaires (« à »), tranches d'âge et séparateurs internes.
+- Fichiers de configuration et d'industrialisation : `index.html`,
+  `netlify.toml`, `Dockerfile`, `tailwind.config.js`,
+  `.github/workflows/supabase-keepalive.yml`.
+
+#### Base de données (commentaires et libellés)
+
+- `supabase/season_2026.sql`, l'ensemble des migrations
+  (`supabase/migrations/`) et les scripts de démonstration/test
+  (`supabase/demo/`) : commentaires et libellés assainis. Les paires
+  seed/cleanup de démonstration restent cohérentes (le séparateur
+  `'DEMO ·'` est aligné entre l'insertion et la purge `LIKE`).
+
+> ℹ️ Seul changement servi en production : les balises `<title>`,
+> Open Graph et Twitter de `index.html`. Le reste (documentation,
+> commentaires SQL, configuration) n'a aucun impact fonctionnel.
+>
+> ⚠️ Le texte par défaut des modèles d'e-mails modifié dans les fichiers
+> de migration (`email_templates`, `content_update`) ne met pas à jour la
+> base déjà en service : réenregistrer les modèles depuis le back-office
+> ou réexécuter le script pour propager le changement.
+
 ## [1.4.4] (2026-05-29)
 
 ### ✍️ Typographie : suppression de tous les tirets cadratin et demi-cadratin
 
-Application stricte de la consigne de rédaction (jamais de « — » ni de
-« – », ni comme séparateur, ni dans un titre ou un objet). Tous les
-occurrences ont été remplacées par un signe adapté au contexte (deux-points,
-virgule, parenthèses, point médian « · », ou « à » pour les plages horaires).
+Application stricte de la consigne de rédaction (jamais de tiret cadratin
+ni de tiret demi-cadratin, ni comme séparateur, ni dans un titre ou un
+objet). Toutes les occurrences ont été remplacées par un signe adapté au
+contexte (deux-points, virgule, parenthèses, point médian « · », ou « à »
+pour les plages horaires).
 
 #### Front (`src/`)
 
@@ -102,7 +143,7 @@ Horaires définitifs transmis par la mairie le 2026-05-29 :
 > n'est pas un prix par créneau ; il se gère hors créneau (code de
 > réduction ou logique de réservation).
 
-## [1.4.2] — 2026-05-28
+## [1.4.2] · 2026-05-28
 
 ### 🏛️ Mise à jour de contenu opérationnel (cahier des charges mairie)
 
@@ -138,7 +179,7 @@ Synchronisation du site sur les informations transmises par la mairie :
 - **Accessibilité reformulée** : « Service accessible aux personnes
   en situation de handicap » → **« Mise à l&apos;eau adaptée pour les
   personnes à mobilité réduite »** (HomePage, InfosPage).
-- **Affaires personnelles — vigilance** : suppression de la mention
+- **Affaires personnelles, vigilance** : suppression de la mention
   « casiers gratuits sur place » (qui n&apos;existent pas) et ajout
   d&apos;un encart de vigilance : « Aucun casier n&apos;est mis à
   disposition. Chaque usager est responsable de ses affaires. Il est
@@ -162,16 +203,16 @@ Synchronisation du site sur les informations transmises par la mairie :
 > gratuit) et ne PAS créer ceux de 10 h, 12 h ni 14 h (inauguration
 > en cours).
 
-## [1.4.1] — 2026-05-28
+## [1.4.1] · 2026-05-28
 
-### ♿ /staff — recherche par nom (3e voie d'accès accessible)
+### ♿ /staff : recherche par nom (3e voie d'accès accessible)
 
 Suite à l&apos;audit RGAA v1.4.0, troisième mode d&apos;entrée ajouté au
 scanner d&apos;accueil en complément du scan caméra et de la saisie
 clavier du code : **recherche par nom**.
 
 - Nouvel onglet « Nom » dans `/staff` (en plus de « Caméra » et
-  « Code ») — un agent non voyant équipé d&apos;un lecteur d&apos;écran
+  « Code »), un agent non voyant équipé d&apos;un lecteur d&apos;écran
   peut désormais valider une entrée en tapant simplement le nom de la
   personne plutôt qu&apos;un long token alphanumérique. Bénéfice
   collatéral : plus rapide aussi pour un agent voyant lorsque le QR
@@ -182,7 +223,7 @@ clavier du code : **recherche par nom**.
   - exige authentification + rôle staff/admin/manager (fail-closed
     sinon) ;
   - filtre AUTORITAIREMENT sur la date du jour en Europe/Paris et les
-    statuts occupants — l&apos;agent ne voit jamais l&apos;historique
+    statuts occupants, l&apos;agent ne voit jamais l&apos;historique
     complet (minimisation PII, RGPD) ;
   - exige une requête ≥ 2 caractères et limite à 20 résultats
     (anti-énumération) ;
@@ -200,9 +241,9 @@ clavier du code : **recherche par nom**.
 > de la v1.4.0). Tant qu&apos;elle n&apos;est pas appliquée, le mode
 > « Nom » affichera « Aucune réservation correspondante ».
 
-## [1.4.0] — 2026-05-28
+## [1.4.0] · 2026-05-28
 
-### 🛡️ Corrections d'audit complet — six axes
+### 🛡️ Corrections d'audit complet : six axes
 
 Synthèse de six audits internes menés en parallèle (sécurité,
 parcours quotidien, back-office, UX/responsive, messages d&apos;erreur,
@@ -216,7 +257,7 @@ l&apos;ouverture publique du 4 juillet.
   fonctions `SECURITY DEFINER` héritées du schéma initial
   (`handle_new_user`, `is_admin`, `is_staff_or_admin`,
   `prevent_privilege_self_escalation`, `secure_reservation_insert`,
-  `secure_reservation_update`, `redeem_discount_after_insert`) —
+  `secure_reservation_update`, `redeem_discount_after_insert`),
   parade contre le shadowing de schéma signalé par le linter Supabase.
 - **Content-Security-Policy stricte** ajoutée dans `netlify.toml`
   (default-src 'self' + allowlist Supabase / Stripe ; `frame-ancestors
@@ -225,7 +266,7 @@ l&apos;ouverture publique du 4 juillet.
   caller doit être propriétaire de la réservation ou staff/admin),
   vérification JWT, CORS restreint au domaine de production.
 - **`process-notifications`** : exige désormais un `Authorization:
-  Bearer <CRON_SECRET>` (ou la service role key) — l&apos;endpoint
+  Bearer <CRON_SECRET>` (ou la service role key), l&apos;endpoint
   n&apos;est plus appelable par anon, ce qui neutralise un vecteur
   d&apos;épuisement de la quota Brevo et de déclenchement prématuré
   des rappels.
@@ -347,7 +388,7 @@ l&apos;ouverture publique du 4 juillet.
   des droits avec liens et adresse postale).
 - **Mention obligatoire** « Accessibilité : non conforme » ajoutée
   au pied de page.
-- **`/staff` — alternative manuelle au scan caméra** : champ de
+- **`/staff`, alternative manuelle au scan caméra** : champ de
   saisie clavier du code de réservation (RGAA 7, exclusion
   non-voyants / pas de caméra levée).
 - **`CookieBanner`** : refonte accessible (`aria-modal`, piège à
@@ -377,15 +418,15 @@ l&apos;ouverture publique du 4 juillet.
 >   message clair (« Réservation introuvable » / RPC absente) ;
 > - le keep-alive Supabase continue de tourner sans rate-limit.
 
-## [1.3.5] — 2026-05-27
+## [1.3.5] · 2026-05-27
 
-### 🟢 Anti-pause Supabase — battement de cœur en écriture
+### 🟢 Anti-pause Supabase : battement de cœur en écriture
 
 Correction du keep-alive : le projet recevait quand même le mail
 « bientôt mis en pause » alors que le job quotidien renvoyait HTTP 200
 depuis 10 jours. Cause : le timer d'inactivité 7 jours du Free tier se
 base sur l'**activité base de données** (écritures/requêtes réelles),
-pas sur les hits du gateway REST/Auth — une simple lecture (`select`)
+pas sur les hits du gateway REST/Auth, une simple lecture (`select`)
 sur une vue ne réinitialise pas le compteur.
 
 - Nouvelle migration `20260527000000_keepalive.sql` : table
@@ -403,13 +444,13 @@ sur une vue ne réinitialise pas le compteur.
 > `supabase/migrations/20260527000000_keepalive.sql` dans le SQL Editor
 > Supabase, sinon la RPC reste introuvable (404) et le keep-alive échoue.
 
-## [1.3.4] — 2026-05-20
+## [1.3.4] · 2026-05-20
 
 ### ✍️ Masculin générique partout
 
 Suppression de toute trace d'écriture inclusive (point médian, doublets,
 parenthèses, tirets) dans l'ensemble de l'interface, des modèles d'e-mails
-et des messages serveur — application stricte de la préférence
+et des messages serveur, application stricte de la préférence
 linguistique de la commande.
 
 - Interface publique : « Nocéens » au lieu de « Nocéen·ne·s » /
@@ -425,12 +466,12 @@ linguistique de la commande.
   pas les valeurs). Garde-fou `raise notice` si une autre forme
   inclusive subsiste.
 
-## [1.3.3] — 2026-05-20
+## [1.3.3] · 2026-05-20
 
-### 📝 Saison 2026 — précisions client
+### 📝 Saison 2026 : précisions client
 
 - **Période d'ouverture corrigée** : du **4 juillet au 30 août 2026**
-  (au lieu de « juillet & août ») — accueil, infos pratiques, génération
+  (au lieu de « juillet & août »), accueil, infos pratiques, génération
   en masse des créneaux côté admin.
 - **Renommage « habitants » → « Nocéen·ne·s »** dans toute l'interface
   publique et le back-office : badge tarif, libellés de cartes, page
@@ -444,17 +485,17 @@ linguistique de la commande.
   4 juillet à 0,00 € pour tous (inauguration), suppression des créneaux
   du 31 août.
 
-## [1.3.2] — 2026-05-20
+## [1.3.2] · 2026-05-20
 
 ### 🧭 En-tête pleine largeur
 
 - La barre de navigation utilise désormais toute la largeur disponible
   (padding latéral `px-6 lg:px-10`) au lieu d'être contrainte par le
   conteneur `container-app` (max-width 1200 px). Logo collé à gauche,
-  actions à droite — plus aéré sur grands écrans. Le contenu des pages
+  actions à droite, plus aéré sur grands écrans. Le contenu des pages
   reste, lui, dans le conteneur classique.
 
-## [1.3.1] — 2026-05-20
+## [1.3.1] · 2026-05-20
 
 ### 🎨 Accent jaune solaire
 
@@ -464,15 +505,15 @@ linguistique de la commande.
   (`bg-slate-900`), titre du gabarit e-mail. Plus chaleureux, plus
   estival ; meilleur contraste sur bleu marine.
 
-## [1.3.0] — 2026-05-20
+## [1.3.0] · 2026-05-20
 
-### 🌊 Opérations saisonnières — liste d'attente, rappels auto, fermeture météo
+### 🌊 Opérations saisonnières : liste d'attente, rappels auto, fermeture météo
 
 Trois fonctionnalités demandées (#20, #21, #22) en un seul lot cohérent :
 - **Liste d'attente** : sur un créneau complet, la page de réservation
   bascule sur un formulaire « M'inscrire en liste d'attente »
   (nombre de personnes). RPC `join_waitlist` / `leave_waitlist` côté
-  serveur (SECURITY DEFINER) — le client ne peut pas s'inscrire
+  serveur (SECURITY DEFINER) : le client ne peut pas s'inscrire
   s'il reste des places, si le créneau est fermé ou passé.
   Section dédiée dans *Mon espace* : voir ses inscriptions, se désinscrire,
   réserver directement quand une place se libère.
@@ -507,7 +548,7 @@ Trois fonctionnalités demandées (#20, #21, #22) en un seul lot cohérent :
 > puis déployer les deux Edge Functions `process-notifications` et
 > `send-reminders`. Planifier les CRON Supabase (voir HANDOFF §3).
 
-## [1.2.1] — 2026-05-20
+## [1.2.1] · 2026-05-20
 
 ### 🎨 Accent couleur sur fonds sombres
 
@@ -518,9 +559,9 @@ Trois fonctionnalités demandées (#20, #21, #22) en un seul lot cohérent :
   fond `bg-slate-900`). Ressort vif sur fond bleu marine, contraste
   conservé pour l'accessibilité.
 
-## [1.2.0] — 2026-05-19
+## [1.2.0] · 2026-05-19
 
-### 🎨 Refonte design — direction institutionnelle & éditoriale
+### 🎨 Refonte design : direction institutionnelle & éditoriale
 
 Objectif : « dé-IA-iser » l'interface, identité plus civique, micro-effets.
 
@@ -531,7 +572,7 @@ Objectif : « dé-IA-iser » l'interface, identité plus civique, micro-effets.
   (apparition au scroll, IntersectionObserver), soulignés de liens
   animés (`.link-underline`), survol de cartes (`.card-hover`), retour
   tactile des boutons (press), apparition du hero (`fade-up` échelonné),
-  **transition de prix** (`<AnimatedPrice>` — le total du tunnel pulse à
+  **transition de prix** (`<AnimatedPrice>` : le total du tunnel pulse à
   chaque changement de quantité/code promo).
 - **Fix** : `.claude/launch.json` → `runtimeExecutable: "npm"` (PATH,
   portable) au lieu d'un chemin absolu Intel cassé sur Apple Silicon
@@ -545,16 +586,16 @@ Objectif : « dé-IA-iser » l'interface, identité plus civique, micro-effets.
   👋 espace compte, 🏊‍♀️ sujet de campagne).
 - Tout le back-office hérite des `.btn`/`.card`/typo affinés.
 
-## [1.1.9] — 2026-05-19
+## [1.1.9] · 2026-05-19
 
 ### 🎟️ Codes de réduction
 
 - Nouvelle table `discount_codes` (% ou montant fixe, usages max,
-  période de validité, montant minimum) — migration
+  période de validité, montant minimum), migration
   `20260519200000_discount_codes.sql` (RLS admin).
 - **Sécurité** : la remise est validée et appliquée **côté serveur**
   via la fonction `compute_discount()` (source unique de vérité) et le
-  trigger `secure_reservation_insert` étendu — le client ne peut pas
+  trigger `secure_reservation_insert` étendu : le client ne peut pas
   forcer une remise. Comptage des usages en `AFTER INSERT`.
 - **Formulaire de réservation** : champ « Code de réduction » +
   bouton Appliquer (aperçu via RPC : ligne remise + nouveau total).
@@ -563,15 +604,15 @@ Objectif : « dé-IA-iser » l'interface, identité plus civique, micro-effets.
   supprimer des codes, suivi des usages. Entrée de menu + route lazy.
 
 > ⚠️ Après merge : exécuter `20260519200000_discount_codes.sql`
-> (SQL Editor) puis redéployer (rien à redéployer côté Edge — la
+> (SQL Editor) puis redéployer (rien à redéployer côté Edge, la
 > logique est en base/trigger).
 
-## [1.1.8] — 2026-05-19
+## [1.1.8] · 2026-05-19
 
 ### ✏️ E-mails automatiques éditables (back-office)
 
 - Nouvelle table `email_templates` (5 modèles : confirmation, rappel
-  J-1/H-1, fermeture météo, satisfaction) — migration
+  J-1/H-1, fermeture météo, satisfaction), migration
   `20260519100000_email_templates.sql` (RLS admin, seed par défaut).
 - **Nouvelle page `/admin/emails`** : édition de l'objet + du corps via
   un **éditeur WYSIWYG** (zéro dépendance, contentEditable), aide
@@ -588,7 +629,7 @@ Objectif : « dé-IA-iser » l'interface, identité plus civique, micro-effets.
 > ⚠️ Après merge : exécuter `20260519100000_email_templates.sql`
 > (SQL Editor) puis redéployer `send-confirmation-email`.
 
-## [1.1.7] — 2026-05-19
+## [1.1.7] · 2026-05-19
 
 ### ✉️ E-mail de confirmation
 
@@ -606,9 +647,9 @@ Objectif : « dé-IA-iser » l'interface, identité plus civique, micro-effets.
 > chez Brevo** + secrets `FROM_EMAIL`/`FROM_NAME`. Redéployer la
 > fonction `send-confirmation-email` après merge.
 
-## [1.1.6] — 2026-05-19
+## [1.1.6] · 2026-05-19
 
-### 🛂 Contrôle d'accès — UX scan + aide
+### 🛂 Contrôle d'accès : UX scan + aide
 
 - **Scanner staff optimisé** : feedback **haptique (vibration)** +
   **bip distinct** OK / refus ; **reprise automatique du scan** après
@@ -620,13 +661,13 @@ Objectif : « dé-IA-iser » l'interface, identité plus civique, micro-effets.
 - **Nouvelle rubrique d'aide back-office** (`/admin/aide`) : guide
   complet du scan (mise en place, signification des couleurs, tarif
   habitant & justificatif, dépannage caméra/rôle/réseau) + entrée de
-  menu « Aide — Scan QR ».
+  menu « Aide : Scan QR ».
 - `scan-qr` appelé sans `scanned_by` côté client (identité dérivée du
-  JWT côté serveur — cohérent avec le durcissement sécurité).
+  JWT côté serveur, cohérent avec le durcissement sécurité).
 
-## [1.1.5] — 2026-05-17
+## [1.1.5] · 2026-05-17
 
-### 🔍 Audit complet — remédiation
+### 🔍 Audit complet : remédiation
 
 **Performance / temps de chargement**
 - `sourcemap:false` en prod (−2,8 Mo, plus de fuite du code source),
@@ -657,19 +698,19 @@ Objectif : « dé-IA-iser » l'interface, identité plus civique, micro-effets.
 > Sécurité critique (escalade privilège / fraude tarifaire) : voir
 > migration `20260519000000_harden_rls.sql` (PR dédiée).
 
-### 🏊 Modèle opérationnel réel — Phase 1 (saison 2026)
+### 🏊 Modèle opérationnel réel : Phase 1 (saison 2026)
 
 Modèle confirmé par la commune le 2026-05-17.
 
 - `supabase/season_2026.sql` : génération des créneaux réels de la saison
   **4 juillet → 30 août 2026** (idempotent, tag `SAISON2026`) :
-  - Semaine : 10h–11h **privé** (cours natation + centres loisir, non
-    public) · 11h–12h **public 1 € pour tous** · 12h–14h / 14h–16h /
-    16h–18h public 5 € · nocéen 2 €.
-  - Week-end : 10h–12h / 12h–14h / 14h–16h / 16h–18h / 18h–20h, tout
+  - Semaine : 10h à 11h **privé** (cours natation + centres loisir, non
+    public) · 11h à 12h **public 1 € pour tous** · 12h à 14h / 14h à 16h /
+    16h à 18h public 5 € · nocéen 2 €.
+  - Week-end : 10h à 12h / 12h à 14h / 14h à 16h / 16h à 18h / 18h à 20h, tout
     public, 5 € · nocéen 2 € (aucun créneau 1 €).
   - Capacité 200 / créneau (provisoire).
-- **Réservation — créneau à tarif unique** : l'option « tarif habitant »
+- **Réservation, créneau à tarif unique** : l'option « tarif habitant »
   (et l'upload du justificatif + l'attestation) n'est désormais proposée
   que si le tarif résident est une **vraie réduction** (`< extérieur`).
   Sur le créneau 1 € pour tous, l'option habitant est masquée (plus de
@@ -702,9 +743,9 @@ Modèle confirmé par la commune le 2026-05-17.
 
 ### Phase 2 (différée, non bloquante)
 - Module d'inscription en ligne aux cours de natation (groupes d'âge
-  6–9 / 10–14, cohortes de 6, alternance 3×/sem sur 2 semaines, nocéens).
+  6 à 9 / 10 à 14, cohortes de 6, alternance 3×/sem sur 2 semaines, nocéens).
 
-## [1.1.4] — 2026-05-17
+## [1.1.4] · 2026-05-17
 
 ### ✨ Tarif habitant / enfant configurable en back-office
 
@@ -722,20 +763,20 @@ Modèle confirmé par la commune le 2026-05-17.
   habitant > 0 (daté J+7) pour valider le formulaire usager
   (upload justificatif + déclaration sur l'honneur).
 
-## [1.1.3] — 2026-05-17
+## [1.1.3] · 2026-05-17
 
 ### 🔒 Correctifs de sécurité
 
-- **Edge Function `scan-qr` — bypass d'autorisation (HIGH)** : l'identité
+- **Edge Function `scan-qr`, bypass d'autorisation (HIGH)** : l'identité
   et le rôle de l'agent sont désormais dérivés du JWT du caller, plus
   jamais du corps de la requête. Échec fermé si non authentifié ou rôle
   insuffisant (avant : `scanned_by` fourni par l'appelant, et contrôle
   ignoré si absent → un usager auto-inscrit pouvait griller un QR et
   obtenir l'URL signée d'un justificatif de domicile / PII).
-- **`scan-qr` — minimisation PII (MEDIUM)** : l'URL signée du justificatif
+- **`scan-qr`, minimisation PII (MEDIUM)** : l'URL signée du justificatif
   n'est générée qu'après autorisation et uniquement pour un accès
   `valid` (plus exposée sur `already_used` / `wrong_slot`).
-- **Seed démo `02_seed_backoffice.sql` — comptes privilégiés (HIGH)** :
+- **Seed démo `02_seed_backoffice.sql`, comptes privilégiés (HIGH)** :
   suppression du mot de passe en dur ; comptes de démo rendus non
   connectables (`banned_until` 2999). La démo back-office se fait avec
   le compte admin réel de l'opérateur. `README.md` mis à jour.
@@ -745,7 +786,7 @@ Modèle confirmé par la commune le 2026-05-17.
 > été appliqué en prod avec l'ancienne version, lancer `99_cleanup_demo.sql`
 > puis re-seeder.
 
-## [1.1.2] — 2026-05-17
+## [1.1.2] · 2026-05-17
 
 ### 🚚 Migration d'hébergement Cloudflare → Netlify
 
@@ -756,7 +797,7 @@ Modèle confirmé par la commune le 2026-05-17.
 - Documentation alignée Netlify : `HANDOFF.md`, `DEPLOY.md`, `README.md`.
 - Cloudflare totalement abandonné (intégration Git déconnectée côté dashboard).
 
-## [1.1.1] — 2026-05-17
+## [1.1.1] · 2026-05-17
 
 ### 🔧 Correction du nom de domaine cible
 
@@ -765,7 +806,7 @@ Modèle confirmé par la commune le 2026-05-17.
 - Identifiants techniques inchangés : repo GitHub `baignade-rivesdaparis`, sous-domaine Cloudflare `…workers.dev`, comptes `baignade-rivesdaparis@tk7.fr`.
 - ⚠️ Actions externes restantes : vérification du domaine `lesrivesdeparis.fr` côté Brevo, et secrets Supabase `APP_URL` / `FROM_EMAIL` à mettre à jour côté serveur.
 
-## [1.1.0] — 2026-05-12
+## [1.1.0] · 2026-05-12
 
 ### ✨ Tarif habitant Neuilly-sur-Marne
 
@@ -782,7 +823,7 @@ Modèle confirmé par la commune le 2026-05-17.
   - Colonne `Justif.` avec lien « Voir » (URL signée 5 min)
   - Export CSV enrichi (type usager, présence justificatif)
 - **Scanner staff** :
-  - Affiche le détail famille (X adulte(s), Y enfant(s)) — le QR code gère déjà les inscriptions multiples via `nb_adults + nb_children`
+  - Affiche le détail famille (X adulte(s), Y enfant(s)), le QR code gère déjà les inscriptions multiples via `nb_adults + nb_children`
   - Badge `Tarif habitant` + lien direct vers le justificatif (URL signée par l'Edge Function)
   - Mention « Justificatif non joint » si manquant
 - **Edge Function `scan-qr`** : génère une URL signée du justificatif côté serveur, retourne `usager_type`, `honor_certification`, `proof_url`
@@ -791,7 +832,7 @@ Modèle confirmé par la commune le 2026-05-17.
 - [ ] Exécuter la migration `20260512000000_resident_proof.sql` (SQL Editor Supabase ou `supabase db push`)
 - [ ] Redéployer l'Edge Function `scan-qr` (`supabase functions deploy scan-qr --project-ref nunglkeqekxzpmushxty`)
 
-## [1.0.2] — 2026-05-11
+## [1.0.2] · 2026-05-11
 
 ### 🚀 Mise en ligne sur Cloudflare Pages
 
@@ -809,7 +850,7 @@ Modèle confirmé par la commune le 2026-05-17.
 - Création compte Stripe par la commune + injection des clés `STRIPE_*`
 - Génération du planning saisonnier des créneaux (juillet-août 2026)
 
-## [1.0.1] — 2026-05-11
+## [1.0.1] · 2026-05-11
 
 ### Adaptation hébergement budget zéro
 - Support Cloudflare Pages : ajout de `public/_redirects` et `public/_headers` (SPA fallback + sécurité)
@@ -817,9 +858,9 @@ Modèle confirmé par la commune le 2026-05-17.
 - Variables d'env ajoutées : `BREVO_API_KEY`, `FROM_EMAIL`, `FROM_NAME`
 - DEPLOY.md réécrit pour le scénario 0 €/mois (Cloudflare Pages + Supabase Free + Brevo Free + Stripe)
 
-## [1.0.0] — 2026-05-11
+## [1.0.0] · 2026-05-11
 
-### 🚀 MVP initial — Prêt pour la mise en production
+### 🚀 MVP initial : Prêt pour la mise en production
 
 #### Public
 - Landing page SEO (Open Graph, Twitter Cards, sitemap.xml, robots.txt)

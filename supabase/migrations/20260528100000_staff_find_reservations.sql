@@ -1,5 +1,5 @@
 -- =====================================================================
--- RPC `staff_find_reservations` — recherche par nom côté /staff
+-- RPC `staff_find_reservations` : recherche par nom côté /staff
 -- =====================================================================
 -- Améliore l'accessibilité du scanner d'accueil (RGAA 7) : un agent non
 -- voyant ou face à un usager sans téléphone peut désormais valider une
@@ -59,8 +59,8 @@ begin
 
   v_today := ((now() at time zone 'Europe/Paris')::date);
   -- Pattern LIKE insensible à la casse (et aux accents si la locale le
-  -- permet ; sinon on accepte de manquer quelques résultats accentués
-  -- — l'agent peut compléter sa recherche).
+  -- permet ; sinon on accepte de manquer quelques résultats accentués,
+  -- l'agent peut compléter sa recherche).
   v_q := '%' || lower(v_q) || '%';
 
   return query
